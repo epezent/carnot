@@ -1,0 +1,86 @@
+{
+	"build_systems":
+	[
+		{
+			"file_regex": "/([^/:]+):(\\d+):(\\d+): ",
+			"name": "CMake (Windows MSVC)",
+			"selector":
+			[
+				"source.cmake"
+			],
+			"shell_cmd": "cmake .. -G \"Visual Studio 15 2017 Win64\"",
+			"working_dir": "$project_path/../build"
+		},
+		{
+			"file_regex": "/([^/:]+):(\\d+):(\\d+): ",
+			"name": "CMake (Windows Ninja)",
+			"selector":
+			[
+				"source.cmake"
+			],
+			"shell_cmd": "cmake .. -G \"Ninja\"",
+			"working_dir": "$project_path/../build"
+		},
+		{
+			"file_regex": "^(..[^:]*)(?::|\\()([0-9]+)(?::|\\))(?:([0-9]+):)?\\s*(.*)",
+			"name": "Ninja (Windows)",
+			"selector":
+			[
+				"source.c++.11"
+			],
+			"shell_cmd": "ninja",
+			"working_dir": "$project_path/../build"
+		},
+		{
+			"file_regex": "^(..[^:]*)(?::|\\()([0-9]+)(?::|\\))(?:([0-9]+):)?\\s*(.*)",
+			"name": "MSVC",
+			"selector":
+			[
+				"source.c++.11"
+			],
+			"shell_cmd": "cmake --build . --config Release",
+			"working_dir": "$project_path/../build"
+		},
+		{
+			"file_regex": "^[ ]*File \"(...*?)\", line ([0-9]*)",
+			"name": "CMake (Clean)",
+			"shell_cmd": "python clean.py",
+			"working_dir": "$project_path/../util"
+		},
+		{
+			"name": "Visual Studio",
+			"shell_cmd": "start SFVG.sln",
+			"working_dir": "$project_path/../build"
+		},
+		{
+			"file_regex": "^[ ]*File \"(...*?)\", line ([0-9]*)",
+			"name": "Anaconda Python Builder",
+			"selector": "source.python",
+			"shell_cmd": "\"python\" -u \"$file\""
+		}
+	],
+	"folders":
+	[
+		{
+			"path": "../"
+		},
+		{
+			"path": "../../SFML/include/SFML"
+		}
+	],
+	"settings":
+	{
+		"ecc_common_flags":
+		[
+			"-I$project_base_path/include",
+			"-I$project_base_path/src",
+			"-I/Git/SFML/include",
+			"-I/Git/Thor/include",
+			"-I/dev/glew-2.1.0/include",
+			"-I/dev/glfw-3.2.1/include"
+		],
+		"ecc_flags_sources":
+		[
+		]
+	}
+}
