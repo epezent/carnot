@@ -7,6 +7,8 @@
 #include <limits>
 #include <SFVG/Detail/earcut.hpp>
 
+#define CLIPPER_PRECISION 10.0f
+
 //==============================================================================
 // HELPER FUNCTIONS
 //==============================================================================
@@ -41,7 +43,7 @@ struct nth<1, sf::Vector2f> {
 } // namespace util
 } // namespace mapbox
 
-#define CLIPPER_PRECISION 10.0f
+namespace sfvg {
 
 ClipperLib::Path sfvgToClipper(const Shape& sfvg) {
     std::vector<sf::Vector2f> shapeVertices = sfvg.getVertices();
@@ -578,3 +580,5 @@ std::vector<Shape> Shape::clipShapes(const Shape &subject, const Shape &clip, Cl
     }
     return clippedShapes;
 }
+
+} // namespace sfvg

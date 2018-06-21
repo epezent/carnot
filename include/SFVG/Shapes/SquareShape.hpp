@@ -3,6 +3,8 @@
 
 #include <SFVG/Shape.hpp>
 
+namespace sfvg {
+
 class SquareShape : public Shape {
 public:
 
@@ -21,5 +23,7 @@ private:
     float m_sideLength;
 
 };
+
+} // namespace sfvg
 
 #endif // SFVG_SQUARESHAPE_HPP

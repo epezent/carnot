@@ -13,16 +13,22 @@
 #include <SFVG/Shapes/PolygonShape.hpp>
 #include <SFVG/ShapeBatch.hpp>
 #include <SFVG/Detail/Detail.hpp>
+#include <SFVG/Fill.hpp>
+
+using namespace sfvg;
+
 
 #define     WINDOW_WIDTH    1000.0f
 #define     WINDOW_HEIGHT   1000.0f
 
 int main()
 {
+    std::cout << sizeof(Fill) << std::endl;
+
     sf::ContextSettings settings;
     settings.antialiasingLevel = 8;
     sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "SFVG", sf::Style::Default, settings);
-    window.setVerticalSyncEnabled(true);
+    // window.setVerticalSyncEnabled(true);
 
     sf::RenderTexture rTexture, hBlurTex, vBlurTex;
     rTexture.create(WINDOW_WIDTH, WINDOW_HEIGHT, settings);
@@ -32,6 +38,9 @@ int main()
     sf::Shader gradient;
     gradient.loadFromFile("../shaders/linear_gradient.frag", sf::Shader::Fragment);
     gradient.setUniform("texture", sf::Shader::CurrentTexture);
+    gradient.setUniform("u_color1", sf::Glsl::Vec4(1,0,0,1));
+    gradient.setUniform("u_color2", sf::Glsl::Vec4(0,1,0,1));
+    gradient.setUniform("u_angle", 45.0f);
 
     sf::Font font;
     font.loadFromFile("../fonts/Roboto-Medium.ttf");
@@ -41,6 +50,7 @@ int main()
     text.setFillColor(sf::Color::Black);
     text.setCharacterSize(30);
     text.setPosition(10, 10);
+
 
     //==========================================================================
 
@@ -53,6 +63,9 @@ int main()
     PolygonShape circle(100, PolygonShape::CircumscribedRadius, 10);
     circle.setFillColor(sf::Color(0,0,0,128));
     circle.setPosition(500, 500);
+
+    Fill bgGradient(sf::Color::White, sf::Color(128,128,128,255), 45.0f);
+    Fill polyGradient(sf::Color::Blue, sf::Color::Green, 0.0f);
 
     //==========================================================================
     FPS fps;
@@ -152,14 +165,8 @@ int main()
 
         // draw to render texture
         rTexture.clear(sf::Color::White);
-        gradient.setUniform("u_color1", sf::Glsl::Vec4(1,1,1,1));
-        gradient.setUniform("u_color2", sf::Glsl::Vec4(0.5,0.5,0.5,1));
-        gradient.setUniform("u_angle", 45.0f);
-        rTexture.draw(background, &gradient);
-        gradient.setUniform("u_color1", sf::Glsl::Vec4(0,1,0,1));
-        gradient.setUniform("u_color2", sf::Glsl::Vec4(0,0,1,1));
-        gradient.setUniform("u_angle", 0.0f);
-        rTexture.draw(poly, &gradient);
+        rTexture.draw(background,bgGradient.getShader());
+        rTexture.draw(poly,polyGradient.getShader());
         rTexture.draw(circle);
         rTexture.display();
         sf::Sprite sprite(rTexture.getTexture());

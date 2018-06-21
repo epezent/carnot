@@ -3,6 +3,8 @@
 
 #include <SFVG/Shape.hpp>
 
+namespace sfvg {
+
 class RectangleShape : public Shape {
 public:
 
@@ -26,5 +28,7 @@ private:
     float m_height;
 
 };
+
+} // namespace sfvg
 
 #endif // SFVG_RECTANGLESHAPE_HPP

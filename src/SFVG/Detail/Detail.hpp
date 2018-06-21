@@ -5,6 +5,8 @@
 #include <cmath>
 #include <vector>
 
+namespace sfvg {
+
 static const float PI = 3.1415927410125732421875f;
 
 /// Computes the area of polygon defined be outer vertices
@@ -81,5 +83,7 @@ inline float magnitude(const sf::Vector2f& V) {
 inline float dot(const sf::Vector2f& a, const sf::Vector2f& b) {
     return a.x * b.x + a.y * b.y;
 }
+
+} // namespace sfvg
 
 #endif  // SFVG_DETAIL_HPP

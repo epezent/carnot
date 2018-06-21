@@ -13,6 +13,8 @@
 #include <SFVG/Shapes/PolygonShape.hpp>
 #include <SFVG/ShapeBatch.hpp>
 
+using namespace sfvg;
+
 #define     WINDOW_WIDTH    1000.0f
 #define     WINDOW_HEIGHT   1000.0f
 

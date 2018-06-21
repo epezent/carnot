@@ -1,6 +1,8 @@
 #include <SFVG/Detail/Detail.hpp>
 #include <algorithm>
 
+namespace sfvg {
+
 float polygonArea(const std::vector<sf::Vector2f> vertices) {
     // float area = 0.0f;
     // for (int p = vertices.size() - 1, q = 0; q < vertices.size(); p = q++) {
@@ -267,3 +269,6 @@ bool triangulate(const std::vector<sf::Vector2f>& vertices,
     // std::reverse(indices_out.begin(), indices_out.end());
     return true;
 }
+
+} // namespace sfvg
+

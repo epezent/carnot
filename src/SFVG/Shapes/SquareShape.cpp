@@ -1,5 +1,7 @@
 #include <SFVG/Shapes/SquareShape.hpp>
 
+namespace sfvg {
+
 SquareShape::SquareShape(float sideLength) :
     Shape(4),
     m_sideLength(sideLength)
@@ -23,3 +25,5 @@ void SquareShape::updateSquareShape() {
     setPoint(2,  halfSideLength,  halfSideLength);
     setPoint(3, -halfSideLength,  halfSideLength);
 }
+
+} // namespace sfvg

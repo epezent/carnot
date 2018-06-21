@@ -13,6 +13,8 @@ struct ImageLoader1 {
 };
 ImageLoader1 loader1;
 
+namespace sfvg {
+
 ShapeBatch::ShapeBatch() :
     m_shapes(0),
     m_vertexArray(0)
@@ -39,3 +41,5 @@ void ShapeBatch::draw(sf::RenderTarget& target, sf::RenderStates states) const {
     }
     target.draw(&m_vertexArray[0], m_vertexArray.size(), sf::Triangles, states);
 }
+
+} // namespace sfvg

@@ -1,5 +1,7 @@
 #include <SFVG/Shapes/RectangleShape.hpp>
 
+namespace sfvg {
+
 RectangleShape::RectangleShape(float width, float height) :
     Shape(4),
     m_width(width),
@@ -35,3 +37,4 @@ void RectangleShape::updateRectangleShape() {
     setPoint(3, -halfWidth,  halfHeight);
 }
 
+} // namespace sfvg

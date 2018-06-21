@@ -3,6 +3,8 @@
 
 #include <SFVG/Shape.hpp>
 
+namespace sfvg {
+
 class PolygonShape : public Shape {
 public:
     enum Parameter { CircumscribedRadius, InscribedRadius, SideLength };
@@ -34,5 +36,7 @@ private:
     std::size_t m_sideCount;
     float m_circumscribedRadius;
 };
+
+} // namespace sfvg
 
 #endif  // SFVG_POLYGONSHAPE_HPP

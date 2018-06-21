@@ -3,6 +3,8 @@
 
 #include <SFVG/Shape.hpp>
 
+namespace sfvg {
+
 class StarShape : public Shape {
 public:
     StarShape(std::size_t starPointCount, float starRadiusA, float starRadiusB);
@@ -28,5 +30,7 @@ private:
     float m_starRadiusA;
     float m_starRadiusB;
 };
+
+} // namespace sfvg
 
 #endif // SFVG_STARSHAPE_HPP

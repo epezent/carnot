@@ -1,6 +1,8 @@
 #include <SFVG/Shapes/PolygonShape.hpp>
 #include <SFVG/Detail/Detail.hpp>
 
+namespace sfvg {
+
 PolygonShape::PolygonShape(std::size_t sideCount, Parameter parameter, float parameterValue) :
     Shape(sideCount),
     m_sideCount(sideCount)
@@ -63,3 +65,5 @@ void PolygonShape::updatePolygonShape() {
                                  std::sin(angle) * m_circumscribedRadius));
     }
 }
+
+} // namespace sfvg

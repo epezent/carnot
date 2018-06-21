@@ -6,6 +6,8 @@
 #include <SFML/Graphics/Vertex.hpp>
 #include <vector>
 
+namespace sfvg {
+
 class ShapeBatch;
 
 /// Encapsulates an advanced vector graphics object
@@ -162,5 +164,7 @@ private:
     bool m_showBoundsBox;
     mutable bool m_needsUpdate;
 };
+
+} // namespace sfvg
 
 #endif  // SFVG_SHAPE_HPP

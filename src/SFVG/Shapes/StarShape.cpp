@@ -1,6 +1,8 @@
 #include <SFVG/Shapes/StarShape.hpp>
 #include <SFVG/Detail/Detail.hpp>
 
+namespace sfvg {
+
 StarShape::StarShape(std::size_t starPointCount, float starRadiusA, float starRadiusB) :
     Shape(starPointCount * 2),
     m_starPointCount(starPointCount),
@@ -49,3 +51,5 @@ void StarShape::updateStarShape() {
         setPoint(2 * i + 1, sf::Vector2f(m_starRadiusB * std::cos(angleB), m_starRadiusB * std::sin(angleB)));
     }
 }
+
+} // namespace sfvg

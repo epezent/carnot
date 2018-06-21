@@ -3,6 +3,8 @@
 
 #include <SFVG/Shape.hpp>
 
+namespace sfvg {
+
 class ShapeBatch : public sf::Drawable {
 public:
     ShapeBatch();
@@ -21,3 +23,5 @@ private:
 };
 
 #endif // SFVG_SHAPEBATCH_HPP
+
+} // namespace sfvg
