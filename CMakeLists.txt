@@ -26,11 +26,15 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
     set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} /MP") # MULTICORE BUILDS
 endif()
 
+# find SFML
+set (CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake/Modules/;${CMAKE_MODULE_PATH}")
+find_package(SFML 2 COMPONENTS audio graphics window system network)
+
 # include directories
 include_directories(
     "include"
     "src"
-    "${SFML_ROOT}/include"
+    ${SFML_INCLUDE_DIR}
 )
 
 # get source files
@@ -38,18 +42,6 @@ file(GLOB SRC_SHAPES
     "${CMAKE_SOURCE_DIR}/include/SFVG/Shapes/*.hpp"
     "${CMAKE_SOURCE_DIR}/src/SFVG/Shapes/*.cpp"
 )
-
-# link libs
-if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-    link_directories("${SFML_ROOT}/lib")
-elseif(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
-    link_directories("${SFML_ROOT}/lib_msvc/Debug")
-endif()
-
-
-# find OpenGL
-find_package(OpenGL REQUIRED)
-include_directories(${OPENGL_INCLUDE_DIR})
 
 # create SFVG library
 add_library(sfvg
@@ -62,10 +54,10 @@ add_library(sfvg
 
 # TESTS
 add_executable(test1 tests/test1.cpp)
-target_link_libraries(test1 sfvg sfml-system sfml-window sfml-graphics ${OPENGL_LIBRARIES})
+target_link_libraries(test1 sfvg ${SFML_LIBRARIES} ${SFML_DEPENDENCIES})
 
 add_executable(test2 tests/test2.cpp)
-target_link_libraries(test2 sfvg sfml-system sfml-window sfml-graphics ${OPENGL_LIBRARIES})
+target_link_libraries(test2 sfvg ${SFML_LIBRARIES} ${SFML_DEPENDENCIES})
 
 add_executable(benchmark tests/benchmark.cpp)
-target_link_libraries(benchmark sfvg sfml-system sfml-window sfml-graphics ${OPENGL_LIBRARIES})
+target_link_libraries(benchmark sfvg ${SFML_LIBRARIES} ${SFML_DEPENDENCIES})
