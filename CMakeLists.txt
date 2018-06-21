@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.7)
 
-set(SFML_ROOT "C:/Git/SFML" CACHE FILEPATH "Absolute path to SFML")
-set(THOR_ROOT "C:/Git/Thor" CACHE FILEPATH "Absolute path to Thor")
+set(SFML_ROOT "/Git/SFML" CACHE FILEPATH "Absolute path to SFML")
 
 # enable C++11
 set(CMAKE_CXX_STANDARD 11)
