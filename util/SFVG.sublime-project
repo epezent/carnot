@@ -3,7 +3,17 @@
 	[
 		{
 			"file_regex": "/([^/:]+):(\\d+):(\\d+): ",
-			"name": "CMake (Windows MSVC)",
+			"name": "CMake",
+			"selector":
+			[
+				"source.cmake"
+			],
+			"shell_cmd": "cmake ..",
+			"working_dir": "$project_path/../build"
+		},
+		{
+			"file_regex": "/([^/:]+):(\\d+):(\\d+): ",
+			"name": "CMake (MSVC)",
 			"selector":
 			[
 				"source.cmake"
@@ -13,7 +23,7 @@
 		},
 		{
 			"file_regex": "/([^/:]+):(\\d+):(\\d+): ",
-			"name": "CMake (Windows Ninja)",
+			"name": "CMake (Ninja)",
 			"selector":
 			[
 				"source.cmake"
@@ -23,12 +33,22 @@
 		},
 		{
 			"file_regex": "^(..[^:]*)(?::|\\()([0-9]+)(?::|\\))(?:([0-9]+):)?\\s*(.*)",
-			"name": "Ninja (Windows)",
+			"name": "Ninja",
 			"selector":
 			[
 				"source.c++.11"
 			],
 			"shell_cmd": "ninja",
+			"working_dir": "$project_path/../build"
+		},
+		{
+			"file_regex": "^(..[^:]*)(?::|\\()([0-9]+)(?::|\\))(?:([0-9]+):)?\\s*(.*)",
+			"name": "Make",
+			"selector":
+			[
+				"source.c++.11"
+			],
+			"shell_cmd": "make",
 			"working_dir": "$project_path/../build"
 		},
 		{
