@@ -17,30 +17,20 @@
 
 using namespace sfvg;
 
-
 #define     WINDOW_WIDTH    1000.0f
 #define     WINDOW_HEIGHT   1000.0f
 
 int main()
 {
-    std::cout << sizeof(Fill) << std::endl;
-
     sf::ContextSettings settings;
     settings.antialiasingLevel = 8;
     sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "SFVG", sf::Style::Default, settings);
-    // window.setVerticalSyncEnabled(true);
+    window.setVerticalSyncEnabled(true);
 
     sf::RenderTexture rTexture, hBlurTex, vBlurTex;
     rTexture.create(WINDOW_WIDTH, WINDOW_HEIGHT, settings);
     hBlurTex.create(WINDOW_WIDTH, WINDOW_HEIGHT, settings);
     vBlurTex.create(WINDOW_WIDTH, WINDOW_HEIGHT, settings);
-
-    sf::Shader gradient;
-    gradient.loadFromFile("../shaders/linear_gradient.frag", sf::Shader::Fragment);
-    gradient.setUniform("texture", sf::Shader::CurrentTexture);
-    gradient.setUniform("u_color1", sf::Glsl::Vec4(1,0,0,1));
-    gradient.setUniform("u_color2", sf::Glsl::Vec4(0,1,0,1));
-    gradient.setUniform("u_angle", 45.0f);
 
     sf::Font font;
     font.loadFromFile("../fonts/Roboto-Medium.ttf");
@@ -51,21 +41,28 @@ int main()
     text.setCharacterSize(30);
     text.setPosition(10, 10);
 
+    sf::Texture texture;
+    texture.loadFromFile("../textures/paper.png");
 
     //==========================================================================
 
+    int N = 6;
+    int offset = -50;
+    float radius = 25;
+    float circumscribedRadius = 200;
+
     SquareShape background(1000.0f);
     background.setPosition(500,500);
+    background.setFill(gradient(sf::Color::White, sf::Color(128,128,128,255), 45.0f));
 
-    PolygonShape poly(6, PolygonShape::CircumscribedRadius, 100);
+    PolygonShape poly(N, PolygonShape::CircumscribedRadius, circumscribedRadius);
     poly.setPosition(500, 500);
+    poly.setFill(gradient(sf::Color::Blue, sf::Color::Green, 45));
+    poly.setTexture(&texture);
 
     PolygonShape circle(100, PolygonShape::CircumscribedRadius, 10);
-    circle.setFillColor(sf::Color(0,0,0,128));
+    circle.setFill(solid(sf::Color(0,0,0,128)));
     circle.setPosition(500, 500);
-
-    Fill bgGradient(sf::Color::White, sf::Color(128,128,128,255), 45.0f);
-    Fill polyGradient(sf::Color::Blue, sf::Color::Green, 0.0f);
 
     //==========================================================================
     FPS fps;
@@ -73,9 +70,7 @@ int main()
 
     sf::Clock deltaClock;
     sf::Clock absClock;
-    int N = 6;
-    int offset = -25;
-    float radius = 10;
+
 
    // Main loop
     while (window.isOpen()) {
@@ -104,15 +99,25 @@ int main()
                poly.setSideCount(N);
             }
             if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Left){
-                offset--;
+                circumscribedRadius--;
+                if (circumscribedRadius < 0.0f)
+                    circumscribedRadius = 0.0f;
+                poly.setCircumscribedRadius(circumscribedRadius);
             }
             if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Right){
+                circumscribedRadius++;
+                poly.setCircumscribedRadius(circumscribedRadius);
+            }
+            if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::A){
+                offset--;
+            }
+            if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::D){
                offset++;
             }
-            if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::LBracket){
+            if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::S){
                 radius--;
             }
-            if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::RBracket){
+            if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::W){
                radius++;
             }
 
@@ -165,17 +170,19 @@ int main()
 
         // draw to render texture
         rTexture.clear(sf::Color::White);
-        rTexture.draw(background,bgGradient.getShader());
-        rTexture.draw(poly,polyGradient.getShader());
+        rTexture.draw(background);
+        rTexture.draw(poly);
         rTexture.draw(circle);
         rTexture.display();
         sf::Sprite sprite(rTexture.getTexture());
 
         std::ostringstream ss;
         ss << "FPS: " << fps.getFPS() << "\n";
-        ss << "N: " << N << "\n";
-        ss << "Offset: " << offset << "\n";
-        ss << "Radius: " << radius;
+        ss << "N: " << N << " [UP,DOWN]\n";
+        ss << "Radius: " << circumscribedRadius << " [LEFT,RIGHT]\n";
+        ss << "Offset: " << offset << " [A,D]\n";
+        ss << "Corner Radius: " << radius << " [S,W]";
+
 
         text.setString(ss.str());
 

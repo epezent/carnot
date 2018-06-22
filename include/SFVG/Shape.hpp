@@ -4,6 +4,7 @@
 #include <SFML/Graphics/Drawable.hpp>
 #include <SFML/Graphics/Transformable.hpp>
 #include <SFML/Graphics/Vertex.hpp>
+#include <SFVG/Fill.hpp>
 #include <vector>
 
 namespace sfvg {
@@ -87,11 +88,11 @@ public:
     /// Adds a new hole and increments to hole count
     void addHole(const Shape& hole);
 
-    /// Sets the solid fill color of the Shape
-    void setFillColor(const sf::Color& color);
+    /// Sets the Fill of the Shape
+    void setFill(const Fill& fill);
 
-    /// Gets the solid fill color of the Shape
-    const sf::Color& getFillColor() const;
+    /// Gets the Fill of the Shape
+    Fill getFill() const;
 
     /// Sets the texture of the Shape
     void setTexture(const sf::Texture* texture, bool resetRect = false);
@@ -144,10 +145,8 @@ private:
     void updateVertexArray() const;
     void updateBounds() const;
     void updateTexCoords() const;
-    void updateFillColors() const;
     void update() const;
     void draw(sf::RenderTarget& target, sf::RenderStates states) const;
-
 
 private:
     std::vector<sf::Vector2f> m_points;
@@ -158,7 +157,7 @@ private:
     mutable std::vector<sf::Vertex> m_vertexArray;
     const sf::Texture* m_texture;
     sf::IntRect m_textureRect;
-    sf::Color m_fillColor;
+    Fill m_fill;
     mutable sf::FloatRect m_bounds;
     bool m_showWireFrame;
     bool m_showBoundsBox;

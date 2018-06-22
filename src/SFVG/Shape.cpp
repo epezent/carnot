@@ -74,7 +74,7 @@ Shape::Shape(std::size_t pointCount) :
     m_vertexArray(sf::Triangles),
     m_texture(NULL),
     m_textureRect(),
-    m_fillColor(255, 255, 255),
+    m_fill(),
     m_showWireFrame(false),
     m_showBoundsBox(false),
     m_needsUpdate(true)
@@ -209,13 +209,12 @@ void Shape::addHole(const Shape &hole) {
     m_needsUpdate = true;
 }
 
-void Shape::setFillColor(const sf::Color& color) {
-    m_fillColor = color;
-    updateFillColors();
+void Shape::setFill(const Fill &fill) {
+    m_fill = fill;
 }
 
-const sf::Color& Shape::getFillColor() const {
-    return m_fillColor;
+Fill Shape::getFill() const {
+    return m_fill;
 }
 
 void Shape::setTexture(const sf::Texture* texture, bool resetRect) {
@@ -432,11 +431,6 @@ void Shape::updateTexCoords() const {
     }
 }
 
-void Shape::updateFillColors() const {
-    for (std::size_t i = 0; i < m_vertexArray.size(); ++i)
-        m_vertexArray[i].color = m_fillColor;
-}
-
 void Shape::update() const {
     // update outer vertices
     updateVertices();
@@ -444,8 +438,6 @@ void Shape::update() const {
     updateVertexArray();
     // update bounds
     updateBounds();
-    // update colors
-    updateFillColors();
     // Texture coordinates
     updateTexCoords();
     // reset update flag
@@ -460,6 +452,7 @@ void Shape::draw(sf::RenderTarget& target, sf::RenderStates states) const {
         states.texture = m_texture;
     else
         states.texture = &whiteTexture;
+    states.shader = m_fill.getShader();
     target.draw(&m_vertexArray[0], m_vertexArray.size(), sf::Triangles, states);
 
     if (m_showBoundsBox) {
