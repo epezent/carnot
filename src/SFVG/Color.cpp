@@ -83,14 +83,22 @@ sf::Color Color::hsv(float h, float s, float v) {
 sf::Color Color::hex(std::string hex) {
     if (hex[0] == '#')
         hex.erase(0,1);
-    sf::Uint8 r, g, b, a;
+    unsigned int r, g, b, a;
     if (hex.length() == 6) {
-        sscanf_s(hex.c_str(), "%02x%02x%02x", &r, &g, &b);
-        return sf::Color(r,g,b);
+        #ifdef _WIN32
+            sscanf_s(hex.c_str(), "%02x%02x%02x", &r, &g, &b);
+        #else
+            sscanf(hex.c_str(), "%02x%02x%02x", &r, &g, &b);
+        #endif
+        return sf::Color(static_cast<sf::Uint8>(r),static_cast<sf::Uint8>(g),static_cast<sf::Uint8>(b));
     }
     else if (hex.length() == 8) {
-        sscanf_s(hex.c_str(), "%02x%02x%02x%02x", &r, &g, &b, &a);
-        return sf::Color(r,g,b,a);
+        #ifdef _WIN32
+            sscanf_s(hex.c_str(), "%02x%02x%02x%02x", &r, &g, &b, &a);
+        #else
+            sscanf(hex.c_str(), "%02x%02x%02x%02x", &r, &g, &b, &a);
+        #endif 
+        return sf::Color(static_cast<sf::Uint8>(r),static_cast<sf::Uint8>(g),static_cast<sf::Uint8>(b),static_cast<sf::Uint8>(a));
     }
     else
         return sf::Color();
