@@ -1,5 +1,5 @@
 #include <SFVG/Shapes/StarShape.hpp>
-#include <SFVG/Detail/Detail.hpp>
+#include <SFVG/Math.hpp>
 
 namespace sfvg {
 

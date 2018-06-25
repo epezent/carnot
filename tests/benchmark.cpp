@@ -25,11 +25,11 @@ int main()
     sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "SFVG", sf::Style::Default, settings);
     // window.setVerticalSyncEnabled(true);
 
-    sf::Shader gradient;
-    gradient.loadFromFile("../shaders/linear_gradient.frag", sf::Shader::Fragment);
-    gradient.setUniform("texture", sf::Shader::CurrentTexture);
-    gradient.setUniform("u_color1", sf::Glsl::Vec4(1,0,0,1));
-    gradient.setUniform("u_color2", sf::Glsl::Vec4(0,0,1,1));
+    sf::Shader shader;
+    shader.loadFromFile("../shaders/linear_gradient.frag", sf::Shader::Fragment);
+    shader.setUniform("texture", sf::Shader::CurrentTexture);
+    shader.setUniform("u_color1", sf::Glsl::Vec4(1,0,0,1));
+    shader.setUniform("u_color2", sf::Glsl::Vec4(0,0,1,1));
 
     sf::Font font;
     font.loadFromFile("../fonts/Roboto-Medium.ttf");
@@ -50,12 +50,11 @@ int main()
         for (std::size_t y = 0; y < 10; ++y) {
             PolygonShape shape(N, PolygonShape::CircumscribedRadius, 50);
             shape.setPosition(x*100 + 50, y*100 + 50);
+            shape.setFill(gradient(sf::Color::Blue, sf::Color::Red, 45));
             shapes.push_back(shape);
         }
         N++;
     }
-
-
 
     //==========================================================================
 
@@ -96,7 +95,6 @@ int main()
 
         window.clear(sf::Color::Black);
 
-
         for (std::size_t i = 0; i < shapes.size(); ++i) {
             shapes[i].rotate(45.0f * dt.asSeconds());
             //shapes[i].setSideCount(N);
@@ -106,7 +104,7 @@ int main()
         }
 
         for (std::size_t i = 0; i < shapes.size(); ++i) {
-            window.draw(shapes[i], &gradient);
+            window.draw(shapes[i]);
         }
 
         text.setString(ss.str());

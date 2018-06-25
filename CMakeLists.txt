@@ -45,10 +45,11 @@ file(GLOB SRC_SHAPES
 
 # create SFVG library
 add_library(sfvg
+    src/SFVG/Math.cpp
     src/SFVG/Shape.cpp
     src/SFVG/ShapeBatch.cpp
     src/SFVG/Fill.cpp
-    src/SFVG/Detail/Detail.cpp
+    src/SFVG/Color.cpp
     src/SFVG/Detail/clipper.cpp
     ${SRC_SHAPES}
 )

@@ -63,7 +63,7 @@ sf::Glsl::Vec4 sfmlToGlsl(const sf::Color& color) {
 Fill::Fill() :
     m_fillType(Fill::Solid),
     m_shader(&g_solidShader),
-    m_colors(),
+    m_colors(10, sf::Color::White),
     m_angle(0.0f)
 {
 }

@@ -12,8 +12,9 @@
 #include <SFVG/Shapes/StarShape.hpp>
 #include <SFVG/Shapes/PolygonShape.hpp>
 #include <SFVG/ShapeBatch.hpp>
-#include <SFVG/Detail/Detail.hpp>
+#include <SFVG/Math.hpp>
 #include <SFVG/Fill.hpp>
+#include <SFVG/Color.hpp>
 
 using namespace sfvg;
 
@@ -22,10 +23,13 @@ using namespace sfvg;
 
 int main()
 {
+    sf::Color c = Color::hex("#F99D8F9B");
+    std::cout << (int)c.r << " " << (int)c.g << " " << (int)c.b << " " << (int)c.a << std::endl;
+
     sf::ContextSettings settings;
     settings.antialiasingLevel = 8;
     sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "SFVG", sf::Style::Default, settings);
-    window.setVerticalSyncEnabled(true);
+    // window.setVerticalSyncEnabled(true);
 
     sf::RenderTexture rTexture, hBlurTex, vBlurTex;
     rTexture.create(WINDOW_WIDTH, WINDOW_HEIGHT, settings);
@@ -37,7 +41,7 @@ int main()
 
     sf::Text text;
     text.setFont(font);
-    text.setFillColor(sf::Color::Black);
+    text.setFillColor(c);
     text.setCharacterSize(30);
     text.setPosition(10, 10);
 
@@ -51,14 +55,16 @@ int main()
     float radius = 25;
     float circumscribedRadius = 200;
 
+
+
     SquareShape background(1000.0f);
     background.setPosition(500,500);
     background.setFill(gradient(sf::Color::White, sf::Color(128,128,128,255), 45.0f));
 
     PolygonShape poly(N, PolygonShape::CircumscribedRadius, circumscribedRadius);
     poly.setPosition(500, 500);
-    poly.setFill(gradient(sf::Color::Blue, sf::Color::Green, 45));
-    poly.setTexture(&texture);
+    poly.setFill(gradient(Greens::Chartreuse, Cyans::Teal, 45));
+    //poly.setTexture(&texture);
 
     PolygonShape circle(100, PolygonShape::CircumscribedRadius, 10);
     circle.setFill(solid(sf::Color(0,0,0,128)));

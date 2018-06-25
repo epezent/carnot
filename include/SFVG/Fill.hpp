@@ -2,7 +2,7 @@
 #define SFVG_FILL_HPP
 
 #include <SFML/Graphics.hpp>
-#include <array>
+#include <vector>
 
 namespace sfvg {
 
@@ -32,7 +32,7 @@ private:
 
     FillType m_fillType;
     sf::Shader* m_shader;
-    std::array<sf::Color, 2> m_colors;
+    std::vector<sf::Color> m_colors;
     float m_angle;
 };
 

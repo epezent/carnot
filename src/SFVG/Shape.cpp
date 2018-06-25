@@ -1,6 +1,6 @@
 #include <SFML/Graphics/RenderTarget.hpp>
 #include <SFVG/Detail/clipper.hpp>
-#include <SFVG/Detail/Detail.hpp>
+#include <SFVG/Math.hpp>
 #include <SFML/Graphics.hpp>
 #include <SFVG/Shape.hpp>
 #include <iostream>
