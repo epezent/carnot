@@ -6,7 +6,6 @@
 
 namespace sfvg {
 
-
 sf::Color Color::cmyk(float c, float m, float y, float k) {
     clamp(c);
     clamp(m);
@@ -91,7 +90,7 @@ sf::Color Color::hex(std::string hex) {
             sscanf_s(hex.c_str(), "%02x%02x%02x%02x", &r, &g, &b, &a);
         #else
             sscanf(hex.c_str(), "%02x%02x%02x%02x", &r, &g, &b, &a);
-        #endif 
+        #endif
         return sf::Color(static_cast<sf::Uint8>(r),static_cast<sf::Uint8>(g),static_cast<sf::Uint8>(b),static_cast<sf::Uint8>(a));
     }
     else
@@ -195,7 +194,8 @@ namespace Greens
     const sf::Color DarkGreen(0,100,0);
 }
 
-namespace Cyans {
+namespace Cyans
+{
     const sf::Color Aqua(0,255,255);
     const sf::Color Cyan(0,255,255);
     const sf::Color LightCyan(224,255,255);
@@ -210,7 +210,8 @@ namespace Cyans {
     const sf::Color Teal(0,128,128);
 }
 
-namespace Blues {
+namespace Blues
+{
     const sf::Color LightSteelBlue(176,196,222);
     const sf::Color PowderBlue(176,224,230);
     const sf::Color LightBlue(173,216,230);
@@ -271,7 +272,8 @@ namespace Whites
     const sf::Color MistyRose(255,228,225);
 }
 
-namespace Grays {
+namespace Grays
+{
     const sf::Color Gainsboro(220,220,220);
     const sf::Color LightGray(211,211,211);
     const sf::Color Silver(192,192,192);

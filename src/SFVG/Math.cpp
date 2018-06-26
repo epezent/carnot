@@ -5,6 +5,8 @@ namespace sfvg {
 const float PI      = 3.1415927410125732421875f;
 const float DEG2RAD = PI / 180.0f;
 const float RAD2DEG = 180.0f / PI;
+const float SQRT2   = std::sqrt(2.0f);
+const float SQRT3   = std::sqrt(3.0f);
 
 std::vector<float> linspace(float a, float b, std::size_t N) {
     std::vector<float> linspace_out(N);

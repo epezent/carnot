@@ -11,6 +11,8 @@ namespace sfvg {
 extern const float PI;
 extern const float DEG2RAD;
 extern const float RAD2DEG;
+extern const float SQRT2;
+extern const float SQRT3;
 
 /// Creates a evenly space array of N values between a and b
 extern std::vector<float> linspace(float a, float b, std::size_t N);
