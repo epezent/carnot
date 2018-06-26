@@ -58,5 +58,8 @@ add_library(sfvg
 add_executable(test1 tests/test1.cpp)
 target_link_libraries(test1 sfvg ${SFML_LIBRARIES} ${SFML_DEPENDENCIES})
 
+add_executable(test2 tests/test2.cpp)
+target_link_libraries(test2 sfvg ${SFML_LIBRARIES} ${SFML_DEPENDENCIES})
+
 add_executable(benchmark tests/benchmark.cpp)
 target_link_libraries(benchmark sfvg ${SFML_LIBRARIES} ${SFML_DEPENDENCIES})

@@ -20,21 +20,35 @@ inline sf::Vector2f intersection(const sf::Vector2f& A1,
     return intersection;
 }
 
-/// Wraps an angle in radians to within 2 pi
 inline float wrapTo2Pi(float angle) {
     if (angle < 0)
         return angle + 2 * PI;
     return angle;
 }
 
-/// Computes the magnitude of a Vector2
 inline float magnitude(const sf::Vector2f& V) {
     return std::sqrt(V.x * V.x + V.y * V.y);
 }
 
-/// Computes the dot product of two Vector2s
 inline float dot(const sf::Vector2f& a, const sf::Vector2f& b) {
     return a.x * b.x + a.y * b.y;
 }
+
+inline void clamp(float& value, float min, float max) {
+    if (value < min)
+        value = min;
+    else if (value > max)
+        value = max;
+}
+
+inline float lerp(float a, float b, float t) {
+    clamp(t, 0.0f, 1.0f);
+    return a + t * (b - a);
+}
+
+inline sf::Vector2f lerp(const sf::Vector2f& a, const sf::Vector2f& b, float t) {
+    return sf::Vector2f(lerp(a.x, b.x, t), lerp(a.y, b.y, t));
+}
+
 
 } // namespace sfvg

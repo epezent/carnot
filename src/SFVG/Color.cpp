@@ -1,17 +1,11 @@
 #include <SFVG/Color.hpp>
+#include <SFVG/Math.hpp>
 #include <cmath>
 #include <cstdio>
 #include <iostream>
 
 namespace sfvg {
 
-// clamp float between 0.0 and 1.0
-void clamp(float& value, float min = 0.0f, float max = 1.0f) {
-    if (value < min)
-        value = min;
-    else if (value > max)
-        value = max;
-}
 
 sf::Color Color::cmyk(float c, float m, float y, float k) {
     clamp(c);
