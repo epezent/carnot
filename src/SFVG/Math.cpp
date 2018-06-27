@@ -3,6 +3,7 @@
 namespace sfvg {
 
 const float PI      = 3.1415927410125732421875f;
+const float HALFPI  = PI * 0.5f;
 const float DEG2RAD = PI / 180.0f;
 const float RAD2DEG = 180.0f / PI;
 const float SQRT2   = std::sqrt(2.0f);

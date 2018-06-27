@@ -41,14 +41,4 @@ inline void clamp(float& value, float min, float max) {
         value = max;
 }
 
-inline float lerp(float a, float b, float t) {
-    clamp(t, 0.0f, 1.0f);
-    return a + t * (b - a);
-}
-
-inline sf::Vector2f lerp(const sf::Vector2f& a, const sf::Vector2f& b, float t) {
-    return sf::Vector2f(lerp(a.x, b.x, t), lerp(a.y, b.y, t));
-}
-
-
 } // namespace sfvg

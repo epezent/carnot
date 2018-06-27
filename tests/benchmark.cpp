@@ -11,7 +11,6 @@
 #include <SFVG/Shapes/RectangleShape.hpp>
 #include <SFVG/Shapes/StarShape.hpp>
 #include <SFVG/Shapes/PolygonShape.hpp>
-#include <SFVG/ShapeBatch.hpp>
 
 using namespace sfvg;
 

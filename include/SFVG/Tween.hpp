@@ -1,89 +1,96 @@
 #ifndef SFVG_TWEEN_HPP
 #define SFVG_TWEEN_HPP
 
+#include <SFVG/Math.hpp>
+
 namespace sfvg {
+
+/// Linearly interoplates between two float values
+template <typename T>
+inline T lerp(T a, T b, float t);
 
 namespace Tween
 {
-    extern float Instant(float a, float b, float t);
-    extern float Linear(float a, float b, float t);
-    extern float Smoothstep(float a, float b, float t);
-    extern float Smootherstep(float a, float b, float t);
-    extern float Smootheststep(float a, float b, float t);
-    extern float CatmullRom(float a, float b, float t, float p0, float p1);
+    template <typename T> inline T Instant(T a, T b, float t);
+    template <typename T> inline T Linear(T a, T b, float t);
+    template <typename T> inline T Smoothstep(T a, T b, float t);
+    template <typename T> inline T Smootherstep(T a, T b, float t);
+    template <typename T> inline T Smootheststep(T a, T b, float t);
 
     namespace Quadratic
     {
-        extern float In(float a, float b, float t);
-        extern float Out(float a, float b, float t);
-        extern float InOut(float a, float b, float t);
+        template <typename T> inline T In(T a, T b, float t);
+        template <typename T> inline T Out(T a, T b, float t);
+        template <typename T> inline T InOut(T a, T b, float t);
     }
 
     namespace Cubic
     {
-        extern float In(float a, float b, float t);
-        extern float Out(float a, float b, float t);
-        extern float InOut(float a, float b, float t);
+        template <typename T> inline T In(T a, T b, float t);
+        template <typename T> inline T Out(T a, T b, float t);
+        template <typename T> inline T InOut(T a, T b, float t);
     }
 
     namespace Quartic
     {
-        extern float In(float a, float b, float t);
-        extern float Out(float a, float b, float t);
-        extern float InOut(float a, float b, float t);
+        template <typename T> inline T In(T a, T b, float t);
+        template <typename T> inline T Out(T a, T b, float t);
+        template <typename T> inline T InOut(T a, T b, float t);
     }
 
     namespace Quintic
     {
-        extern float In(float a, float b, float t);
-        extern float Out(float a, float b, float t);
-        extern float InOut(float a, float b, float t);
+        template <typename T> inline T In(T a, T b, float t);
+        template <typename T> inline T Out(T a, T b, float t);
+        template <typename T> inline T InOut(T a, T b, float t);
     }
 
     namespace Sinusoidal
     {
-        extern float In(float a, float b, float t);
-        extern float Out(float a, float b, float t);
-        extern float InOut(float a, float b, float t);
+        template <typename T> inline T In(T a, T b, float t);
+        template <typename T> inline T Out(T a, T b, float t);
+        template <typename T> inline T InOut(T a, T b, float t);
     }
 
     namespace Exponential
     {
-        extern float In(float a, float b, float t);
-        extern float Out(float a, float b, float t);
-        extern float InOut(float a, float b, float t);
+        template <typename T> inline T In(T a, T b, float t);
+        template <typename T> inline T Out(T a, T b, float t);
+        template <typename T> inline T InOut(T a, T b, float t);
     }
 
     namespace Circular
     {
-        extern float In(float a, float b, float t);
-        extern float Out(float a, float b, float t);
-        extern float InOut(float a, float b, float t);
+        template <typename T> inline T In(T a, T b, float t);
+        template <typename T> inline T Out(T a, T b, float t);
+        template <typename T> inline T InOut(T a, T b, float t);
     }
 
     namespace Elastic
     {
-        extern float In(float a, float b, float t);
-        extern float Out(float a, float b, float t);
-        extern float InOut(float a, float b, float t);
+        template <typename T> inline T In(T a, T b, float t);
+        template <typename T> inline T Out(T a, T b, float t);
+        template <typename T> inline T InOut(T a, T b, float t);
     }
 
     namespace Back
     {
-        extern float In(float a, float b, float t);
-        extern float Out(float a, float b, float t);
-        extern float InOut(float a, float b, float t);
+        template <typename T> inline T In(T a, T b, float t);
+        template <typename T> inline T Out(T a, T b, float t);
+        template <typename T> inline T InOut(T a, T b, float t);
     }
 
     namespace Bounce
     {
-        extern float In(float a, float b, float t);
-        extern float Out(float a, float b, float t);
-        extern float InOut(float a, float b, float t);
+        template <typename T> inline T In(T a, T b, float t);
+        template <typename T> inline T Out(T a, T b, float t);
+        template <typename T> inline T InOut(T a, T b, float t);
     }
 
 } // namespace Tween
 
 } // namespace sfvg
+
+#include <SFVG/Tween.inl>
 
 #endif // SFVG_TWEEN_HPP

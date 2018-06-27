@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.7)
 set(SFML_ROOT "/Git/SFML" CACHE FILEPATH "Absolute path to SFML")
 
 # enable C++11
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 
 # create project
 project(SFVG)
@@ -47,7 +47,6 @@ file(GLOB SRC_SHAPES
 add_library(sfvg
     src/SFVG/Math.cpp
     src/SFVG/Shape.cpp
-    src/SFVG/ShapeBatch.cpp
     src/SFVG/Fill.cpp
     src/SFVG/Color.cpp
     src/SFVG/Detail/clipper.cpp
@@ -61,5 +60,11 @@ target_link_libraries(test1 sfvg ${SFML_LIBRARIES} ${SFML_DEPENDENCIES})
 add_executable(test2 tests/test2.cpp)
 target_link_libraries(test2 sfvg ${SFML_LIBRARIES} ${SFML_DEPENDENCIES})
 
+
+
 add_executable(benchmark tests/benchmark.cpp)
 target_link_libraries(benchmark sfvg ${SFML_LIBRARIES} ${SFML_DEPENDENCIES})
+
+# EXAMPLES
+add_executable(example_tween examples/example_tween.cpp)
+target_link_libraries(example_tween sfvg ${SFML_LIBRARIES} ${SFML_DEPENDENCIES})

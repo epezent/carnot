@@ -1,23 +1,39 @@
 #ifndef SFVG_ANIMATION_HPP
 #define SFVG_ANIMATION_HPP
 
-#include <SFML/System/Time.hpp>
+#include <SFVG/KeyFrame.hpp>
+#include <vector>
 
+namespace sfvg {
+
+template <typename... TProperties>
 class Animation {
 public:
-    Animation(/* args */);
+    Animation(std::size_t count = 0) { setKeyFrameCount(count); }
 
-    void play();
-    void update(sf::Time dt);
-    void stop();
+    // void setSubject(TSubject* subject);
 
-    void setDuration(sf::Time duration);
+    KeyFrame<TProperties...>& getKeyFrame(std::size_t index) {
+        return m_keyFrames[index];
+    }
+
+    KeyFrame<TProperties...>& addKeyFrame() {
+        m_keyFrames.resize(m_keyFrames.size() + 1);
+        return m_keyFrames[m_keyFrames.size() - 1];
+    }
+
+    void setKeyFrameCount(std::size_t count) { m_keyFrames.resize(count); }
+
+    template <typename TSubject>
+    void applyKeyFrame(std::size_t index, TSubject* subject) {
+        m_keyFrames[index].apply(subject);
+    }
 
 private:
 
-    bool m_isPlaying;
-    sf::Time m_duration;
-
+    std::vector<KeyFrame<TProperties...>> m_keyFrames;
 };
 
-#endif // SFVG_ANIMATION_HPP
+}  // namespace sfvg
+
+#endif  // SFVG_ANIMATION_HPP

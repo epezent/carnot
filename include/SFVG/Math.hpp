@@ -9,6 +9,7 @@ namespace sfvg {
 
 // Constants
 extern const float PI;
+extern const float HALFPI;
 extern const float DEG2RAD;
 extern const float RAD2DEG;
 extern const float SQRT2;
@@ -48,12 +49,6 @@ inline float dot(const sf::Vector2f& a, const sf::Vector2f& b);
 
 /// Clamps a value between min and max
 inline void clamp(float& value, float min = 0.0f, float max = 1.0f);
-
-/// Linearly interoplates between two float values
-inline float lerp(float a, float b, float t);
-
-/// Linearly interpolates between to Vector2f values
-inline sf::Vector2f lerp(const sf::Vector2f& a, const sf::Vector2f& b, float t);
 
 }  // namespace sfvg
 

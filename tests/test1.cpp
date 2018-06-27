@@ -11,7 +11,6 @@
 #include <SFVG/Shapes/RectangleShape.hpp>
 #include <SFVG/Shapes/StarShape.hpp>
 #include <SFVG/Shapes/PolygonShape.hpp>
-#include <SFVG/ShapeBatch.hpp>
 #include <SFVG/Math.hpp>
 #include <SFVG/Fill.hpp>
 #include <SFVG/Color.hpp>
