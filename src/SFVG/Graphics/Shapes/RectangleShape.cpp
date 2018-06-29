@@ -1,4 +1,4 @@
-#include <SFVG/Shapes/RectangleShape.hpp>
+#include <SFVG/Graphics/Shapes/RectangleShape.hpp>
 
 namespace sfvg {
 

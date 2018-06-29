@@ -1,11 +1,11 @@
-#include <SFML/Graphics/RenderTarget.hpp>
-#include <SFVG/Detail/clipper.hpp>
-#include <SFVG/Math.hpp>
 #include <SFML/Graphics.hpp>
-#include <SFVG/Shape.hpp>
+#include <SFML/Graphics/RenderTarget.hpp>
+#include <SFVG/Graphics/Detail/clipper.hpp>
+#include <SFVG/Graphics/Detail/earcut.hpp>
+#include <SFVG/Graphics/Shape.hpp>
+#include <SFVG/Math.hpp>
 #include <iostream>
 #include <limits>
-#include <SFVG/Detail/earcut.hpp>
 
 #define CLIPPER_PRECISION 10.0f
 

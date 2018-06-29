@@ -1,19 +1,18 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Window/Mouse.hpp>
 #include <SFML/Window/Keyboard.hpp>
-#include <SFVG/Shape.hpp>
-#include <SFVG/Fps.hpp>
+#include "Fps.hpp"
 #include <iostream>
 #include <cmath>
 #include <sstream>
 #include <limits>
-#include <SFVG/Shapes/SquareShape.hpp>
-#include <SFVG/Shapes/RectangleShape.hpp>
-#include <SFVG/Shapes/StarShape.hpp>
-#include <SFVG/Shapes/PolygonShape.hpp>
+#include <SFVG/Graphics/Shapes/SquareShape.hpp>
+#include <SFVG/Graphics/Shapes/RectangleShape.hpp>
+#include <SFVG/Graphics/Shapes/StarShape.hpp>
+#include <SFVG/Graphics/Shapes/PolygonShape.hpp>
 #include <SFVG/Math.hpp>
-#include <SFVG/Fill.hpp>
-#include <SFVG/Color.hpp>
+#include <SFVG/Graphics/Fill.hpp>
+#include <SFVG/Graphics/Color.hpp>
 
 using namespace sfvg;
 
@@ -22,13 +21,10 @@ using namespace sfvg;
 
 int main()
 {
-    sf::Color c = Color::hex("#F99D8F9B");
-    std::cout << (int)c.r << " " << (int)c.g << " " << (int)c.b << " " << (int)c.a << std::endl;
-
     sf::ContextSettings settings;
     settings.antialiasingLevel = 8;
     sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "SFVG", sf::Style::Default, settings);
-    // window.setVerticalSyncEnabled(true);
+    window.setVerticalSyncEnabled(true);
 
     sf::RenderTexture rTexture, hBlurTex, vBlurTex;
     rTexture.create(WINDOW_WIDTH, WINDOW_HEIGHT, settings);
@@ -40,7 +36,7 @@ int main()
 
     sf::Text text;
     text.setFont(font);
-    text.setFillColor(c);
+    text.setFillColor(sf::Color::Black);
     text.setCharacterSize(30);
     text.setPosition(10, 10);
 

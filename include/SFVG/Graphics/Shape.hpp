@@ -4,7 +4,7 @@
 #include <SFML/Graphics/Drawable.hpp>
 #include <SFML/Graphics/Transformable.hpp>
 #include <SFML/Graphics/Vertex.hpp>
-#include <SFVG/Fill.hpp>
+#include <SFVG/Graphics/Fill.hpp>
 #include <vector>
 
 namespace sfvg {

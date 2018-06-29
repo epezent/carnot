@@ -1,4 +1,4 @@
-#include <SFVG/Shapes/PolygonShape.hpp>
+#include <SFVG/Graphics/Shapes/PolygonShape.hpp>
 #include <SFVG/Math.hpp>
 
 namespace sfvg {

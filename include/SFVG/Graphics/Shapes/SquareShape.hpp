@@ -1,7 +1,7 @@
 #ifndef SFVG_SQUARESHAPE_HPP
 #define SFVG_SQUARESHAPE_HPP
 
-#include <SFVG/Shape.hpp>
+#include <SFVG/Graphics/Shape.hpp>
 
 namespace sfvg {
 

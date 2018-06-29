@@ -1,0 +1,13 @@
+ ☐ make properties take variadic number of args
+ ☐ inverse color functions
+ ☐ outline to Shape
+ ☐ animation relative frames
+ ☐ animation pass frames
+ ☐ animation implicit time 0.0 and 1.0
+ ☐ generalize fill color
+ ☐ delime: Fill is a class, and Fill may be a Property...can these be one thing? extend to Position, Rotation
+ ☐ can Properties be functors? pointers to member functions?
+ ☐ add remaining shapes
+ ☐ clean up Animation headers
+ ☐ bezier curves, svg import (see Github svgpp)
+ ☐ frame "change" function for relative

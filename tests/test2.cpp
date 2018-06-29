@@ -1,43 +1,95 @@
-#include <SFVG/Tween.hpp>
-#include <SFVG/Shape.hpp>
-#include <SFVG/Animation.hpp>
-#include <SFML/Graphics/Sprite.hpp>
+#include <SFVG/Animation/Tween.hpp>
+#include <SFVG/Graphics/Shapes/SquareShape.hpp>
+#include <SFVG/Animation/Animation.hpp>
+#include <SFML/Graphics.hpp>
+#include <SFVG/Graphics/Color.hpp>
 #include <iostream>
 #include <vector>
 #include <tuple>
+#include <functional>
+#include <SFML/Graphics/RectangleShape.hpp>
+#include "FPS.hpp"
 
 using namespace sfvg;
 
-struct Rotate {
-    template <typename TSubject>
-    void apply(TSubject* subject) {
-        subject->rotate(value);
-    }
-    float value;
-};
 
 
-struct Move {
-    template <typename TSubject>
-    void apply(TSubject* subject) {
-        subject->move(value);
-    }
-    sf::Vector2f value;
-};
+void printColor(const sf::Color& color) {
+    std::cout << (int)color.r << ",";
+    std::cout << (int)color.g << ",";
+    std::cout << (int)color.b << ",";
+    std::cout << (int)color.a << std::endl;
+}
 
 int main(int argc, char* argv[]) {
-    Shape shape;
-    Animation<Rotate, Move> anim;
-    anim.addKeyFrame().set<Move>(sf::Vector2f(2.0,2.0)).set<Rotate>(45.0f);
-    anim.addKeyFrame().set<Move>(sf::Vector2f(3.0f, 3.0f));
-    anim.applyKeyFrame(0, &shape);
-    anim.applyKeyFrame(1, &shape);
-    //anim.getKeyFrame(0).apply(&shape);
-    //anim.getKeyFrame(1).apply(&shape);
+
+    sf::ContextSettings settings;
+    settings.antialiasingLevel = 8;
+    sf::RenderWindow window(sf::VideoMode(1000, 1000), "SFVG", sf::Style::Default, settings);
+    //window.setVerticalSyncEnabled(true);
+
+    sf::Font font;
+    font.loadFromFile("../fonts/Roboto-Medium.ttf");
+
+    sf::Text text;
+    text.setFont(font);
+    text.setFillColor(sf::Color::Black);
+    text.setCharacterSize(30);
+    text.setPosition(10, 10);
+
+    FPS fps;
+
+    // ====
 
 
-    std::cout << shape.getPosition().x << " " << shape.getPosition().y << std::endl;
-    std::cout << shape.getRotation() << std::endl;
+    // SquareShape shape(50);
+    // shape.setRadii(5);
+    // shape.setFill(solid(a));
+    sf::RectangleShape shape(sf::Vector2f(50,50));
+    shape.setFillColor(sf::Color::Red);
+    shape.setPosition(250, 250);
+
+    Animation<Position, FillColor, Rotation> anim;
+    anim.keyFrame(0.0f).set<Position>(shape.getPosition())
+                       .set<FillColor>(shape.getFillColor());
+    anim.keyFrame(0.5f).set<Position>(sf::Vector2f(100, 100),    Tween::Smoothstep)
+                       .set<FillColor>(sf::Color::Blue,          Tween::Smoothstep)
+                       .change<Rotation>(45.0f,                  Tween::Smoothstep);
+    anim.keyFrame(1.0f).change<Position>(sf::Vector2f(150, 150), Tween::Smoothstep)
+                       .set<FillColor>(sf::Color::Red,           Tween::Smoothstep)
+                       .change<Rotation>(-45.0f,                 Tween::Smoothstep);
+    anim.setDuration(sf::seconds(1));
+    // ====
+
+    sf::Clock dtClock;
+
+    // Main loop
+    while (window.isOpen()) {
+
+        fps.update();
+
+        sf::Event event;
+
+        sf::Time dt = dtClock.restart();
+
+        while (window.pollEvent(event)) {
+            if (event.type == sf::Event::KeyPressed &&
+                event.key.code == sf::Keyboard::Space)
+                anim.restart();
+
+            if (event.type == sf::Event::Closed ||
+                (event.type == sf::Event::KeyPressed &&
+                event.key.code == sf::Keyboard::Escape))
+                window.close();
+        }
+
+        anim.update(&shape, dt);
+        text.setString("FPS: " + std::to_string(fps.getFPS()));
+        window.clear(sf::Color::White);
+        window.draw(shape);
+        window.draw(text);
+        window.display();
+    }
 
     return 0;
 }
@@ -46,67 +98,3 @@ int main(int argc, char* argv[]) {
 
 
 
-
-
-// struct Property {
-//     virtual void update() { }
-//     void setSubject(void* subject) {
-//         m_subject = subject;
-//     }
-//     void* m_subject;
-// };
-
-// template <typename T>
-// struct Move : public Property {
-//     Move(sf::Vector2f value) : m_value(value) {}
-//     void update() override {
-//         static_cast<T*>(m_subject)->move(m_value);
-//     }
-//     sf::Vector2f m_value;
-// };
-
-// template <typename T>
-// struct Rotate : public Property {
-//     Rotate(float value) : m_value(value) {}
-//     void update() override {
-//         static_cast<T*>(m_subject)->rotate(m_value);
-//     }
-//     float m_value;
-// };
-
-// template <typename T>
-// class KeyFrame {
-// public:
-//     KeyFrame(T* subject) : m_subject(subject) {}
-
-//     void addProperty(Property* property) {
-//         property->setSubject(m_subject);
-//         properties.push_back(property);
-//     }
-
-//     void update() {
-//         for (std::size_t i = 0; i < properties.size(); ++i) {
-//             properties[i]->update();
-//         }
-//     }
-
-// private:
-//     T* m_subject;
-//     std::vector<Property*> properties;
-// };
-
-// int main(int argc, char* argv[]) {
-
-//     sf::Sprite shape;
-
-//     KeyFrame<sf::Sprite> key(&shape);
-//     key.addProperty(new Move<sf::Sprite>(sf::Vector2f(2.0,2.0)));
-//     key.addProperty(new Rotate<sf::Sprite>(45.0f));
-
-//     key.update();
-
-//     std::cout << shape.getPosition().x << " " << shape.getPosition().y << std::endl;
-//     std::cout << shape.getRotation() << std::endl;
-
-//     return 0;
-// }

@@ -1,4 +1,4 @@
-#include <SFVG/Shapes/StarShape.hpp>
+#include <SFVG/Graphics/Shapes/StarShape.hpp>
 #include <SFVG/Math.hpp>
 
 namespace sfvg {

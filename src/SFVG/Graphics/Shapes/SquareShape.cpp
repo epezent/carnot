@@ -1,4 +1,4 @@
-#include <SFVG/Shapes/SquareShape.hpp>
+#include <SFVG/Graphics/Shapes/SquareShape.hpp>
 
 namespace sfvg {
 

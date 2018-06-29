@@ -1,7 +1,7 @@
 #include <SFML/Graphics.hpp>
-#include <SFVG/Shapes/PolygonShape.hpp>
-#include <SFVG/Tween.hpp>
-#include <SFVG/Color.hpp>
+#include <SFVG/Graphics/Shapes/PolygonShape.hpp>
+#include <SFVG/Animation/Tween.hpp>
+#include <SFVG/Graphics/Color.hpp>
 
 using namespace sfvg;
 

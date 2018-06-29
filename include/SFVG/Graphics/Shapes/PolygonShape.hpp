@@ -1,7 +1,7 @@
 #ifndef SFVG_POLYGONSHAPE_HPP
 #define SFVG_POLYGONSHAPE_HPP
 
-#include <SFVG/Shape.hpp>
+#include <SFVG/Graphics/Shape.hpp>
 
 namespace sfvg {
 

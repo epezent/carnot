@@ -39,17 +39,17 @@ include_directories(
 
 # get source files
 file(GLOB SRC_SHAPES
-    "${CMAKE_SOURCE_DIR}/include/SFVG/Shapes/*.hpp"
-    "${CMAKE_SOURCE_DIR}/src/SFVG/Shapes/*.cpp"
+    "${CMAKE_SOURCE_DIR}/include/SFVG/Graphics/Shapes/*.hpp"
+    "${CMAKE_SOURCE_DIR}/src/SFVG//Graphics/Shapes/*.cpp"
 )
 
 # create SFVG library
 add_library(sfvg
     src/SFVG/Math.cpp
-    src/SFVG/Shape.cpp
-    src/SFVG/Fill.cpp
-    src/SFVG/Color.cpp
-    src/SFVG/Detail/clipper.cpp
+    src/SFVG/Graphics//Shape.cpp
+    src/SFVG/Graphics/Fill.cpp
+    src/SFVG/Graphics/Color.cpp
+    src/SFVG/Graphics/Detail/clipper.cpp
     ${SRC_SHAPES}
 )
 

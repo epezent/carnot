@@ -1,16 +1,16 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Window/Mouse.hpp>
 #include <SFML/Window/Keyboard.hpp>
-#include <SFVG/Shape.hpp>
-#include <SFVG/Fps.hpp>
+#include <SFVG/Graphics/Shape.hpp>
+#include "Fps.hpp"
 #include <iostream>
 #include <cmath>
 #include <sstream>
 #include <limits>
-#include <SFVG/Shapes/SquareShape.hpp>
-#include <SFVG/Shapes/RectangleShape.hpp>
-#include <SFVG/Shapes/StarShape.hpp>
-#include <SFVG/Shapes/PolygonShape.hpp>
+#include <SFVG/Graphics/Shapes/SquareShape.hpp>
+#include <SFVG/Graphics/Shapes/RectangleShape.hpp>
+#include <SFVG/Graphics/Shapes/StarShape.hpp>
+#include <SFVG/Graphics/Shapes/PolygonShape.hpp>
 
 using namespace sfvg;
 

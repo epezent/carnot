@@ -1,7 +1,7 @@
 #ifndef SFVG_RECTANGLESHAPE_HPP
 #define SFVG_RECTANGLESHAPE_HPP
 
-#include <SFVG/Shape.hpp>
+#include <SFVG/Graphics/Shape.hpp>
 
 namespace sfvg {
 
