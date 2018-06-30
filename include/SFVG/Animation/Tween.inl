@@ -1,6 +1,17 @@
+#include <SFVG/Math.hpp>
 #include <SFML/Graphics/Color.hpp>
+#include <SFVG/Graphics/Gradient.hpp>
 
-#define TWEEN_SFML_COLOR(FUNC)                                               \
+//==============================================================================
+// MACROS
+//==============================================================================
+
+// While SFML suffciently overloads sf::olor math operations for SFVG Tweens
+// it clamps values over 255, which results in inproper interpolation behavior.
+// Therefore this macro is used to individually Tween each RGBA component of
+// a sf::Color. It is also used to Tween sfvg::Gradient.
+
+#define TWEEN_COLOR_TYPES(FUNC)                                              \
     template <>                                                              \
     inline sf::Color FUNC(const sf::Color& a, const sf::Color& b, float t) { \
         return sf::Color(                                                    \
@@ -12,15 +23,16 @@
                 FUNC(static_cast<float>(a.b), static_cast<float>(b.b), t)),  \
             static_cast<sf::Uint8>(                                          \
                 FUNC(static_cast<float>(a.a), static_cast<float>(b.a), t))); \
+    }                                                                        \
+                                                                             \
+    template <>                                                              \
+    inline Gradient FUNC(const Gradient& a, const Gradient& b, float t) {    \
+        return Gradient(FUNC(a.colors[0], b.colors[0], t),                   \
+                        FUNC(a.colors[1], b.colors[1], t),                   \
+                        FUNC(a.angle, b.angle, t));                          \
     }
 
 namespace sfvg {
-
-template <typename T>
-inline T lerp(const T& a, const T& b, float t) {
-    clamp(t, 0.0f, 1.0f);
-    return a + t * (b - a);
-}
 
 namespace Tween {
 
@@ -40,7 +52,7 @@ inline T Linear(const T& a, const T& b, float t) {
     return a + (b - a) * t;
 }
 
-TWEEN_SFML_COLOR(Linear);
+TWEEN_COLOR_TYPES(Linear);
 
 template <typename T>
 inline T Smoothstep(const T& a, const T& b, float t) {
@@ -48,7 +60,7 @@ inline T Smoothstep(const T& a, const T& b, float t) {
     return a + (b - a) * t;
 }
 
-TWEEN_SFML_COLOR(Smoothstep);
+TWEEN_COLOR_TYPES(Smoothstep);
 
 template <typename T>
 inline T Smootherstep(const T& a, const T& b, float t) {
@@ -56,7 +68,7 @@ inline T Smootherstep(const T& a, const T& b, float t) {
     return a + (b - a) * t;
 }
 
-TWEEN_SFML_COLOR(Smootherstep);
+TWEEN_COLOR_TYPES(Smootherstep);
 
 template <typename T>
 inline T Smootheststep(const T& a, const T& b, float t) {
@@ -64,7 +76,7 @@ inline T Smootheststep(const T& a, const T& b, float t) {
     return a + (b - a) * t;
 }
 
-TWEEN_SFML_COLOR(Smootheststep);
+TWEEN_COLOR_TYPES(Smootheststep);
 
 namespace Quadratic {
 template <typename T>
@@ -86,9 +98,9 @@ inline T InOut(const T& a, const T& b, float t) {
     return a - (b - a) * 0.5f * (t * (t - 2.0f) - 1.0f);
 }
 
-TWEEN_SFML_COLOR(In);
-TWEEN_SFML_COLOR(Out);
-TWEEN_SFML_COLOR(InOut);
+TWEEN_COLOR_TYPES(In);
+TWEEN_COLOR_TYPES(Out);
+TWEEN_COLOR_TYPES(InOut);
 
 };  // namespace Quadratic
 
@@ -113,9 +125,9 @@ inline T InOut(const T& a, const T& b, float t) {
     return a + (b - a) * 0.5f * (t * t * t + 2.0f);
 }
 
-TWEEN_SFML_COLOR(In);
-TWEEN_SFML_COLOR(Out);
-TWEEN_SFML_COLOR(InOut);
+TWEEN_COLOR_TYPES(In);
+TWEEN_COLOR_TYPES(Out);
+TWEEN_COLOR_TYPES(InOut);
 
 };  // namespace Cubic
 
@@ -140,9 +152,9 @@ inline T InOut(const T& a, const T& b, float t) {
     return a - (b - a) * 0.5f * (t * t * t * t - 2.0f);
 }
 
-TWEEN_SFML_COLOR(In);
-TWEEN_SFML_COLOR(Out);
-TWEEN_SFML_COLOR(InOut);
+TWEEN_COLOR_TYPES(In);
+TWEEN_COLOR_TYPES(Out);
+TWEEN_COLOR_TYPES(InOut);
 
 };  // namespace Quartic
 
@@ -167,9 +179,9 @@ inline T InOut(const T& a, const T& b, float t) {
     return a + (b - a) * 0.5f * (t * t * t * t * t + 2.0f);
 }
 
-TWEEN_SFML_COLOR(In);
-TWEEN_SFML_COLOR(Out);
-TWEEN_SFML_COLOR(InOut);
+TWEEN_COLOR_TYPES(In);
+TWEEN_COLOR_TYPES(Out);
+TWEEN_COLOR_TYPES(InOut);
 
 };  // namespace Quintic
 
@@ -189,9 +201,9 @@ inline T InOut(const T& a, const T& b, float t) {
     return a - (b - a) * 0.5f * (std::cos(sfvg::PI * t) - 1.0f);
 }
 
-TWEEN_SFML_COLOR(In);
-TWEEN_SFML_COLOR(Out);
-TWEEN_SFML_COLOR(InOut);
+TWEEN_COLOR_TYPES(In);
+TWEEN_COLOR_TYPES(Out);
+TWEEN_COLOR_TYPES(InOut);
 
 };  // namespace Sinusoidal
 
@@ -215,9 +227,9 @@ inline T InOut(const T& a, const T& b, float t) {
     return a + (b - a) * 0.5f * (-std::pow(2.0f, -10.0f * t) + 2.0f);
 }
 
-TWEEN_SFML_COLOR(In);
-TWEEN_SFML_COLOR(Out);
-TWEEN_SFML_COLOR(InOut);
+TWEEN_COLOR_TYPES(In);
+TWEEN_COLOR_TYPES(Out);
+TWEEN_COLOR_TYPES(InOut);
 
 };  // namespace Exponential
 
@@ -242,9 +254,9 @@ inline T InOut(const T& a, const T& b, float t) {
     return a + (b - a) * 0.5f * (std::sqrt(1.0f - t * t) + 1.0f);
 }
 
-TWEEN_SFML_COLOR(In);
-TWEEN_SFML_COLOR(Out);
-TWEEN_SFML_COLOR(InOut);
+TWEEN_COLOR_TYPES(In);
+TWEEN_COLOR_TYPES(Out);
+TWEEN_COLOR_TYPES(InOut);
 
 };  // namespace Circular
 
@@ -289,9 +301,9 @@ inline T InOut(const T& a, const T& b, float t) {
                     1.0f);
 }
 
-TWEEN_SFML_COLOR(In);
-TWEEN_SFML_COLOR(Out);
-TWEEN_SFML_COLOR(InOut);
+TWEEN_COLOR_TYPES(In);
+TWEEN_COLOR_TYPES(Out);
+TWEEN_COLOR_TYPES(InOut);
 
 };  // namespace Elastic
 
@@ -319,9 +331,9 @@ inline T InOut(const T& a, const T& b, float t) {
     return a + (b - a) * (0.5f * (t * t * ((s2 + 1.0f) * t + s2) + 2.0f));
 }
 
-TWEEN_SFML_COLOR(In);
-TWEEN_SFML_COLOR(Out);
-TWEEN_SFML_COLOR(InOut);
+TWEEN_COLOR_TYPES(In);
+TWEEN_COLOR_TYPES(Out);
+TWEEN_COLOR_TYPES(InOut);
 
 };  // namespace Back
 
@@ -369,9 +381,9 @@ inline T InOut(const T& a, const T& b, float t) {
     return a + (b - a) * detail::InOut(t);
 }
 
-TWEEN_SFML_COLOR(In);
-TWEEN_SFML_COLOR(Out);
-TWEEN_SFML_COLOR(InOut);
+TWEEN_COLOR_TYPES(In);
+TWEEN_COLOR_TYPES(Out);
+TWEEN_COLOR_TYPES(InOut);
 
 };  // namespace Bounce
 

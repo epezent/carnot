@@ -47,7 +47,7 @@ file(GLOB SRC_SHAPES
 add_library(sfvg
     src/SFVG/Math.cpp
     src/SFVG/Graphics//Shape.cpp
-    src/SFVG/Graphics/Fill.cpp
+    src/SFVG/Graphics/Gradient.cpp
     src/SFVG/Graphics/Color.cpp
     src/SFVG/Graphics/Detail/clipper.cpp
     ${SRC_SHAPES}

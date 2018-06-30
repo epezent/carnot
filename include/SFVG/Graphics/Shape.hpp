@@ -4,12 +4,10 @@
 #include <SFML/Graphics/Drawable.hpp>
 #include <SFML/Graphics/Transformable.hpp>
 #include <SFML/Graphics/Vertex.hpp>
-#include <SFVG/Graphics/Fill.hpp>
+#include <SFVG/Graphics/Gradient.hpp>
 #include <vector>
 
 namespace sfvg {
-
-class ShapeBatch;
 
 /// Encapsulates an advanced vector graphics object
 class Shape : public sf::Drawable, public sf::Transformable {
@@ -88,11 +86,17 @@ public:
     /// Adds a new hole and increments to hole count
     void addHole(const Shape& hole);
 
-    /// Sets the Fill of the Shape
-    void setFill(const Fill& fill);
+    /// Sets the fill of a shape to a solid Color
+    void setFillColor(const sf::Color& color);
 
-    /// Gets the Fill of the Shape
-    Fill getFill() const;
+    /// Gets the fill Color of a shape
+    const sf::Color& getFillColor() const;
+
+    /// Sets the fill Gradient of the Shape
+    void setFillGradient(const Gradient& gradient);
+
+    /// Gets the fill Gradient of the Shape
+    Gradient getFillGradient() const;
 
     /// Sets the texture of the Shape
     void setTexture(const sf::Texture* texture, bool resetRect = false);
@@ -135,16 +139,16 @@ public:
         Exclusion     ///< region where either subject or clip is filled, but not where both are filled
     };
 
-    static Shape offsetShape(const Shape& shape, float offset, OffsetType type);
+    static Shape offsetShape(const Shape& shape, float offset, OffsetType type = Round);
     static std::vector<Shape> clipShapes(const Shape& subject, const Shape& clip, ClipType type);
 
 private:
-    friend class ShapeBatch;
 
     void updateVertices() const;
     void updateVertexArray() const;
     void updateBounds() const;
     void updateTexCoords() const;
+    void updateFillColors() const;
     void update() const;
     void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 
@@ -157,7 +161,9 @@ private:
     mutable std::vector<sf::Vertex> m_vertexArray;
     const sf::Texture* m_texture;
     sf::IntRect m_textureRect;
-    Fill m_fill;
+    sf::Color m_fillColor;
+    Gradient m_fillGradient;
+    bool m_hasSolidFill;
     mutable sf::FloatRect m_bounds;
     bool m_showWireFrame;
     bool m_showBoundsBox;

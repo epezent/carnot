@@ -49,7 +49,7 @@ int main()
         for (std::size_t y = 0; y < 10; ++y) {
             PolygonShape shape(N, PolygonShape::CircumscribedRadius, 50);
             shape.setPosition(x*100 + 50, y*100 + 50);
-            shape.setFill(gradient(sf::Color::Blue, sf::Color::Red, 45));
+            shape.setFillGradient(Gradient(sf::Color::Blue, sf::Color::Red, 45));
             shapes.push_back(shape);
         }
         N++;

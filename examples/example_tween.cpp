@@ -26,8 +26,7 @@ int main() {
 
     PolygonShape poly(6, PolygonShape::CircumscribedRadius, 50.0f);
     poly.setPosition(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);
-    poly.setFill(gradient(Color::hex("#0094FFFF"), Color::hex("#00137FFF"), 45.0f));
-
+    poly.setFillGradient(Gradient(Color::hex("#0094FFFF"), Color::hex("#00137FFF"), 45.0f));
     sf::Clock moveClock;
     sf::Vector2f moveFrom = poly.getPosition();
     sf::Vector2f moveTo   = poly.getPosition();

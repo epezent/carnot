@@ -11,7 +11,6 @@
 #include <SFVG/Graphics/Shapes/StarShape.hpp>
 #include <SFVG/Graphics/Shapes/PolygonShape.hpp>
 #include <SFVG/Math.hpp>
-#include <SFVG/Graphics/Fill.hpp>
 #include <SFVG/Graphics/Color.hpp>
 
 using namespace sfvg;
@@ -54,15 +53,15 @@ int main()
 
     SquareShape background(1000.0f);
     background.setPosition(500,500);
-    background.setFill(gradient(sf::Color::White, sf::Color(128,128,128,255), 45.0f));
+    background.setFillGradient(Gradient(sf::Color::White, sf::Color(128,128,128,255), 45.0f));
 
     PolygonShape poly(N, PolygonShape::CircumscribedRadius, circumscribedRadius);
     poly.setPosition(500, 500);
-    poly.setFill(gradient(Greens::Chartreuse, Cyans::Teal, 45));
+    poly.setFillGradient(Gradient(Greens::Chartreuse, Cyans::Teal, 45));
     //poly.setTexture(&texture);
 
     PolygonShape circle(100, PolygonShape::CircumscribedRadius, 10);
-    circle.setFill(solid(sf::Color(0,0,0,128)));
+    circle.setFillColor(sf::Color(0,0,0,128));
     circle.setPosition(500, 500);
 
     //==========================================================================

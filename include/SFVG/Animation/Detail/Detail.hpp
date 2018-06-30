@@ -2,7 +2,6 @@
 #define SFVG_ANIMATION_DETAIL_HPP
 
 #include <tuple>
-#include <iostream>
 
 namespace sfvg {
 
@@ -37,29 +36,6 @@ namespace sfvg {
     void for_each_in_tuple3(std::tuple<Ts...>& t1, std::tuple<Ts...>& t2, std::tuple<Ts...>& t3, F f) {
         for_each3(t1, t2, t3, f, gen_seq<sizeof...(Ts)>());
     }
-
-    template <typename Subject>
-    struct set_functor {
-        set_functor(Subject* subject) : m_subject(subject) {}
-        template <typename T>
-        void operator()(T&& t) {
-            t.set(m_subject);
-        }
-        Subject* m_subject;
-    };
-
-    struct tween_functor {
-        tween_functor(float t) : m_t(t) {}
-        template <typename T>
-        void operator()(T&& a, T&& b, T&& out) {
-            if ((int)b.mode == 0) // Absolute
-                b.absValue = b.value;
-            else if ((int)b.mode == 1) // Relative
-                b.absValue = a.absValue + b.value;
-            out.value = b.func(a.absValue, b.absValue, m_t);
-        }
-        float m_t;
-    };
 
     }  // namespace detail
 

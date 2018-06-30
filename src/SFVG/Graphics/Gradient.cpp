@@ -1,4 +1,4 @@
-#include <SFVG/Graphics/Fill.hpp>
+#include <SFVG/Graphics/Gradient.hpp>
 #include <string>
 #include <iostream>
 
@@ -60,46 +60,86 @@ sf::Glsl::Vec4 sfmlToGlsl(const sf::Color& color) {
 // PUBLIC FUNCTIONS
 //==============================================================================
 
-Fill::Fill() :
-    m_fillType(Fill::Solid),
-    m_shader(&g_solidShader),
-    m_colors(10, sf::Color::White),
-    m_angle(0.0f)
-{
-}
+Gradient::Gradient() :
+    type(Gradient::Linear),
+    colors({sf::Color::Black, sf::Color::Black}),
+    angle(0.0f),
+    m_shader(&g_gradientShader)
+{ }
 
-Fill solid(sf::Color color) {
-    Fill fill;
-    fill.m_colors[0] = color;
-    return fill;
-}
-
-Fill gradient(sf::Color color1, sf::Color color2, float angle) {
-    Fill fill;
-    fill.m_fillType = Fill::LinearGradient;
-    fill.m_shader = &g_gradientShader;
-    fill.m_colors[0] = color1;
-    fill.m_colors[1] = color2;
-    fill.m_angle = angle;
-    return fill;
-}
+Gradient::Gradient(const sf::Color& color1, const sf::Color& color2, float angle_) :
+    type(Gradient::Linear),
+    colors({color1, color2}),
+    angle(angle_),
+    m_shader(&g_gradientShader)
+{ }
 
 //==============================================================================
 // PRIVATE FUNCTIONS
 //==============================================================================
 
-sf::Shader* Fill::getShader() const {
-    switch(m_fillType) {
-        case Solid:
-            m_shader->setUniform("u_color", sfmlToGlsl(m_colors[0]));
-            break;
-        case LinearGradient:
-            m_shader->setUniform("u_color1", sfmlToGlsl(m_colors[0]));
-            m_shader->setUniform("u_color2", sfmlToGlsl(m_colors[1]));
-            m_shader->setUniform("u_angle", m_angle);
+sf::Shader* Gradient::getShader() const {
+    switch(type) {
+        case Linear:
+            m_shader->setUniform("u_color1", sfmlToGlsl(colors[0]));
+            m_shader->setUniform("u_color2", sfmlToGlsl(colors[1]));
+            m_shader->setUniform("u_angle", angle);
             break;
     }
     return m_shader;
 }
+
+bool operator==(const Gradient& left, const Gradient& right) {
+    return (left.type == right.type &&
+            left.colors == right.colors &&
+            left.angle == right.angle);
+}
+
+bool operator !=(const Gradient& left, const Gradient& right) {
+    return !(left == right);
+}
+
+Gradient operator +(const Gradient& left, const Gradient& right) {
+    Gradient gradient;
+    gradient.type = left.type;
+    for (std::size_t i = 0; i < 2; ++i) {
+        gradient.colors[i] = left.colors[i] + right.colors[i];
+    }
+    gradient.angle = left.angle + right.angle;
+    return gradient;
+}
+
+Gradient operator -(const Gradient& left, const Gradient& right) {
+    Gradient gradient;
+    gradient.type = left.type;
+    for (std::size_t i = 0; i < 2; ++i) {
+        gradient.colors[i] = left.colors[i] - right.colors[i];
+    }
+    gradient.angle = left.angle - right.angle;
+    return gradient;
+}
+
+Gradient operator *(const Gradient& left, const Gradient& right) {
+    Gradient gradient;
+    gradient.type = left.type;
+    for (std::size_t i = 0; i < 2; ++i) {
+        gradient.colors[i] = left.colors[i] * right.colors[i];
+    }
+    gradient.angle = left.angle * right.angle;
+    return gradient;
+}
+
+Gradient& operator +=(Gradient& left, const Gradient& right) {
+    return left = left + right;
+}
+
+Gradient& operator -=(Gradient& left, const Gradient& right) {
+    return left = left - right;
+}
+
+Gradient& operator *=(Gradient& left, const Gradient& right) {
+    return left = left * right;
+}
+
 
 } // namespace sfvg

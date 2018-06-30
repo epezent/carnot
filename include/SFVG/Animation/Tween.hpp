@@ -1,13 +1,7 @@
 #ifndef SFVG_TWEEN_HPP
 #define SFVG_TWEEN_HPP
 
-#include <SFVG/Math.hpp>
-
 namespace sfvg {
-
-/// Linearly interoplates between two float values
-template <typename T>
-inline T lerp(const T& a, const T& b, float t);
 
 namespace Tween
 {
