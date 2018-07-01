@@ -74,3 +74,6 @@ target_link_libraries(benchmark sfvg ${SFML_LIBRARIES} ${SFML_DEPENDENCIES})
 # EXAMPLES
 add_executable(example_tween examples/example_tween.cpp)
 target_link_libraries(example_tween sfvg ${SFML_LIBRARIES} ${SFML_DEPENDENCIES})
+
+add_executable(example_shapes examples/example_shapes.cpp)
+target_link_libraries(example_shapes sfvg ${SFML_LIBRARIES} ${SFML_DEPENDENCIES})

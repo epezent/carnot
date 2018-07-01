@@ -1,10 +1,8 @@
-#include <SFVG/Animation/Tween.hpp>
-#include <SFVG/Graphics/Shapes/StarShape.hpp>
-#include <SFVG/Graphics/Shapes/SquareShape.hpp>
-#include <SFVG/Graphics/Shapes/PolygonShape.hpp>
-#include <SFVG/Animation/Animation.hpp>
+
 #include <SFML/Graphics.hpp>
-#include <SFVG/Graphics/Color.hpp>
+#include <SFVG/Graphics.hpp>
+#include <SFVG/Animation.hpp>
+
 #include <iostream>
 #include <vector>
 #include <tuple>
@@ -42,6 +40,9 @@ int main(int argc, char* argv[]) {
     text.setCharacterSize(20);
     text.setPosition(5, 5);
 
+    sf::Texture texture;
+    texture.create(1000, 1000);
+
     FPS fps;
 
     // ====
@@ -78,7 +79,6 @@ int main(int argc, char* argv[]) {
                         .absolute<PScale>(sf::Vector2f(1.0f,1.0f))
                         .setFrom<PFillGradient>(&shape).tween = Tween::Smootheststep;
     anim.setDuration(sf::seconds(4));
-    anim.setLoop(true);
 
     // Animation<pPoints, PRotation> anim;
     // anim.keyFrame(0).setFrom(&shape);
@@ -87,6 +87,8 @@ int main(int argc, char* argv[]) {
 
 
     // ====
+
+    int frameCount = 0;
 
     sf::Clock dtClock;
 
@@ -120,6 +122,11 @@ int main(int argc, char* argv[]) {
                 anim.stop();
             }
 
+            if (event.type == sf::Event::KeyPressed)
+                sf::Clipboard::setString("This is a test");
+
+
+
             if (event.type == sf::Event::Closed ||
                 (event.type == sf::Event::KeyPressed &&
                 event.key.code == sf::Keyboard::Escape))
@@ -127,14 +134,18 @@ int main(int argc, char* argv[]) {
         }
 
         if (anim.isPlaying()) {
-            anim.update(dt);
+            anim.update(sf::seconds(0.04f));
             anim.applyTo(&shape);
+            texture.update(window);
+            sf::Image img = texture.copyToImage();
+            img.saveToFile("frames/frame_" + std::to_string(frameCount) + ".png");
+            frameCount++;
         }
 
         text.setString("FPS: " + std::to_string(fps.getFPS()));
-        window.clear(Grays::Black);
+        window.clear(Whites::White);
         window.draw(shape);
-        window.draw(text);
+        //window.draw(text);
         window.display();
     }
 

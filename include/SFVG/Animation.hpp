@@ -31,6 +31,7 @@ public:
     /// Creates and returns a tween frame at a normalized time t.
     Frame<Ps...> getTweenedFrame(float t);
 
+    /// Sets whether the animation should loop
     void setLoop(bool loop);
 
     /// Starts or resumes an animation.
