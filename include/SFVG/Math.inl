@@ -34,11 +34,13 @@ inline float dot(const sf::Vector2f& a, const sf::Vector2f& b) {
     return a.x * b.x + a.y * b.y;
 }
 
-inline void clamp(float& value, float min, float max) {
-    if (value < min)
-        value = min;
-    else if (value > max)
-        value = max;
+inline float clamp(float& value, float min, float max) {
+    return value <= min ? min : value >= max ? max : value;
 }
+
+inline float clamp01(float value) {
+    return value <= 0.0f ? 0.0f : value >= 1.0f ? 1.0f : value;
+}
+
 
 } // namespace sfvg

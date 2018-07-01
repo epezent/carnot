@@ -4,6 +4,7 @@
 #include <SFML/Graphics/Drawable.hpp>
 #include <SFML/Graphics/Transformable.hpp>
 #include <SFML/Graphics/Vertex.hpp>
+#include <SFVG/Graphics/Points.hpp>
 #include <SFVG/Graphics/Gradient.hpp>
 #include <vector>
 
@@ -27,22 +28,22 @@ public:
     std::size_t getPointCount() const;
 
     /// Sets the position of a point
-    void setPoint(std::size_t index, sf::Vector2f position);
+    void setPoint(std::size_t index, Point position);
 
     /// Sets the position of a point
     void setPoint(std::size_t index, float x, float y);
 
     /// Sets the positions of all points in a shape and resets the point count
-    void setPoints(const std::vector<sf::Vector2f>& points);
+    void setPoints(const Points& points);
 
     /// Gets the position of a point
-    sf::Vector2f getPoint(std::size_t index) const;
+    Point getPoint(std::size_t index) const;
 
     /// Gets the positions of all points
-    std::vector<sf::Vector2f> getPoints() const;
+    const Points& getPoints() const;
 
     /// Adds a new point and increments the point count
-    void addPoint(sf::Vector2f position);
+    void addPoint(Point position);
 
     /// Adds a new point and increments the point count
     void addPoint(float x, float y);
@@ -62,7 +63,7 @@ public:
 
     /// Gets the vertices making up the Shape's outer contour after all radii
     // have been applied.
-    std::vector<sf::Vector2f> getVertices() const;
+    const Points& getVertices() const;
 
     /// Permantly applies all radii
     void flatten();
@@ -153,11 +154,11 @@ private:
     void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 
 private:
-    std::vector<sf::Vector2f> m_points;
+    Points m_points;
     std::vector<float> m_radii;
     std::vector<std::size_t> m_smoothness;
     std::vector<Shape> m_holes;
-    mutable std::vector<sf::Vector2f> m_vertices;
+    mutable Points m_vertices;
     mutable std::vector<sf::Vertex> m_vertexArray;
     const sf::Texture* m_texture;
     sf::IntRect m_textureRect;

@@ -74,7 +74,7 @@ int main() {
 
         sf::Vector2f position;
         float t = moveClock.getElapsedTime().asSeconds();
-        clamp(t,0,1);
+        t = clamp01(t);
 
         if (function == 0) {
             position = Tween::Instant(moveFrom, moveTo, t);

@@ -31,6 +31,8 @@ public:
     /// Creates and returns a tween frame at a normalized time t.
     Frame<Ps...> getTweenedFrame(float t);
 
+    void setLoop(bool loop);
+
     /// Starts or resumes an animation.
     void start();
 
@@ -54,6 +56,7 @@ private:
     sf::Time m_duration;
     sf::Time m_elapsedTime;
     bool m_isPlaying;
+    bool m_loop;
 };
 
 
@@ -66,12 +69,20 @@ namespace detail {
 struct TweenFunctor {
     TweenFunctor(float t) : m_t(t) {}
     template <typename F>
-    void operator()(F&& a, F&& b, F&& out) {
-        if (b.m_mode == Mode::Absolute) // Absolute
-            b.m_absValue = b.m_setValue;
-        else if (b.m_mode == Mode::Delta) // Delta
-            b.m_absValue = a.m_absValue + b.m_setValue;
-        out.m_absValue = b.m_func(a.m_absValue, b.m_absValue, m_t);
+    void operator()(F&& a, F&& b, F&& tweened) {
+        if (b.type == PropertyType::Skip) {
+            b.absValue = a.absValue;
+            tweened.absValue = a.absValue;
+        }
+        if (b.type == PropertyType::Absolute) {
+            b.absValue = b.setValue;
+            tweened.absValue = b.tween(a.absValue, b.absValue, m_t);
+        }
+        else if (b.type == PropertyType::Delta) {
+            b.absValue = a.absValue + b.setValue;
+            tweened.absValue = b.tween(a.absValue, b.absValue, m_t);
+        }
+        tweened.type = PropertyType::Tweened;
     }
     float m_t;
 };
@@ -82,7 +93,8 @@ template <typename... Ps>
 Animation<Ps...>::Animation()  :
           m_duration(sf::seconds(1.0f)),
           m_elapsedTime(sf::Time::Zero),
-          m_isPlaying(false)
+          m_isPlaying(false),
+          m_loop(false)
     {
             keyFrame(0.0f);
             keyFrame(1.0f);
@@ -100,7 +112,7 @@ bool Animation<Ps...>::isPlaying() const {
 
 template <typename... Ps>
 Frame<Ps...>& Animation<Ps...>::keyFrame(float t) {
-    clamp(t, 0.0f, 1.0f);
+    t = clamp01(t);
     return m_keyFrames[t];
 }
 
@@ -126,9 +138,16 @@ Frame<Ps...> Animation<Ps...>::getTweenedFrame(float t) {
     t = (t - a->first) / (b->first - a->first);
     // tween
     Frame<Ps...> frame;
-    detail::for_each_in_tuple3(a->second.m_properties, b->second.m_properties,
-                       frame.m_properties, detail::TweenFunctor(t));
+    detail::for_each_in_tuple3(a->second.m_properties,
+                               b->second.m_properties,
+                               frame.m_properties,
+                               detail::TweenFunctor(t));
     return frame;
+}
+
+template <typename... Ps>
+void Animation<Ps...>::setLoop(bool loop) {
+    m_loop = loop;
 }
 
 template <typename... Ps>
@@ -154,7 +173,9 @@ void Animation<Ps...>::update(sf::Time dt) {
         float t = m_elapsedTime / m_duration;
         if (t > 1.0f) {
             t           = 1.0f;
-            m_isPlaying = false;
+            if (!m_loop)
+                m_isPlaying = false;
+            m_elapsedTime = sf::Time::Zero;
         }
         m_currentFrame = getTweenedFrame(t);
     }

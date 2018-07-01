@@ -45,6 +45,7 @@ int main()
     std::size_t N = 3;
 
     std::vector<PolygonShape> shapes;
+    shapes.reserve(100);
     for (std::size_t x = 0; x < 10; ++x) {
         for (std::size_t y = 0; y < 10; ++y) {
             PolygonShape shape(N, PolygonShape::CircumscribedRadius, 50);
@@ -54,6 +55,9 @@ int main()
         }
         N++;
     }
+
+
+
 
     //==========================================================================
 
@@ -65,6 +69,8 @@ int main()
     sf::Clock absClock;
 
     PolygonShape hole(100, PolygonShape::CircumscribedRadius, 10);
+
+
 
    // Main loop
     while (window.isOpen()) {

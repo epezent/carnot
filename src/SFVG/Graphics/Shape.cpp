@@ -24,7 +24,7 @@ struct ImageLoader {
 };
 ImageLoader loader;
 
-// Custom earcut point types for SFML types
+// Custom earcut point types for SFVG/SFML types
 namespace mapbox {
 namespace util {
 template <>
@@ -46,7 +46,7 @@ struct nth<1, sf::Vector2f> {
 namespace sfvg {
 
 ClipperLib::Path sfvgToClipper(const Shape& sfvg) {
-    std::vector<sf::Vector2f> shapeVertices = sfvg.getVertices();
+    Points shapeVertices = sfvg.getVertices();
     ClipperLib::Path clipper;
     clipper.resize(shapeVertices.size());
     for (std::size_t i = 0; i < shapeVertices.size(); ++i) {
@@ -97,7 +97,7 @@ std::size_t Shape::getPointCount() const {
     return m_points.size();
 }
 
-void Shape::setPoint(std::size_t index, sf::Vector2f position) {
+void Shape::setPoint(std::size_t index, Point position) {
     m_points[index] = position;
     m_needsUpdate   = true;
 }
@@ -106,21 +106,21 @@ void Shape::setPoint(std::size_t index, float x, float y) {
     setPoint(index, sf::Vector2f(x,y));
 }
 
-void Shape::setPoints(const std::vector<sf::Vector2f>& points) {
+void Shape::setPoints(const Points& points) {
     setPointCount(points.size());
     m_points = points;
 }
 
-sf::Vector2f Shape::getPoint(std::size_t index) const {
+Point Shape::getPoint(std::size_t index) const {
     return m_points[index];
 }
 
-std::vector<sf::Vector2f> Shape::getPoints() const {
+const Points& Shape::getPoints() const {
     return m_points;
 }
 
-void Shape::addPoint(sf::Vector2f position) {
-    m_points.push_back(position);
+void Shape::addPoint(Point position) {
+    m_points.append(position);
     m_radii.push_back(float());
     m_smoothness.push_back(std::size_t());
     m_needsUpdate    = true;
@@ -158,7 +158,7 @@ std::size_t Shape::getVerticesCount() const {
     return m_vertices.size();
 }
 
-std::vector<sf::Vector2f> Shape::getVertices() const {
+const Points& Shape::getVertices() const {
     if (m_needsUpdate)
         updateVertices();
     return m_vertices;
@@ -310,7 +310,7 @@ void Shape::updateVertices() const {
             sf::Vector2f V2 = B - C;
             // Check if corner radius is longer than vectors
             if (m_radii[i] >= magnitude(V1) || m_radii[i] >= magnitude(V2)) {
-                m_vertices = std::vector<sf::Vector2f>();
+                m_vertices = Points();
                 return;
             }
             // Find unit vectors
@@ -364,7 +364,7 @@ void Shape::updateVertices() const {
 
 void Shape::updateVertexArray() const {
     // make earcut polygon
-    std::vector<std::vector<sf::Vector2f>> polygon(1 + m_holes.size());
+    std::vector<Points> polygon(1 + m_holes.size());
     polygon[0] = m_vertices;
     std::size_t n_vertices = polygon[0].size();
     if (n_vertices < 3)
@@ -398,7 +398,7 @@ void Shape::updateVertexArray() const {
 }
 
 void Shape::updateBounds() const {
-    if (!m_vertices.empty())
+    if (m_vertices.size() > 0)
     {
         float left   = m_vertices[0].x;
         float top    = m_vertices[0].y;

@@ -48,7 +48,10 @@ inline float magnitude(const sf::Vector2f& V);
 inline float dot(const sf::Vector2f& a, const sf::Vector2f& b);
 
 /// Clamps a value between min and max
-inline void clamp(float& value, float min = 0.0f, float max = 1.0f);
+inline float clamp(float value, float min, float max);
+
+/// Clamps a value between 0 and 1
+inline float clamp01(float value);
 
 }  // namespace sfvg
 

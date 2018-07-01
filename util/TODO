@@ -2,7 +2,7 @@
  ☐ inverse color functions
  ☐ outline to Shape
  ✔ animation relative frames @done (18-06-29 23:03)
- ☐ animation pass frames
+ ✔ animation pass frames @done (18-06-30 19:01)
  ✔ animation implicit time 0.0 and 1.0 @done (18-06-29 23:04)
  ✔ generalize fill color @done (18-06-29 23:03)
  ☐ delime: Fill is a class, and Fill may be a Property...can these be one thing? extend to Position, Rotation
@@ -14,3 +14,4 @@
  ✔ formalize Property...make get and set that return and take value, move absValue to impl @done (18-06-30 01:20)
  ☐ make dll
  ☐ make animation playable on multiple subjects relatively...how?
+ ☐ squash bug where framerate goes down and window fails to load (something to do with compile order and global shaders)

@@ -1,6 +1,7 @@
-#ifndef SFVG_KEY_FRAME_HPP
-#define SFVG_KEY_FRAME_HPP
+#ifndef SFVG_FRAME_HPP
+#define SFVG_FRAME_HPP
 
+#include <SFVG/Animation/Detail/Detail.hpp>
 #include <SFVG/Animation/Property.hpp>
 
 namespace sfvg {
@@ -12,15 +13,15 @@ template <typename... Ps>
 class Frame {
 public:
 
-    /// Sets the Frame's Property P to a V value and optionally sets the
-    /// tweening function to be used (defaults to linear interpolation)
+    /// Sets the Frame's Property P to an absolute V value and optionally sets
+    /// the tweening function to be used (defaults to Tween::Linear)
     template <typename P, typename V>
-    Frame<Ps...>& absolute(V value, V (*func)(const V&, const V&, float) = Tween::Linear<V>);
+    Frame<Ps...>& absolute(V value, V (*func)(const V&, const V&, float) = Tween::Linear);
 
-    /// Sets the Frame's Property P to a V value and optionally sets the
-    /// tweening function to be used (defaults to linear interpolation)
+    /// Sets the Frame's Property P to a delta V value and optionally sets the
+    /// tweening function to be used (defaults to Tween::Linear)
     template <typename P, typename V>
-    Frame<Ps...>& delta(V value, V (*func)(const V&, const V&, float) = Tween::Linear<V>);
+    Frame<Ps...>& delta(V value, V (*func)(const V&, const V&, float) = Tween::Linear);
 
     /// Gets a Property P from the Frame
     template <typename P>
@@ -30,9 +31,17 @@ public:
     template <typename S>
     void applyTo(S* subject);
 
-    /// Sets the Frame's Properties from a Subject S
+    /// Sets all the Frame's Properties from a Subject's current state and
+    /// returns a reference to the itself (defaults each Property's tweening
+    /// function to Tween::Linear)
     template <typename S>
-    void setFrom(S* subject);
+    Frame<Ps...>& setFrom(S* subject);
+
+    /// Sets a single Frame's Properties from Subject's current state and
+    /// returns a reference to the Property (defaults the Property's tweening
+    /// function to Tween::Linear)
+    template <typename P, typename S>
+    P& setFrom(S* subject);
 
 private:
     friend class Animation<Ps...>;
@@ -50,7 +59,8 @@ struct ApplyToFunctor {
     ApplyToFunctor(S* subject) : m_subject(subject) {}
     template <typename P>
     void operator()(P&& p) {
-        p.set(m_subject, p.m_absValue);
+        if (p.type != PropertyType::Skip)
+            p.set(m_subject, p.absValue);
     }
     S* m_subject;
 };
@@ -60,8 +70,10 @@ struct SetFromFunctor {
     SetFromFunctor(S* subject) : m_subject(subject) {}
     template <typename P>
     void operator()(P&& p) {
-        p.m_setValue = p.get(m_subject);
-        p.m_absValue = p.m_setValue;
+        p.type     = PropertyType::Absolute;
+        p.tween    = Tween::Linear;
+        p.setValue = p.get(m_subject);
+        p.absValue = p.setValue;
     }
     S* m_subject;
 };
@@ -72,10 +84,10 @@ template <typename... Ps>
 template <typename P, typename V>
 Frame<Ps...>& Frame<Ps...>::absolute(V value, V (*func)(const V&, const V&, float))
 {
-    std::get<P>(m_properties).m_setValue = value;
-    std::get<P>(m_properties).m_absValue = value;
-    std::get<P>(m_properties).m_func  = func;
-    std::get<P>(m_properties).m_mode = Mode::Absolute;
+    get<P>().setValue = value;
+    get<P>().absValue = value;
+    get<P>().tween  = func;
+    get<P>().type = PropertyType::Absolute;
     return *this;
 }
 
@@ -83,10 +95,10 @@ template <typename... Ps>
 template <typename P, typename V>
 Frame<Ps...>& Frame<Ps...>::delta(V value, V (*func)(const V&, const V&, float))
 {
-    std::get<P>(m_properties).m_setValue = value;
-    std::get<P>(m_properties).m_absValue = value;
-    std::get<P>(m_properties).m_func  = func;
-    std::get<P>(m_properties).m_mode = Mode::Delta;
+    get<P>().setValue = value;
+    get<P>().absValue = value;
+    get<P>().tween  = func;
+    get<P>().type = PropertyType::Delta;
     return *this;
 }
 
@@ -104,10 +116,22 @@ void Frame<Ps...>::applyTo(S* subject) {
 
 template <typename... Ps>
 template <typename S>
-void Frame<Ps...>::setFrom(S* subject) {
+Frame<Ps...>& Frame<Ps...>::setFrom(S* subject) {
     detail::for_each_in_tuple(m_properties, detail::SetFromFunctor<S>(subject));
+    return *this;
+}
+
+template <typename... Ps>
+template <typename P, typename S>
+P& Frame<Ps...>::setFrom(S* subject) {
+    P& p = get<P>();
+    p.type = PropertyType::Absolute;
+    p.setValue = p.get(subject);
+    p.absValue = p.setValue;
+    p.tween = Tween::Linear;
+    return p;
 }
 
 }  // namespace sfvg
 
-#endif  // SFVG_KEY_FRAME_HPP
+#endif  // SFVG_FRAME_HPP

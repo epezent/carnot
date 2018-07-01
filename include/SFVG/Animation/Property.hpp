@@ -1,31 +1,32 @@
 #ifndef SFVG_PROPERTY_HPP
 #define SFVG_PROPERTY_HPP
 
-#include <SFML/System/Vector2.hpp>
-#include <SFVG/Animation/Detail/Detail.hpp>
+#include <SFVG/Graphics/Points.hpp>
 #include <SFVG/Animation/Tween.hpp>
 #include <iostream>
 
 namespace sfvg {
 
-enum class Mode {
-    Absolute = 0,  ///< Property value is used as an absolute
-    Delta    = 1   ///< Property value is used relative to last KeyFrame
+enum class PropertyType {
+    Skip     = 0,  ///< Property is skpped (default)
+    Absolute = 1,  ///< Property is an absolute keyframe property
+    Delta    = 2,  ///< Property is delta keyframe property
+    Tweened  = 3   ///< Property is a tweened frame property
 };
 
 template <typename V>
 struct Property {
-    Mode m_mode;                             ///< Property mode
-    V (*m_func)(const V&, const V&, float);  ///< tweening function
-    V m_setValue;                            ///< value set by caller
-    V m_absValue;                            ///< absolute value used internally
+    PropertyType type;                      ///< Property mode
+    V (*tween)(const V&, const V&, float);  ///< tweening function
+    V setValue;                             ///< value set by caller
+    V absValue;                             ///< absolute value used internally
 };
 
 /// Helper macro for quickly defining new Animation Properties.
 ///
-/// This simply replaces NAME, TYPE, SETTER, GETTER with the Property class
-/// name, the type the property operates on, and the name of the property's
-/// setter and getter functions.
+/// This simply replaces NAME, TYPE, SETTER, GETTER with a chosen name for the
+/// Property, the type the Property operates on, and the name of the getter and
+/// setter functions the Property should call from a Subject
 #define SFVG_PROPERTY(NAME, TYPE, SETTER, GETTER)   \
     struct NAME : public Property<TYPE> {           \
                                                     \
@@ -40,16 +41,32 @@ struct Property {
         }                                           \
     };
 
+#define SFVG_IDX_PROPERTY(NAME, TYPE, SETTER, GETTER)   \
+    template <std::size_t Idx>                         \
+    struct NAME : public Property<TYPE> {               \
+                                                        \
+        template <typename S>                           \
+        void set(S* subject, const TYPE & value) {      \
+            subject->SETTER(Idx, value);                \
+        }                                               \
+                                                        \
+        template <typename S>                           \
+        TYPE get(S* subject) {                          \
+            return subject->GETTER(Idx);                \
+        }                                               \
+    };
+
 //==============================================================================
 // BUILT-IN PROPERTIES
 //==============================================================================
 
 //            NAME          TYPE          SETTER           GETTER
-SFVG_PROPERTY(Position,     sf::Vector2f, setPosition,     getPosition);
-SFVG_PROPERTY(Rotation,     float,        setRotation,     getRotation);
-SFVG_PROPERTY(Scale,        sf::Vector2f, setScale,        getScale);
-SFVG_PROPERTY(FillColor,    sf::Color,    setFillColor,    getFillColor);
-SFVG_PROPERTY(FillGradient, Gradient,     setFillGradient, getFillGradient);
+SFVG_PROPERTY(PPosition,     sf::Vector2f, setPosition,     getPosition);
+SFVG_PROPERTY(PRotation,     float,        setRotation,     getRotation);
+SFVG_PROPERTY(PScale,        sf::Vector2f, setScale,        getScale);
+SFVG_PROPERTY(PFillColor,    sf::Color,    setFillColor,    getFillColor);
+SFVG_PROPERTY(PFillGradient, Gradient,     setFillGradient, getFillGradient);
+SFVG_PROPERTY(PPoints,       Points,       setPoints,       getPoints);
 
 }  // namespace sfvg
 

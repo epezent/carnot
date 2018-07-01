@@ -43,13 +43,17 @@ file(GLOB SRC_SHAPES
     "${CMAKE_SOURCE_DIR}/src/SFVG//Graphics/Shapes/*.cpp"
 )
 
+link_directories("${SFML_ROOT}/lib")
+
+
 # create SFVG library
 add_library(sfvg
-    src/SFVG/Math.cpp
-    src/SFVG/Graphics//Shape.cpp
     src/SFVG/Graphics/Gradient.cpp
     src/SFVG/Graphics/Color.cpp
+    src/SFVG/Graphics/Shape.cpp
+    src/SFVG/Graphics/Points.cpp
     src/SFVG/Graphics/Detail/clipper.cpp
+    src/SFVG/Math.cpp
     ${SRC_SHAPES}
 )
 
@@ -60,6 +64,8 @@ target_link_libraries(test1 sfvg ${SFML_LIBRARIES} ${SFML_DEPENDENCIES})
 add_executable(test2 tests/test2.cpp)
 target_link_libraries(test2 sfvg ${SFML_LIBRARIES} ${SFML_DEPENDENCIES})
 
+add_executable(test3 tests/test3.cpp)
+target_link_libraries(test3 sfvg ${SFML_LIBRARIES} ${SFML_DEPENDENCIES})
 
 
 add_executable(benchmark tests/benchmark.cpp)

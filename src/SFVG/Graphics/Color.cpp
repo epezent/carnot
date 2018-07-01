@@ -7,10 +7,10 @@
 namespace sfvg {
 
 sf::Color Color::cmyk(float c, float m, float y, float k) {
-    clamp(c);
-    clamp(m);
-    clamp(y);
-    clamp(k);
+    c = clamp01(c);
+    m = clamp01(m);
+    y = clamp01(y);
+    k = clamp01(k);
     sf::Uint8 r = static_cast<sf::Uint8>(255.0f * (1.0f - c) * (1.0f - k));
     sf::Uint8 g = static_cast<sf::Uint8>(255.0f * (1.0f - m) * (1.0f - k));
     sf::Uint8 b = static_cast<sf::Uint8>(255.0f * (1.0f - y) * (1.0f - k));
@@ -18,9 +18,9 @@ sf::Color Color::cmyk(float c, float m, float y, float k) {
 }
 
 sf::Color Color::hsv(float h, float s, float v) {
-    clamp(h);
-    clamp(s);
-    clamp(v);
+    h = clamp01(h);
+    s = clamp01(s);
+    v = clamp01(v);
     float hh, p, q, t, ff;
     if (s == 0.0f){
         sf::Uint8 rgb = static_cast<sf::Uint8>(255.0f * v);
