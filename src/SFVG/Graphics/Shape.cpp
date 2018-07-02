@@ -398,32 +398,7 @@ void Shape::updateVertexArray() const {
 }
 
 void Shape::updateBounds() const {
-    if (m_vertices.size() > 0)
-    {
-        float left   = m_vertices[0].x;
-        float top    = m_vertices[0].y;
-        float right  = m_vertices[0].x;
-        float bottom = m_vertices[0].y;
-
-        for (std::size_t i = 1; i < m_vertices.size(); ++i)
-        {
-            // Update left and right
-            if (m_vertices[i].x < left)
-                left = m_vertices[i].x;
-            else if (m_vertices[i].x > right)
-                right = m_vertices[i].x;
-            // Update top and bottom
-            if (m_vertices[i].y < top)
-                top = m_vertices[i].y;
-            else if (m_vertices[i].y > bottom)
-                bottom = m_vertices[i].y;
-        }
-        m_bounds =  sf::FloatRect(left, top, right - left, bottom - top);
-    }
-    else {
-        // Array is empty
-        m_bounds = sf::FloatRect();
-    }
+    m_bounds = m_vertices.getBounds();
 }
 
 void Shape::updateTexCoords() const {
@@ -489,9 +464,6 @@ void Shape::draw(sf::RenderTarget& target, sf::RenderStates states) const {
         bounds[3].position =
             sf::Vector2f(m_bounds.left, m_bounds.top + m_bounds.height);
         bounds[4].position = bounds[0].position;
-        for (std::size_t i = 0; i < bounds.getVertexCount(); ++i) {
-            bounds[i].color = sf::Color::Black;
-        }
         target.draw(bounds, states);
     }
 
@@ -503,9 +475,6 @@ void Shape::draw(sf::RenderTarget& target, sf::RenderStates states) const {
             wireframe[k++].position = m_vertexArray[3 * i + 1].position;
             wireframe[k++].position = m_vertexArray[3 * i + 2].position;
             wireframe[k++].position = m_vertexArray[3 * i].position;
-        }
-        for (std::size_t i = 0; i < wireframe.getVertexCount(); ++i) {
-            wireframe[i].color = sf::Color::Black;
         }
         target.draw(wireframe, states);
     }

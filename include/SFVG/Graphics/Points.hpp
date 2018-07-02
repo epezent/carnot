@@ -2,6 +2,7 @@
 #define SFVG_POINTS_HPP
 
 #include <SFML/System/Vector2.hpp>
+#include <SFML/Graphics/Rect.hpp>
 #include <vector>
 
 namespace sfvg {
@@ -27,6 +28,12 @@ public:
     void resize(std::size_t pointCount);
 
     void append(const Point& point);
+
+    sf::FloatRect getBounds() const;
+
+    float getArea() const;
+
+    bool isInside(const Point& point) const;
 
     typedef Point value_type;
 

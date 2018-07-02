@@ -2,8 +2,8 @@
 #define SFVG_MATH_HPP
 
 #include <SFML/System/Vector2.hpp>
-#include <vector>
 #include <cmath>
+#include <vector>
 
 namespace sfvg {
 
@@ -19,12 +19,7 @@ extern const float SQRT3;
 extern std::vector<float> linspace(float a, float b, std::size_t N);
 
 /// Computes the area of polygon defined be outer vertices
-extern float polygonArea(const std::vector<sf::Vector2f> vertices);
-
-// Determines if a point P lies on and within the endpoints of a line L
-extern bool insideLine(const sf::Vector2f& L1,
-                       const sf::Vector2f& L2,
-                       const sf::Vector2f& P);
+extern float polygonArea(const std::vector<sf::Vector2f>& vertices);
 
 /// Determiens if a point P lies inside triangle ABC
 extern bool insideTriangle(const sf::Vector2f& A,
@@ -32,11 +27,32 @@ extern bool insideTriangle(const sf::Vector2f& A,
                            const sf::Vector2f& C,
                            const sf::Vector2f& P);
 
-/// Finds the intersection point of lines A and B
+// Determines if a point P lies on and within the endpoints of a line L
+inline bool insideLine(const sf::Vector2f& L1,
+                       const sf::Vector2f& L2,
+                       const sf::Vector2f& P);
+
+/// Finds the intersection point of infinite lines A and B
 inline sf::Vector2f intersection(const sf::Vector2f& A1,
                                  const sf::Vector2f& A2,
                                  const sf::Vector2f& B1,
                                  const sf::Vector2f& B2);
+
+/// Finds the intersection point of infinite lines A and B
+inline bool parallel(const sf::Vector2f& A1,
+                     const sf::Vector2f& A2,
+                     const sf::Vector2f& B1,
+                     const sf::Vector2f& B2);
+
+/// Returns true if two line segments intersect
+inline bool intersect(const sf::Vector2f& A1,
+                      const sf::Vector2f& A2,
+                      const sf::Vector2f& B1,
+                      const sf::Vector2f& B2);
+
+/// Returns true if a point is inside a set of polygon points
+inline bool insidePolygon(const sf::Vector2f& point,
+                          const std::vector<sf::Vector2f>& polygon);
 
 /// Wraps an angle in radians to within 2 pi
 inline float wrapTo2Pi(float angle);

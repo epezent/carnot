@@ -37,8 +37,11 @@ public:
     /// Starts or resumes an animation.
     void start();
 
-    /// Stops a animation. The animation state and elapsed time are preserved.
+    /// Stops a animation. The animation state and elapsed time are reset.
     void stop();
+
+    /// Pauses a animation. The animation state and elapsed time are preserved.
+    void pause();
 
     /// Restarts an animation back from the beginning
     void restart();
@@ -158,6 +161,12 @@ void Animation<Ps...>::start() {
 
 template <typename... Ps>
 void Animation<Ps...>::stop() {
+    m_elapsedTime = sf::Time::Zero;
+    m_isPlaying = false;
+}
+
+template <typename... Ps>
+void Animation<Ps...>::pause() {
     m_isPlaying = false;
 }
 

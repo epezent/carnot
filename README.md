@@ -25,4 +25,3 @@ SFVG's shape class is a drop-in replacement for SFML's. It offers all of the ori
 
 <img src="https://github.com/epezent/SFVG/blob/master/screenshots/animation.gif" width="100">
 
-![Animation]( | width=100)

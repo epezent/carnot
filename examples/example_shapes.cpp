@@ -1,5 +1,6 @@
 #include <SFML/Graphics.hpp>
 #include <SFVG/Graphics.hpp>
+#include <iostream>
 
 using namespace sfvg;
 
@@ -13,18 +14,25 @@ int main(int argc, char* argv[]) {
     CircleShape circle(50);
     circle.setPosition(100, 100);
     circle.setFillColor(Reds::FireBrick);
+    std::cout << circle.getPoints().getArea() << std::endl;
 
     PolygonShape polygon(5, PolygonShape::CircumscribedRadius, 50);
     polygon.setPosition(300, 100);
     polygon.setFillColor(Oranges::Orange);
+    std::cout << polygon.getPoints().getArea() << std::endl;
+
 
     RectangleShape rectangle(100, 50);
     rectangle.setPosition(500, 100);
     rectangle.setFillColor(Yellows::Gold);
+    std::cout << rectangle.getPoints().getArea() << std::endl;
+
 
     SquareShape square(100);
     square.setPosition(700, 100);
     square.setFillColor(Greens::Chartreuse);
+    std::cout << square.getPoints().getArea() << std::endl;
+
 
     StarShape star(5, 25, 50);
     star.setPosition(900, 100);

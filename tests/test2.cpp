@@ -48,11 +48,11 @@ int main(int argc, char* argv[]) {
     // ====
 
     StarShape shape(6, 50, 100);
-    shape.setFillGradient(Gradient(Yellows::Gold, Yellows::LemonChiffon, 0.0f));
+    shape.setFillGradient(Gradient(Yellows::Gold, Yellows::Khaki, 0.0f));
     shape.setRadii(10);
     shape.setPosition(250, 250);
-    // shape.showWireFrame(true);
-    // shape.showBoundsBox(true);
+    shape.showWireFrame(true);
+    shape.showBoundsBox(true);
 
     StarShape star(6, 100, 300);
 
@@ -60,25 +60,25 @@ int main(int argc, char* argv[]) {
     anim.keyFrame(0.00f).setFrom(&shape);
 
     anim.keyFrame(0.25f).delta<PPosition>(sf::Vector2f(500, 0), Tween::Elastic::Out)
-                        .delta<PRotation>(90.0f)
+                        .delta<PRotation>(180.0f, Tween::Smootherstep)
                         .absolute<PScale>(sf::Vector2f(2.0f,2.0f))
                         .absolute<PFillGradient>(Gradient(Reds::Crimson, Reds::Salmon));
 
     anim.keyFrame(0.50f).delta<PPosition>(sf::Vector2f(0, 500), Tween::Bounce::Out)
-                        .delta<PRotation>(90.0f)
+                        .delta<PRotation>(-90.0f, Tween::Smootherstep)
                         .absolute<PScale>(sf::Vector2f(1.0f,1.0f))
                         .absolute<PFillGradient>(Gradient(Blues::DodgerBlue, Blues::DeepSkyBlue));
 
-    anim.keyFrame(0.75f).delta<PPosition>(sf::Vector2f(-500,0), Tween::Back::Out)
-                        .delta<PRotation>(90.0f)
+    anim.keyFrame(0.75f).delta<PPosition>(sf::Vector2f(-500,0), Tween::Elastic::Out)
+                        .delta<PRotation>(90.0f, Tween::Smootherstep)
                         .absolute<PScale>(sf::Vector2f(2.0f,2.0f))
                         .absolute<PFillGradient>(Gradient(Greens::Chartreuse, Greens::DarkGreen));
 
-    anim.keyFrame(1.00f).delta<PPosition>(sf::Vector2f(0,-500), Tween::Exponential::In)
-                        .delta<PRotation>(90.0f)
+    anim.keyFrame(1.00f).delta<PPosition>(sf::Vector2f(0,-500), Tween::Back::Out)
+                        .delta<PRotation>(-180.0f, Tween::Smootherstep)
                         .absolute<PScale>(sf::Vector2f(1.0f,1.0f))
-                        .setFrom<PFillGradient>(&shape).tween = Tween::Smootheststep;
-    anim.setDuration(sf::seconds(4));
+                        .setFrom<PFillGradient>(&shape);
+    anim.setDuration(sf::seconds(2));
 
     // Animation<pPoints, PRotation> anim;
     // anim.keyFrame(0).setFrom(&shape);
@@ -104,7 +104,7 @@ int main(int argc, char* argv[]) {
         while (window.pollEvent(event)) {
 
             if (event.type == sf::Event::KeyPressed &&
-                event.key.code == sf::Keyboard::P)
+                event.key.code == sf::Keyboard::S)
             {
                 anim.start();
             }
@@ -117,9 +117,9 @@ int main(int argc, char* argv[]) {
             }
 
             if (event.type == sf::Event::KeyPressed &&
-                event.key.code == sf::Keyboard::S)
+                event.key.code == sf::Keyboard::P)
             {
-                anim.stop();
+                anim.pause();
             }
 
             if (event.type == sf::Event::KeyPressed)
@@ -134,16 +134,16 @@ int main(int argc, char* argv[]) {
         }
 
         if (anim.isPlaying()) {
-            anim.update(sf::seconds(0.04f));
+            anim.update(dt);
             anim.applyTo(&shape);
-            texture.update(window);
-            sf::Image img = texture.copyToImage();
-            img.saveToFile("frames/frame_" + std::to_string(frameCount) + ".png");
+            //texture.update(window);
+            //sf::Image img = texture.copyToImage();
+            //img.saveToFile("frames/frame_" + std::to_string(frameCount) + ".png");
             frameCount++;
         }
 
         text.setString("FPS: " + std::to_string(fps.getFPS()));
-        window.clear(Whites::White);
+        window.clear(sf::Color(10,10,10));
         window.draw(shape);
         //window.draw(text);
         window.display();

@@ -19,7 +19,7 @@ std::vector<float> linspace(float a, float b, std::size_t N) {
     return linspace_out;
 }
 
-float polygonArea(const std::vector<sf::Vector2f> vertices) {
+float polygonArea(const std::vector<sf::Vector2f>& vertices) {
     float area       = 0.0f;
     std::size_t size = vertices.size();
     for (std::size_t i = 1; i < size - 1; ++i)
@@ -27,28 +27,6 @@ float polygonArea(const std::vector<sf::Vector2f> vertices) {
     area += vertices[size - 1].x * (vertices[0].y - vertices[size - 2].y);
     area += vertices[0].x * (vertices[1].y - vertices[size - 1].y);
     return area * 0.5f;
-}
-
-bool insideLine(const sf::Vector2f& L1,
-                const sf::Vector2f& L2,
-                const sf::Vector2f& P)
-{
-    float crossproduct =
-        (P.y - L1.y) * (L2.x - L1.x) - (P.x - L1.x) * (L2.y - L1.y);
-    if (std::abs(crossproduct) > 0.1)
-        return false;
-
-    float dotproduct =
-        (P.x - L1.x) * (L2.x - L1.x) + (P.y - L1.y) * (L2.y - L1.y);
-    if (dotproduct < 0.0f)
-        return false;
-
-    float squarelength =
-        (L2.x - L1.x) * (L2.x - L1.x) + (L2.y - L1.y) * (L2.y - L1.y);
-    if (dotproduct > squarelength)
-        return false;
-
-    return true;
 }
 
 bool insideTriangle(const sf::Vector2f& A,
