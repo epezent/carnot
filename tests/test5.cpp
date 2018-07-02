@@ -6,6 +6,9 @@ using namespace sfvg;
 
 int main(int argc, char* argv[]) {
 
+    auto x = intersection(Point(100,100), Point(900,100), Point(100,200), Point(900,200));
+    std::cout << x.x << "," << x.y << std::endl;
+
     sf::ContextSettings settings;
     settings.antialiasingLevel = 8;
     sf::RenderWindow window(sf::VideoMode(1000, 1000), "SFVG Shapes", sf::Style::Default, settings);

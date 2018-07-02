@@ -1,4 +1,5 @@
 #include <SFVG/Math.hpp>
+#include <limits>
 
 namespace sfvg {
 
@@ -8,16 +9,7 @@ const float DEG2RAD = PI / 180.0f;
 const float RAD2DEG = 180.0f / PI;
 const float SQRT2   = std::sqrt(2.0f);
 const float SQRT3   = std::sqrt(3.0f);
-
-std::vector<float> linspace(float a, float b, std::size_t N) {
-    std::vector<float> linspace_out(N);
-    float delta     = (b - a) / (N - 1);
-    linspace_out[0] = a;
-    for (std::size_t i = 1; i < N - 1; i++)
-        linspace_out[i] = linspace_out[i - 1] + delta;
-    linspace_out[N - 1] = b;
-    return linspace_out;
-}
+const float INF     = std::numeric_limits<float>::infinity();
 
 float polygonArea(const std::vector<sf::Vector2f>& vertices) {
     float area       = 0.0f;

@@ -14,11 +14,13 @@ extern const float DEG2RAD;
 extern const float RAD2DEG;
 extern const float SQRT2;
 extern const float SQRT3;
+extern const float INF;
 
 /// Creates a evenly space array of N values between a and b
-extern std::vector<float> linspace(float a, float b, std::size_t N);
+template <typename T>
+inline std::vector<T> linspace(T a, T b, std::size_t N);
 
-/// Computes the area of polygon defined be outer vertices
+/// Computes the area of polygon defined by vector of outer vertices
 extern float polygonArea(const std::vector<sf::Vector2f>& vertices);
 
 /// Determiens if a point P lies inside triangle ABC
@@ -32,13 +34,14 @@ inline bool insideLine(const sf::Vector2f& L1,
                        const sf::Vector2f& L2,
                        const sf::Vector2f& P);
 
-/// Finds the intersection point of infinite lines A and B
+/// Finds the intersection point of infinite lines A and B. If A and B are
+/// parallel, returns sf::Vector2f(INF,INF).
 inline sf::Vector2f intersection(const sf::Vector2f& A1,
                                  const sf::Vector2f& A2,
                                  const sf::Vector2f& B1,
                                  const sf::Vector2f& B2);
 
-/// Finds the intersection point of infinite lines A and B
+/// Returns true if two lines A and B are parallel
 inline bool parallel(const sf::Vector2f& A1,
                      const sf::Vector2f& A2,
                      const sf::Vector2f& B1,
@@ -66,7 +69,7 @@ inline float dot(const sf::Vector2f& a, const sf::Vector2f& b);
 /// Clamps a value between min and max
 inline float clamp(float value, float min, float max);
 
-/// Clamps a value between 0 and 1
+/// Clamps a float between 0 and 1
 inline float clamp01(float value);
 
 }  // namespace sfvg
