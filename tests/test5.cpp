@@ -28,7 +28,7 @@ int main(int argc, char* argv[]) {
     ray[0].color = Yellows::Gold;
     ray[1].color = Yellows::Gold;
 
-    StarShape poly(5, 50, 200);
+    StarShape poly(5, 50, 100);
     poly.setPosition(500, 500);
 
     sf::Clock dtClock;

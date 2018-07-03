@@ -17,6 +17,10 @@ public:
 
     Points(std::initializer_list<Point> init);
 
+    Points(const std::vector<Point>& points);
+
+    operator std::vector<Point>() const;
+
     std::size_t size() const;
 
     Point& operator [](std::size_t index);

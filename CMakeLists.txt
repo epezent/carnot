@@ -53,7 +53,6 @@ add_library(sfvg
     src/SFVG/Graphics/Shape.cpp
     src/SFVG/Graphics/Points.cpp
     src/SFVG/Graphics/Detail/clipper.cpp
-    src/SFVG/Math.cpp
     ${SRC_SHAPES}
 )
 

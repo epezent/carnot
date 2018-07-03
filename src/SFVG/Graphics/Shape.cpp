@@ -314,14 +314,11 @@ void Shape::updateVertices() const {
                 return;
             }
             // Find unit vectors
-            sf::Vector2f U1 = V1 / magnitude(V1);
-            sf::Vector2f U2 = V2 / magnitude(V2);
-            // Find normal vectors
-            sf::Vector2f N1, N2;
-            N1.x = -U1.y;
-            N1.y = U1.x;
-            N2.x = -U2.y;
-            N2.y = U2.x;
+            sf::Vector2f U1 = unit(V1);
+            sf::Vector2f U2 = unit(V2);
+            // Find unit normal vectors
+            sf::Vector2f N1 = normal(U1);
+            sf::Vector2f N2 = normal(U2);
             // Check direction of normal vector
             if (dot(N1, -V2) < 0.0f)
                 N1 = -N1;

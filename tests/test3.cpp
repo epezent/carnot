@@ -1,8 +1,13 @@
-#include <SFVG/Graphics/Points.hpp>
-#include <SFVG/Animation/Tween.hpp>
+#include <SFVG/Graphics.hpp>
+#include <SFVG/Animation.hpp>
 #include <iostream>
 
 using namespace sfvg;
+
+template <typename T>
+void print(const T& t) {
+    std::cout << t << std::endl;
+}
 
 void print(const Point& point) {
     std::cout << "(" << point.x << "," << point.y << ")" << std::endl;
@@ -16,10 +21,13 @@ void print(const Points& points) {
 
 int main(int argc, char* argv[]) {
 
-    Points points1({Point(1,2), Point(3,4), Point(5,6)});
-    Points points2({Point(7,8), Point(9,10), Point(11,12)});
+    Points points({Point(0,0), Point(100,100), Point(0,100)});
 
-    auto points3 = Tween::Exponential::In(points1, points2, 0.5f);
-    print(points3);
+    sf::Vector2f vec(300,400);
+    auto norm = normal(vec);
 
+    print(norm);
+    print(parallel(Point(10,10), Point(10,10) + vec, Point(0,0), vec));
+
+    print(unit(vec));
 }

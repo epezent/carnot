@@ -12,6 +12,12 @@ Points::Points(std::initializer_list<Point> init) {
         m_points.push_back(i);
 }
 
+Points::Points(const std::vector<Point>& points) : m_points(points) { }
+
+Points::operator std::vector<Point>() const {
+    return m_points;
+}
+
 std::size_t Points::size() const {
     return m_points.size();
 }
@@ -66,7 +72,7 @@ float Points::getArea() const {
 }
 
 bool Points::isInside(const Point& point) const {
-    return insidePolygon(point, m_points);
+    return insidePolygon(m_points, point);
     return true;
 }
 

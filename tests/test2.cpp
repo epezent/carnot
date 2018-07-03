@@ -51,8 +51,8 @@ int main(int argc, char* argv[]) {
     shape.setFillGradient(Gradient(Yellows::Gold, Yellows::Khaki, 0.0f));
     shape.setRadii(10);
     shape.setPosition(250, 250);
-    shape.showWireFrame(true);
-    shape.showBoundsBox(true);
+    // shape.showWireFrame(true);
+    // shape.showBoundsBox(true);
 
     StarShape star(6, 100, 300);
 
@@ -78,7 +78,7 @@ int main(int argc, char* argv[]) {
                         .delta<PRotation>(-180.0f, Tween::Smootherstep)
                         .absolute<PScale>(sf::Vector2f(1.0f,1.0f))
                         .setFrom<PFillGradient>(&shape);
-    anim.setDuration(sf::seconds(2));
+    anim.setDuration(sf::seconds(4));
 
     // Animation<pPoints, PRotation> anim;
     // anim.keyFrame(0).setFrom(&shape);
