@@ -71,7 +71,6 @@ Shape clipperToSfvg(const ClipperLib::Path& clipper) {
 
 Shape::Shape(std::size_t pointCount) :
     m_holes(0),
-    m_vertexArray(sf::Triangles),
     m_texture(NULL),
     m_textureRect(),
     m_fillGradient(),

@@ -30,6 +30,10 @@ inline float wrapTo2Pi(float angle) {
 // VECTOR ALGEBRA
 //==============================================================================
 
+inline float squaredLength(const sf::Vector2f v) {
+    return v.x * v.x + v.y * v.y;
+}
+
 inline float magnitude(const sf::Vector2f& v) {
     return std::sqrt(v.x * v.x + v.y * v.y);
 }

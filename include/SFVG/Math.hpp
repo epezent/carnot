@@ -41,6 +41,9 @@ inline float wrapTo2Pi(float angle);
 // VECTOR ALGEBRA
 //==============================================================================
 
+/// Computes the squared length of a vector
+inline float squaredLength(const sf::Vector2f v);
+
 /// Computes the magnitude of a vector
 inline float magnitude(const sf::Vector2f& v);
 
