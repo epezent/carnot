@@ -151,6 +151,16 @@ void Shape::setRadii(float radius, std::size_t smoothness) {
     }
 }
 
+void Shape::setRadii(const std::vector<float> &radii) {
+    assert(m_radii.size() == radii.size());
+    m_radii = radii;
+    m_needsUpdate = true;
+}
+
+std::vector<float> Shape::getRadii() const {
+    return m_radii;
+}
+
 std::size_t Shape::getVerticesCount() const {
     if (m_needsUpdate)
         updateVertices();

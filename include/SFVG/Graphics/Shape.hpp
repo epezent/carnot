@@ -57,6 +57,12 @@ public:
     /// Sets the radii for all points to a single radius
     void setRadii(float radius, std::size_t smoothness = 10);
 
+    /// Sets the radii for all points
+    void setRadii(const std::vector<float>& radii);
+
+    /// Gets the radii for all poiints
+    std::vector<float> getRadii() const;
+
     /// Gets the number of vertices making up the Shape's outer contour after
     /// all radii have been applied
     std::size_t getVerticesCount() const;

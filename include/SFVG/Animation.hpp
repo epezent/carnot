@@ -4,6 +4,10 @@
 #include <SFML/System/Time.hpp>
 #include <SFVG/Animation/Frame.hpp>
 #include <map>
+#include <vector>
+#include <cassert>
+#include <algorithm>
+#include <functional>
 
 namespace sfvg {
 
@@ -70,8 +74,19 @@ private:
 
 namespace detail {
 
+template <typename T>
+std::vector<T> operator+(const std::vector<T>& a, const std::vector<T>& b) {
+    assert(a.size() == b.size());
+    std::vector<T> result;
+    result.reserve(a.size());
+    std::transform(a.begin(), a.end(), b.begin(),
+                   std::back_inserter(result), std::plus<T>());
+    return result;
+}
+
 struct TweenFunctor {
     TweenFunctor(float t) : m_t(t) {}
+
     template <typename F>
     void operator()(F&& a, F&& b, F&& tweened) {
         if (b.type == PropertyType::Skip) {

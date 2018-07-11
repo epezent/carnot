@@ -4,6 +4,7 @@
 #include <SFVG/Graphics/Points.hpp>
 #include <SFVG/Animation/Tween.hpp>
 #include <iostream>
+#include <vector>
 
 namespace sfvg {
 
@@ -67,6 +68,7 @@ SFVG_PROPERTY(PScale,        sf::Vector2f, setScale,        getScale);
 SFVG_PROPERTY(PFillColor,    sf::Color,    setFillColor,    getFillColor);
 SFVG_PROPERTY(PFillGradient, Gradient,     setFillGradient, getFillGradient);
 SFVG_PROPERTY(PPoints,       Points,       setPoints,       getPoints);
+SFVG_PROPERTY(PRadii,  std::vector<float>, setRadii,        getRadii);
 
 }  // namespace sfvg
 
