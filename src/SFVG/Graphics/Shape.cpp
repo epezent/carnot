@@ -1,69 +1,13 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Graphics/RenderTarget.hpp>
-#include <SFVG/Graphics/Detail/clipper.hpp>
-#include <SFVG/Graphics/Detail/earcut.hpp>
 #include <SFVG/Graphics/Shape.hpp>
 #include <SFVG/Math.hpp>
+#include "Detail/ExternalLibs.hpp"
+#include "Detail/SharedResources.hpp"
 #include <iostream>
 #include <limits>
 
-#define CLIPPER_PRECISION 10.0f
-
-//==============================================================================
-// HELPER FUNCTIONS
-//==============================================================================
-
-// Default white 1x1 texture
-sf::Image whiteImage;
-sf::Texture whiteTexture;
-struct ImageLoader {
-    ImageLoader() {
-        whiteImage.create(1, 1, sf::Color::White);
-        whiteTexture.loadFromImage(whiteImage);
-    }
-};
-ImageLoader loader;
-
-// Custom earcut point types for SFVG/SFML types
-namespace mapbox {
-namespace util {
-template <>
-struct nth<0, sf::Vector2f> {
-    inline static float get(const sf::Vector2f &t) {
-        return t.x;
-    };
-};
-template <>
-struct nth<1, sf::Vector2f> {
-    inline static float get(const sf::Vector2f &t) {
-        return t.y;
-    };
-};
-
-} // namespace util
-} // namespace mapbox
-
 namespace sfvg {
-
-ClipperLib::Path sfvgToClipper(const Shape& sfvg) {
-    Points shapeVertices = sfvg.getVertices();
-    ClipperLib::Path clipper;
-    clipper.resize(shapeVertices.size());
-    for (std::size_t i = 0; i < shapeVertices.size(); ++i) {
-        clipper[i] = ClipperLib::IntPoint(static_cast<ClipperLib::cInt>(shapeVertices[i].x * CLIPPER_PRECISION),
-                                     static_cast<ClipperLib::cInt>(shapeVertices[i].y * CLIPPER_PRECISION));
-    }
-    return clipper;
-}
-
-Shape clipperToSfvg(const ClipperLib::Path& clipper) {
-    Shape sfvg(clipper.size());
-    for (std::size_t j = 0; j < clipper.size(); ++j) {
-        sfvg.setPoint(j, sf::Vector2f(static_cast<float>(clipper[j].X) / CLIPPER_PRECISION,
-                                      static_cast<float>(clipper[j].Y) / CLIPPER_PRECISION));
-    }
-    return sfvg;
-}
 
 //==============================================================================
 // PUBLIC FUNCTIONS
@@ -455,7 +399,7 @@ void Shape::draw(sf::RenderTarget& target, sf::RenderStates states) const {
     if (m_texture)
         states.texture = m_texture;
     else
-        states.texture = &whiteTexture;
+        states.texture = &SFVG_WHITE_TEXTURE;
     if (!m_hasSolidFill)
         states.shader = m_fillGradient.getShader();
     target.draw(&m_vertexArray[0], m_vertexArray.size(), sf::Triangles, states);

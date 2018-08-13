@@ -6,6 +6,7 @@
 #include <SFVG/Graphics/Color.hpp>
 #include <SFVG/Graphics/Gradient.hpp>
 #include <SFVG/Graphics/Path.hpp>
+#include <SFVG/Graphics/Stroke.hpp>
 #include <SFVG/Graphics/Shape.hpp>
 #include <SFVG/Graphics/Shapes/CircleShape.hpp>
 #include <SFVG/Graphics/Shapes/PolygonShape.hpp>

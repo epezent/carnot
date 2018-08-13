@@ -26,6 +26,10 @@ inline float wrapTo2Pi(float angle) {
     return angle;
 }
 
+inline bool approximately(float a, float b, float delta) {
+    return std::abs(a-b) < delta;
+}
+
 //==============================================================================
 // VECTOR ALGEBRA
 //==============================================================================

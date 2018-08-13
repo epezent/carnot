@@ -106,14 +106,15 @@ int main(int argc, char* argv[]) {
             if (event.type == sf::Event::KeyPressed &&
                 event.key.code == sf::Keyboard::S)
             {
-                anim.start();
+                anim.play();
             }
 
 
             if (event.type == sf::Event::KeyPressed &&
                 event.key.code == sf::Keyboard::R)
             {
-                anim.restart();
+                anim.stop();
+                anim.play();
             }
 
             if (event.type == sf::Event::KeyPressed &&

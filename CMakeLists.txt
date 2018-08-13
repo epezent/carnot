@@ -48,13 +48,17 @@ link_directories("${SFML_ROOT}/lib")
 
 # create SFVG library
 add_library(sfvg
+    src/SFVG/Animation/Animation.cpp
     src/SFVG/Graphics/Gradient.cpp
     src/SFVG/Graphics/Color.cpp
     src/SFVG/Graphics/Shape.cpp
+    src/SFVG/Graphics//Stroke.cpp
     src/SFVG/Graphics/Path.cpp
     src/SFVG/Graphics/Anchor.cpp
     src/SFVG/Graphics/Points.cpp
     src/SFVG/Graphics/Detail/clipper.cpp
+    src/SFVG/Graphics/Detail/ExternalLibs.cpp
+    src/SFVG/Graphics/Detail/SharedResources.cpp
     ${SRC_SHAPES}
 )
 
@@ -76,6 +80,9 @@ target_link_libraries(test5 sfvg ${SFML_LIBRARIES} ${SFML_DEPENDENCIES})
 
 add_executable(test6 tests/test6.cpp)
 target_link_libraries(test6 sfvg ${SFML_LIBRARIES} ${SFML_DEPENDENCIES})
+
+add_executable(test7 tests/test7.cpp)
+target_link_libraries(test7 sfvg ${SFML_LIBRARIES} ${SFML_DEPENDENCIES})
 
 add_executable(benchmark tests/benchmark.cpp)
 target_link_libraries(benchmark sfvg ${SFML_LIBRARIES} ${SFML_DEPENDENCIES})

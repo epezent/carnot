@@ -7,6 +7,7 @@
 namespace sfvg {
 
 class Shape;
+class Stroke;
 
 class Gradient {
 public:
@@ -31,6 +32,7 @@ public:
 private:
 
     friend class Shape;
+    friend class Stroke;
 
     sf::Shader* getShader() const;
 

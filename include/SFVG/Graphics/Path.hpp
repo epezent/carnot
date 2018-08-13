@@ -30,7 +30,6 @@ private:
     void update() const;
     void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 
-
 private:
 
     std::vector<Anchor> m_anchors;

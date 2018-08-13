@@ -7,6 +7,7 @@ namespace sfvg {
 
 class CircleShape : public Shape {
 public:
+
     CircleShape(float radius, std::size_t smoothness = 50);
 
     void setCircleRadius(float radius);

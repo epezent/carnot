@@ -37,6 +37,9 @@ inline float clamp01(float value);
 /// Wraps an angle in radians to within 2 PI
 inline float wrapTo2Pi(float angle);
 
+/// Determines if two floats a and b are approximately equal
+inline bool approximately(float a, float b, float delta = EPS);
+
 //==============================================================================
 // VECTOR ALGEBRA
 //==============================================================================
