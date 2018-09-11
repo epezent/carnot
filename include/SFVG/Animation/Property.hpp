@@ -65,8 +65,8 @@ struct Property {
 SFVG_PROPERTY(PPosition,     sf::Vector2f, setPosition,     getPosition);
 SFVG_PROPERTY(PRotation,     float,        setRotation,     getRotation);
 SFVG_PROPERTY(PScale,        sf::Vector2f, setScale,        getScale);
-SFVG_PROPERTY(PFillColor,    sf::Color,    setFillColor,    getFillColor);
-SFVG_PROPERTY(PFillGradient, Gradient,     setFillGradient, getFillGradient);
+SFVG_PROPERTY(PColor,        sf::Color,    setColor,        getColor);
+SFVG_PROPERTY(PGradient,     Gradient,     setGradient,     getGradient);
 SFVG_PROPERTY(PPoints,       Points,       setPoints,       getPoints);
 SFVG_PROPERTY(PRadii,  std::vector<float>, setRadii,        getRadii);
 

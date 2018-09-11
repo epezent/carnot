@@ -1,16 +1,12 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Window/Mouse.hpp>
 #include <SFML/Window/Keyboard.hpp>
-#include <SFVG/Graphics/Shape.hpp>
 #include "Fps.hpp"
 #include <iostream>
 #include <cmath>
 #include <sstream>
 #include <limits>
-#include <SFVG/Graphics/Shapes/SquareShape.hpp>
-#include <SFVG/Graphics/Shapes/RectangleShape.hpp>
-#include <SFVG/Graphics/Shapes/StarShape.hpp>
-#include <SFVG/Graphics/Shapes/PolygonShape.hpp>
+#include <SFVG/Graphics.hpp>
 
 using namespace sfvg;
 
@@ -19,10 +15,11 @@ using namespace sfvg;
 
 int main()
 {
+    sfvgInit();
+
     sf::ContextSettings settings;
     settings.antialiasingLevel = 8;
     sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "SFVG", sf::Style::Default, settings);
-    // window.setVerticalSyncEnabled(true);
 
     sf::Shader shader;
     shader.loadFromFile("../shaders/linear_gradient.frag", sf::Shader::Fragment);
@@ -50,14 +47,11 @@ int main()
         for (std::size_t y = 0; y < 10; ++y) {
             PolygonShape shape(N, PolygonShape::CircumscribedRadius, 50);
             shape.setPosition(x*100 + 50, y*100 + 50);
-            shape.setFillGradient(Gradient(sf::Color::Blue, sf::Color::Red, 45));
+            shape.setGradient(Gradient(sf::Color::Blue, sf::Color::Red, 45));
             shapes.push_back(shape);
         }
         N++;
     }
-
-
-
 
     //==========================================================================
 

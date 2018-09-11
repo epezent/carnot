@@ -8,7 +8,7 @@ namespace sfvg {
 class SquareShape : public Shape {
 public:
 
-    SquareShape(float sideLength);
+    SquareShape(float sideLength = 100);
 
     void setSideLength(float sideLength);
 

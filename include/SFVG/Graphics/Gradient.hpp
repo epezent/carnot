@@ -39,6 +39,7 @@ private:
 private:
 
     sf::Shader* m_shader;
+
 };
 
 bool operator ==(const Gradient& left, const Gradient& right);

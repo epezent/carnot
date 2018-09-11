@@ -6,6 +6,8 @@ using namespace sfvg;
 
 int main(int argc, char* argv[]) {
 
+    sfvgInit();
+
     sf::ContextSettings settings;
     settings.antialiasingLevel = 8;
     sf::RenderWindow window(sf::VideoMode(1000, 1000), "SFVG Shapes", sf::Style::Default, settings);

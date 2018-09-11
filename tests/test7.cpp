@@ -6,6 +6,7 @@ using namespace sfvg;
 
 int main(int argc, char* argv[]) {
 
+    sfvgInit();
 
     std::size_t n = 100;
     auto t = linspace(0, 1.0, n);
@@ -13,9 +14,21 @@ int main(int argc, char* argv[]) {
     float thk = 10;
 
     Stroke stroke1(n);
-    //stroke1.setColor(sf::Color::Red);
+    // stroke1.setColor(sf::Color::Red);
     stroke1.setGradient(Gradient(sf::Color::Red, sf::Color::Black, 90));
-    stroke1.setThicnkess(10);
+    stroke1.setThicnkess(thk);
+    // stroke1.showWireFrame(true);
+
+    Stroke stroke2;
+    stroke2.setColor(sfvg::Greens::Chartreuse);
+    stroke2.addPoint(100,100);
+    stroke2.addPoint(500,100);
+    stroke2.addPoint(900,100);
+    stroke2.addPoint(900, 500);
+    stroke2.addPoint(900,900);
+    stroke2.addPoint(700,700);
+    stroke2.addPoint(500,500);
+    stroke2.setThicnkess(10);
 
     // stroke1.addPoint(100,100);
     // stroke1.addPoint(200,100);
@@ -30,15 +43,21 @@ int main(int argc, char* argv[]) {
 
     while (window.isOpen()) {
         sf::Event event;
+
+        auto mousePosition = sf::Vector2f(sf::Mouse::getPosition(window));
+
         while (window.pollEvent(event)) {
 
             if (event.type == sf::Event::Closed ||
                 (event.type == sf::Event::KeyPressed &&
                 event.key.code == sf::Keyboard::Escape))
                 window.close();
+
+            if (event.type == sf::Event::MouseButtonPressed) {
+                stroke2.addPoint(mousePosition);
+            }
         }
 
-        auto mousePosition = sf::Vector2f(sf::Mouse::getPosition(window));
 
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num1))
             stroke1.setPoint(0, mousePosition);
@@ -52,14 +71,14 @@ int main(int argc, char* argv[]) {
             stroke1.setPoint(4, mousePosition);
 
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
-            f += 0.001f;
+            f += 0.01f;
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
-            f -= 0.001f;
+            f -= 0.01f;
 
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
-            thk -= 0.01f;
+            thk -= 0.1f;
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
-            thk += 0.01f;
+            thk += 0.1f;
 
         for (std::size_t i = 0; i < n; ++i) {
             stroke1.setPoint(i, 1000 * t[i], 500 + 100 * std::sin(2*PI*t[i]*f));
@@ -69,6 +88,7 @@ int main(int argc, char* argv[]) {
 
         window.clear(Grays::Black);
         window.draw(stroke1);
+        window.draw(stroke2);
         window.display();
     }
 

@@ -1,7 +1,6 @@
 #include <SFML/Graphics.hpp>
-#include <SFVG/Graphics/Shapes/PolygonShape.hpp>
+#include <SFVG/Graphics.hpp>
 #include <SFVG/Animation/Tween.hpp>
-#include <SFVG/Graphics/Color.hpp>
 
 using namespace sfvg;
 
@@ -9,6 +8,9 @@ using namespace sfvg;
 #define WINDOW_HEIGHT 1000.0f
 
 int main() {
+
+    sfvgInit();
+
     sf::ContextSettings settings;
     settings.antialiasingLevel = 8;
     sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "SFVG",
@@ -26,7 +28,7 @@ int main() {
 
     PolygonShape poly(6, PolygonShape::CircumscribedRadius, 50.0f);
     poly.setPosition(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);
-    poly.setFillGradient(Gradient(Color::hex("#0094FFFF"), Color::hex("#00137FFF"), 45.0f));
+    poly.setGradient(Gradient(Color::hex("#0094FFFF"), Color::hex("#00137FFF"), 45.0f));
     sf::Clock moveClock;
     sf::Vector2f moveFrom = poly.getPosition();
     sf::Vector2f moveTo   = poly.getPosition();

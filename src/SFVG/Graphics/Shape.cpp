@@ -3,7 +3,7 @@
 #include <SFVG/Graphics/Shape.hpp>
 #include <SFVG/Math.hpp>
 #include "Detail/ExternalLibs.hpp"
-#include "Detail/SharedResources.hpp"
+#include "SharedResources.hpp"
 #include <iostream>
 #include <limits>
 
@@ -17,7 +17,7 @@ Shape::Shape(std::size_t pointCount) :
     m_holes(0),
     m_texture(NULL),
     m_textureRect(),
-    m_fillGradient(),
+    m_gradient(),
     m_hasSolidFill(true),
     m_showWireFrame(false),
     m_showBoundsBox(false),
@@ -25,6 +25,7 @@ Shape::Shape(std::size_t pointCount) :
 {
     setPointCount(pointCount);
     setTextureRect(sf::IntRect(0, 0, 1, 1));
+
 }
 
 Shape::~Shape() {}
@@ -163,25 +164,25 @@ void Shape::addHole(const Shape &hole) {
     m_needsUpdate = true;
 }
 
-void Shape::setFillGradient(const Gradient &gradient) {
-    m_fillGradient = gradient;
+void Shape::setGradient(const Gradient &gradient) {
+    m_gradient = gradient;
     m_hasSolidFill = false;
 }
 
-Gradient Shape::getFillGradient() const {
-    return m_fillGradient;
+Gradient Shape::getGradient() const {
+    return m_gradient;
 }
 
-void Shape::setFillColor(const sf::Color& color)
+void Shape::setColor(const sf::Color& color)
 {
-    m_fillColor = color;
+    m_color = color;
     m_hasSolidFill = true;
     updateFillColors();
 }
 
-const sf::Color& Shape::getFillColor() const
+const sf::Color& Shape::getColor() const
 {
-    return m_fillColor;
+    return m_color;
 }
 
 void Shape::setTexture(const sf::Texture* texture, bool resetRect) {
@@ -373,7 +374,7 @@ void Shape::updateTexCoords() const {
 void Shape::updateFillColors() const
 {
     for (std::size_t i = 0; i < m_vertexArray.size(); ++i)
-        m_vertexArray[i].color = m_fillColor;
+        m_vertexArray[i].color = m_color;
 }
 
 void Shape::update() const {
@@ -399,20 +400,17 @@ void Shape::draw(sf::RenderTarget& target, sf::RenderStates states) const {
     if (m_texture)
         states.texture = m_texture;
     else
-        states.texture = &SFVG_WHITE_TEXTURE;
+        states.texture = SFVG_WHITE_TEXTURE;
     if (!m_hasSolidFill)
-        states.shader = m_fillGradient.getShader();
+        states.shader = m_gradient.getShader();
     target.draw(&m_vertexArray[0], m_vertexArray.size(), sf::Triangles, states);
 
     if (m_showBoundsBox) {
         sf::VertexArray bounds(sf::LineStrip, 5);
         bounds[0].position = sf::Vector2f(m_bounds.left, m_bounds.top);
-        bounds[1].position =
-            sf::Vector2f(m_bounds.left + m_bounds.width, m_bounds.top);
-        bounds[2].position = sf::Vector2f(m_bounds.left + m_bounds.width,
-                                          m_bounds.top + m_bounds.height);
-        bounds[3].position =
-            sf::Vector2f(m_bounds.left, m_bounds.top + m_bounds.height);
+        bounds[1].position = sf::Vector2f(m_bounds.left + m_bounds.width, m_bounds.top);
+        bounds[2].position = sf::Vector2f(m_bounds.left + m_bounds.width, m_bounds.top + m_bounds.height);
+        bounds[3].position = sf::Vector2f(m_bounds.left, m_bounds.top + m_bounds.height);
         bounds[4].position = bounds[0].position;
         target.draw(bounds, states);
     }
@@ -435,7 +433,7 @@ void Shape::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 //==============================================================================
 
 Shape Shape::offsetShape(const Shape &shape, float offset, Shape::OffsetType type) {
-    ClipperLib::Path subj = sfvgToClipper(shape);
+    ClipperLib::Path subj = sfvgToClipper(shape.getVertices());
     ClipperLib::ClipperOffset co;
     switch (type) {
         case Miter:
@@ -449,10 +447,12 @@ Shape Shape::offsetShape(const Shape &shape, float offset, Shape::OffsetType typ
     }
     ClipperLib::Paths solution;
     co.Execute(solution, offset * CLIPPER_PRECISION);
-    Shape offsetShape =  clipperToSfvg(solution[0]);
+    Shape offsetShape;
+    if (solution.size() > 0)
+        offsetShape.setPoints(clipperToSfvg(solution[0]));
     for (std::size_t i = 0; i < shape.getHoleCount(); ++i) {
         co.Clear();
-        ClipperLib::Path holeSubj = sfvgToClipper(shape.m_holes[i]);
+        ClipperLib::Path holeSubj = sfvgToClipper(shape.m_holes[i].getVertices());
         switch (type) {
             case Miter:
                 co.AddPath(holeSubj, ClipperLib::jtMiter, ClipperLib::etClosedPolygon);
@@ -465,7 +465,11 @@ Shape Shape::offsetShape(const Shape &shape, float offset, Shape::OffsetType typ
         }
         solution.clear();
         co.Execute(solution, -offset * CLIPPER_PRECISION);
-        offsetShape.addHole(clipperToSfvg(solution[0]));
+        if (solution.size() > 0) {
+            Shape hole;
+            hole.setPoints(clipperToSfvg(solution[0]));
+            offsetShape.addHole(hole);
+        }
     }
 
     return offsetShape;
@@ -476,13 +480,13 @@ std::vector<Shape> Shape::clipShapes(const Shape &subject, const Shape &clip, Cl
     ClipperLib::Paths subj;
     ClipperLib::Paths clp;
 
-    subj << sfvgToClipper(subject);
-    clp  << sfvgToClipper(clip);
+    subj << sfvgToClipper(subject.getVertices());
+    clp  << sfvgToClipper(clip.getVertices());
 
     for (std::size_t i = 0; i < subject.m_holes.size(); ++i)
-        subj << sfvgToClipper(subject.m_holes[i]);
+        subj << sfvgToClipper(subject.m_holes[i].getVertices());
     for (std::size_t i = 0; i < clip.m_holes.size(); ++i)
-        clp << sfvgToClipper(clip.m_holes[i]);
+        clp << sfvgToClipper(clip.m_holes[i].getVertices());
 
     ClipperLib::Clipper clpr;
     clpr.AddPaths(subj, ClipperLib::ptSubject, true);
@@ -505,11 +509,12 @@ std::vector<Shape> Shape::clipShapes(const Shape &subject, const Shape &clip, Cl
     }
     std::vector<Shape> clippedShapes(polyTree.ChildCount());
     for (std::size_t i = 0; i < static_cast<std::size_t>(polyTree.ChildCount()); ++i) {
-        clippedShapes[i] = clipperToSfvg(polyTree.Childs[i]->Contour);
+        clippedShapes[i].setPoints(clipperToSfvg(polyTree.Childs[i]->Contour));
         // add holes
         for (std::size_t j = 0; j < static_cast<std::size_t>(polyTree.Childs[i]->ChildCount()); ++j) {
             if (polyTree.Childs[i]->Childs[j]->IsHole()) {
-                Shape hole = clipperToSfvg(polyTree.Childs[i]->Childs[j]->Contour);
+                Shape hole;
+                hole.setPoints(clipperToSfvg(polyTree.Childs[i]->Childs[j]->Contour));
                 clippedShapes[i].addHole(hole);
             }
         }

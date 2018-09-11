@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cassert>
 
 namespace sfvg {
 
@@ -12,7 +13,7 @@ inline std::vector<float> linspace(float a, float b, std::size_t N) {
     return linspace_out;
 }
 
-inline float clamp(float& value, float min, float max) {
+inline float clamp(float value, float min, float max) {
     return value <= min ? min : value >= max ? max : value;
 }
 
@@ -43,6 +44,7 @@ inline float magnitude(const sf::Vector2f& v) {
 }
 
 inline sf::Vector2f unit(const sf::Vector2f& v) {
+    assert(v != sf::Vector2f());
     return v / magnitude(v);
 }
 

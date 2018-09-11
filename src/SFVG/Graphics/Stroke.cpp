@@ -1,9 +1,11 @@
 #include <SFVG/Graphics/Stroke.hpp>
 #include <SFVG/Math.hpp>
+#include <SFVG/Graphics/Shape.hpp>
 #include <SFML/Graphics/RenderTarget.hpp>
-#include "Detail/SharedResources.hpp"
+#include "SharedResources.hpp"
+#include "Detail/ExternalLibs.hpp"
 
-#define SFVG_STROKE_PRECISION 10e-4
+#define SFVG_PRECISION 10e-10
 
 namespace sfvg {
 
@@ -13,6 +15,8 @@ Stroke::Stroke(std::size_t pointCount) :
     m_textureRect(),
     m_gradient(),
     m_hasSolidFill(true),
+    m_showWireFrame(false),
+    m_showBoundsBox(false),
     m_needsUpdate(true)
 {
     setPointCount(pointCount);
@@ -121,6 +125,26 @@ sf::FloatRect Stroke::getGlobalBounds() const {
     return getTransform().transformRect(m_bounds);
 }
 
+void Stroke::showWireFrame(bool show) {
+    m_showWireFrame = show;
+}
+
+void Stroke::showBoundsBox(bool show) {
+    m_showBoundsBox = show;
+}
+
+//==============================================================================
+// PUBLIC STATIC
+//==============================================================================
+
+Stroke Stroke::fromShape(const sfvg::Shape &shape) {
+    Stroke stroke;
+    stroke.setPointCount(shape.getVerticesCount() + 1);
+    stroke.setPoints(shape.getVertices());
+    stroke.addPoint(stroke.getPoint(0));
+    return stroke;
+}
+
 //==============================================================================
 // PRIVATE
 //==============================================================================
@@ -128,60 +152,42 @@ sf::FloatRect Stroke::getGlobalBounds() const {
 void Stroke::updateVertexArray() const {
     if (m_points.size() < 2)
         return;
-    float halfThickness = m_thickness * 0.5f;
+    // clear and reserve vertex array
     m_vertexArray.clear();
     m_vertexArray.reserve(m_points.size() * 2);
+    // declare variables
+    Point A, B, C, N, T, M;
+    float halfThickness = m_thickness * 0.5f;
+    // first point
+    N = unit(normal(m_points[1] - m_points[0]));
+    m_vertexArray.push_back(m_points[0] + N * halfThickness);
+    m_vertexArray.push_back(m_points[0] - N * halfThickness);
+    // inner points
     std::size_t a = 0;
-    for (std::size_t i = 0; i < m_points.size(); ++i) {
-        if (i == 0) {
-            Point n = unit(normal(m_points[i+1] - m_points[i]));
-            m_vertexArray.push_back(m_points[i] + n * halfThickness);
-            m_vertexArray.push_back(m_points[i] - n * halfThickness);
-        }
-        else if (i == (m_points.size() - 1)) {
-            sf::Vector2f n = unit(normal(m_points[i] - m_points[i-1]));
-            m_vertexArray.push_back(m_points[i] + n * halfThickness);
-            m_vertexArray.push_back(m_points[i] - n * halfThickness);
-        }
-        else {
-            Point A = m_points[a];
-            Point B = m_points[i];
-            Point C = m_points[i+1];
-            Point V1 = B - A;
-            Point V2 = B - C;
-            Point U1 = unit(V1);
-            Point U2 = unit(V2);
-            if (!approximately(U1.y * U2.x, U2.y * U1.x, SFVG_STROKE_PRECISION)) {
-                Point N1 = normal(U1);
-                Point N2 = normal(U2);
-                if (dot(N1, -V2) < 0.0f)
-                    N1 = -N1;
-                if (dot(N2, -V1) < 0.0f)
-                    N2 = -N2;
-                Point O11in = A + N1 * halfThickness;
-                Point O10in = B + N1 * halfThickness;
-                Point O22in = C + N2 * halfThickness;
-                Point O20in = B + N2 * halfThickness;
-                Point Iin = intersection(O11in, O10in, O22in, O20in);
-                Point O11out = A - N1 * halfThickness;
-                Point O10out = B - N1 * halfThickness;
-                Point O22out = C - N2 * halfThickness;
-                Point O20out = B - N2 * halfThickness;
-                Point Iout = intersection(O11out, O10out, O22out, O20out);
-                  if (((A.x-C.x)*(B.y-A.y) - (A.x-B.x)*(C.y-A.y)) < 0) {
-                    // counter-clockwise rotation
-                    m_vertexArray.push_back(Iout);
-                    m_vertexArray.push_back(Iin);
-                }
-                else {
-                    // clockwise rotation
-                    m_vertexArray.push_back(Iin);
-                    m_vertexArray.push_back(Iout);
-                }
-                a = i;
-            }
+    for (std::size_t i = 1; i < m_points.size()-1; ++i) {
+        A = m_points[a];   // previous point
+        B = m_points[i];   // this point
+        C = m_points[i+1]; // next point
+        N = unit(normal(B-A));           // normal vector to AB
+        T = unit(unit(C-B) + unit(B-A)); // tangent vector at B
+        M = normal(T);                   // miter direction
+        float dotMN = dot(M,N);
+        float offset = halfThickness / dotMN; // offset length along miter
+        // make sure AB an BC aren't parallel
+        if (!approximately(dotMN, 1.0, SFVG_PRECISION))
+        {
+            Point M1 = B + M * offset;
+            Point M2 = B - M * offset;
+            m_vertexArray.push_back(M1);
+            m_vertexArray.push_back(M2);
+            a = i;
         }
     }
+    // last point
+    std::size_t i = m_points.size()-1;
+    N = unit(normal(m_points[i] - m_points[i-1]));
+    m_vertexArray.push_back(m_points[i] + N * halfThickness);
+    m_vertexArray.push_back(m_points[i] - N * halfThickness);
 }
 
 void Stroke::updateBounds() const {
@@ -230,13 +236,29 @@ void Stroke::draw(sf::RenderTarget& target, sf::RenderStates states) const {
     if (m_needsUpdate)
         update();
     states.transform *= getTransform();
+    auto baseStates = states;
     if (m_texture)
         states.texture = m_texture;
     else
-        states.texture = &SFVG_WHITE_TEXTURE;
+        states.texture = SFVG_WHITE_TEXTURE;
     if (!m_hasSolidFill)
         states.shader = m_gradient.getShader();
     target.draw(&m_vertexArray[0], m_vertexArray.size(), sf::TriangleStrip, states);
+
+    if (m_showBoundsBox) {
+        sf::VertexArray bounds(sf::LineStrip, 5);
+        bounds[0].position = sf::Vector2f(m_bounds.left, m_bounds.top);
+        bounds[1].position = sf::Vector2f(m_bounds.left + m_bounds.width, m_bounds.top);
+        bounds[2].position = sf::Vector2f(m_bounds.left + m_bounds.width, m_bounds.top + m_bounds.height);
+        bounds[3].position = sf::Vector2f(m_bounds.left, m_bounds.top + m_bounds.height);
+        bounds[4].position = bounds[0].position;
+        target.draw(bounds, baseStates);
+    }
+
+    if (m_showWireFrame) {
+        target.draw(&m_vertexArray[0], m_vertexArray.size(), sf::LineStrip, baseStates);
+    }
+
 }
 
 } // namespace sfvg

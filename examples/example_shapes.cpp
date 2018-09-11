@@ -6,6 +6,8 @@ using namespace sfvg;
 
 int main(int argc, char* argv[]) {
 
+    sfvgInit();
+
     sf::ContextSettings settings;
     settings.antialiasingLevel = 8;
     sf::RenderWindow window(sf::VideoMode(1000, 1000), "SFVG Shapes", sf::Style::Default, settings);
@@ -13,30 +15,29 @@ int main(int argc, char* argv[]) {
 
     CircleShape circle(50);
     circle.setPosition(100, 100);
-    circle.setFillColor(Reds::FireBrick);
-    std::cout << circle.getPoints().getArea() << std::endl;
+    circle.setColor(Reds::FireBrick);
 
     PolygonShape polygon(5, PolygonShape::CircumscribedRadius, 50);
     polygon.setPosition(300, 100);
-    polygon.setFillColor(Oranges::Orange);
-    std::cout << polygon.getPoints().getArea() << std::endl;
-
+    polygon.setColor(Oranges::Orange);
 
     RectangleShape rectangle(100, 50);
     rectangle.setPosition(500, 100);
-    rectangle.setFillColor(Yellows::Gold);
-    std::cout << rectangle.getPoints().getArea() << std::endl;
-
+    rectangle.setColor(Yellows::Gold);
 
     SquareShape square(100);
     square.setPosition(700, 100);
-    square.setFillColor(Greens::Chartreuse);
-    std::cout << square.getPoints().getArea() << std::endl;
-
+    square.setColor(Greens::Chartreuse);
 
     StarShape star(5, 25, 50);
     star.setPosition(900, 100);
-    star.setFillColor(Greens::Green);
+    star.setColor(Greens::Green);
+
+    CrossShape cross(100,100,20);
+    cross.setPosition(100, 300);
+    cross.setColor(Blues::DeepSkyBlue);
+
+
 
     while (window.isOpen()) {
         sf::Event event;
@@ -47,13 +48,14 @@ int main(int argc, char* argv[]) {
                 window.close();
         }
 
-        window.clear(Whites::White);
+        window.clear(sf::Color::White);
 
         window.draw(circle);
         window.draw(polygon);
         window.draw(rectangle);
         window.draw(square);
         window.draw(star);
+        window.draw(cross);
 
         window.display();
     }

@@ -26,6 +26,8 @@ T MyTween(const T& a, const T& b, float t) {
 
 int main(int argc, char* argv[]) {
 
+    sfvgInit();
+
     sf::ContextSettings settings;
     settings.antialiasingLevel = 8;
     sf::RenderWindow window(sf::VideoMode(1000, 1000), "SFVG", sf::Style::Default, settings);
@@ -48,7 +50,7 @@ int main(int argc, char* argv[]) {
     // ====
 
     StarShape shape(6, 50, 100);
-    shape.setFillGradient(Gradient(Yellows::Gold, Yellows::Khaki, 0.0f));
+    shape.setGradient(Gradient(Yellows::Gold, Yellows::Khaki, 0.0f));
     shape.setRadii(10);
     shape.setPosition(250, 250);
     // shape.showWireFrame(true);
@@ -56,28 +58,28 @@ int main(int argc, char* argv[]) {
 
     StarShape star(6, 100, 300);
 
-    Animation<PPosition, PRotation, PScale, PFillGradient> anim;
+    Animation<PPosition, PRotation, PScale, PGradient> anim;
     anim.keyFrame(0.00f).setFrom(&shape);
 
     anim.keyFrame(0.25f).delta<PPosition>(sf::Vector2f(500, 0), Tween::Elastic::Out)
                         .delta<PRotation>(180.0f, Tween::Smootherstep)
                         .absolute<PScale>(sf::Vector2f(2.0f,2.0f))
-                        .absolute<PFillGradient>(Gradient(Reds::Crimson, Reds::Salmon));
+                        .absolute<PGradient>(Gradient(Reds::Crimson, Reds::Salmon));
 
     anim.keyFrame(0.50f).delta<PPosition>(sf::Vector2f(0, 500), Tween::Bounce::Out)
                         .delta<PRotation>(-90.0f, Tween::Smootherstep)
                         .absolute<PScale>(sf::Vector2f(1.0f,1.0f))
-                        .absolute<PFillGradient>(Gradient(Blues::DodgerBlue, Blues::DeepSkyBlue));
+                        .absolute<PGradient>(Gradient(Blues::DodgerBlue, Blues::DeepSkyBlue));
 
     anim.keyFrame(0.75f).delta<PPosition>(sf::Vector2f(-500,0), Tween::Elastic::Out)
                         .delta<PRotation>(90.0f, Tween::Smootherstep)
                         .absolute<PScale>(sf::Vector2f(2.0f,2.0f))
-                        .absolute<PFillGradient>(Gradient(Greens::Chartreuse, Greens::DarkGreen));
+                        .absolute<PGradient>(Gradient(Greens::Chartreuse, Greens::DarkGreen));
 
     anim.keyFrame(1.00f).delta<PPosition>(sf::Vector2f(0,-500), Tween::Back::Out)
                         .delta<PRotation>(-180.0f, Tween::Smootherstep)
                         .absolute<PScale>(sf::Vector2f(1.0f,1.0f))
-                        .setFrom<PFillGradient>(&shape);
+                        .setFrom<PGradient>(&shape);
     anim.setDuration(sf::seconds(4));
 
     // Animation<pPoints, PRotation> anim;

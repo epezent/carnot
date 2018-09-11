@@ -9,9 +9,16 @@
 #include <SFVG/Graphics/Stroke.hpp>
 #include <SFVG/Graphics/Shape.hpp>
 #include <SFVG/Graphics/Shapes/CircleShape.hpp>
+#include <SFVG/Graphics/Shapes/CrossShape.hpp>
 #include <SFVG/Graphics/Shapes/PolygonShape.hpp>
 #include <SFVG/Graphics/Shapes/RectangleShape.hpp>
 #include <SFVG/Graphics/Shapes/SquareShape.hpp>
 #include <SFVG/Graphics/Shapes/StarShape.hpp>
+
+namespace sfvg {
+
+extern void sfvgInit();
+
+}
 
 #endif // SFVG_GRAPHICS_HPP

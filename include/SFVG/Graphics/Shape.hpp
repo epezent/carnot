@@ -94,16 +94,16 @@ public:
     void addHole(const Shape& hole);
 
     /// Sets the fill of a shape to a solid Color
-    void setFillColor(const sf::Color& color);
+    void setColor(const sf::Color& color);
 
     /// Gets the fill Color of a shape
-    const sf::Color& getFillColor() const;
+    const sf::Color& getColor() const;
 
     /// Sets the fill Gradient of the Shape
-    void setFillGradient(const Gradient& gradient);
+    void setGradient(const Gradient& gradient);
 
     /// Gets the fill Gradient of the Shape
-    Gradient getFillGradient() const;
+    Gradient getGradient() const;
 
     /// Sets the texture of the Shape
     void setTexture(const sf::Texture* texture, bool resetRect = false);
@@ -168,8 +168,8 @@ private:
     mutable std::vector<sf::Vertex> m_vertexArray;
     const sf::Texture* m_texture;
     sf::IntRect m_textureRect;
-    sf::Color m_fillColor;
-    Gradient m_fillGradient;
+    sf::Color m_color;
+    Gradient m_gradient;
     bool m_hasSolidFill;
     mutable sf::FloatRect m_bounds;
     bool m_showWireFrame;

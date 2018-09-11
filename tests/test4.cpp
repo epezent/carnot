@@ -6,6 +6,8 @@ using namespace sfvg;
 
 int main(int argc, char* argv[]) {
 
+    sfvgInit();
+
     sf::ContextSettings settings;
     settings.antialiasingLevel = 8;
     sf::RenderWindow window(sf::VideoMode(1000, 1000), "SFVG Shapes", sf::Style::Default, settings);
@@ -56,9 +58,9 @@ int main(int argc, char* argv[]) {
             line2[1].position = sf::Vector2f(mousePosition);
 
         if (intersect(line1[0].position,line1[1].position,line2[0].position,line2[1].position))
-            point.setFillColor(Greens::Chartreuse);
+            point.setColor(Greens::Chartreuse);
         else
-            point.setFillColor(Reds::FireBrick);
+            point.setColor(Reds::FireBrick);
 
         point.setPosition(intersection(line1[0].position,line1[1].position,line2[0].position,line2[1].position));
 

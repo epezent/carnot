@@ -8,7 +8,7 @@ namespace sfvg {
 class RectangleShape : public Shape {
 public:
 
-    RectangleShape(float width, float height);
+    RectangleShape(float width = 100, float height = 50);
 
     void setWidth(float width);
 

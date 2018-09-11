@@ -7,7 +7,7 @@ namespace sfvg {
 
 class StarShape : public Shape {
 public:
-    StarShape(std::size_t starPointCount, float starRadiusA, float starRadiusB);
+    StarShape(std::size_t starPointCount = 5, float starRadiusA = 100, float starRadiusB = 50);
 
     void setStarPointCount(std::size_t starPointCount);
 

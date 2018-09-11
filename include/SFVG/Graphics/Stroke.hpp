@@ -81,6 +81,16 @@ public:
     /// Gets the global bounding rectangle of the Shape
     sf::FloatRect getGlobalBounds() const;
 
+    /// Sets whether or not the Shape's wireframe is drawn
+    void showWireFrame(bool show);
+
+    /// Sets whether or not the Shape's bounding box is drawn
+    void showBoundsBox(bool show);
+
+public:
+
+    static Stroke fromShape(const Shape& shape);
+
 private:
 
     void updateVertexArray() const;
@@ -101,6 +111,8 @@ private:
     Gradient m_gradient;
     bool m_hasSolidFill;
     mutable sf::FloatRect m_bounds;
+    bool m_showWireFrame;
+    bool m_showBoundsBox;
     mutable bool m_needsUpdate;
 
 };

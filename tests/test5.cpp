@@ -6,6 +6,8 @@ using namespace sfvg;
 
 int main(int argc, char* argv[]) {
 
+    sfvgInit();
+
     sf::ContextSettings settings;
     settings.antialiasingLevel = 8;
     sf::RenderWindow window(sf::VideoMode(1000, 1000), "SFVG Shapes", sf::Style::Default, settings);
@@ -19,7 +21,7 @@ int main(int argc, char* argv[]) {
     label1.setPosition(10, 10);
 
     CircleShape point(10);
-    point.setFillColor(Yellows::Gold);
+    point.setColor(Yellows::Gold);
 
     sf::VertexArray ray(sf::Lines, 2);
     ray[0].color = Yellows::Gold;
@@ -68,9 +70,9 @@ int main(int argc, char* argv[]) {
         label1.setString(std::to_string(crosses));
 
         if (poly.getPoints().isInside(poly.getInverseTransform().transformPoint(point.getPosition())))
-            poly.setFillColor(Yellows::LightYellow);
+            poly.setColor(Yellows::LightYellow);
         else
-            poly.setFillColor(Grays::Gray);
+            poly.setColor(Grays::Gray);
 
 
         window.clear(Grays::Black);
@@ -81,7 +83,7 @@ int main(int argc, char* argv[]) {
         for (std::size_t i = 0; i < intersections.size(); ++i) {
             SquareShape s(10);
             s.setPosition(intersections[i]);
-            s.setFillColor(Yellows::Gold);
+            s.setColor(Yellows::Gold);
             window.draw(s);
         }
 

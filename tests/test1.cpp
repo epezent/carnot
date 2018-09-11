@@ -6,10 +6,7 @@
 #include <cmath>
 #include <sstream>
 #include <limits>
-#include <SFVG/Graphics/Shapes/SquareShape.hpp>
-#include <SFVG/Graphics/Shapes/RectangleShape.hpp>
-#include <SFVG/Graphics/Shapes/StarShape.hpp>
-#include <SFVG/Graphics/Shapes/PolygonShape.hpp>
+#include <SFVG/Graphics.hpp>
 #include <SFVG/Math.hpp>
 #include <SFVG/Graphics/Color.hpp>
 
@@ -20,6 +17,8 @@ using namespace sfvg;
 
 int main()
 {
+    sfvgInit();
+
     sf::ContextSettings settings;
     settings.antialiasingLevel = 8;
     sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "SFVG", sf::Style::Default, settings);
@@ -53,15 +52,15 @@ int main()
 
     SquareShape background(1000.0f);
     background.setPosition(500,500);
-    background.setFillGradient(Gradient(sf::Color::White, sf::Color(128,128,128,255), 45.0f));
+    background.setGradient(Gradient(sf::Color::White, sf::Color(128,128,128,255), 45.0f));
 
     PolygonShape poly(N, PolygonShape::CircumscribedRadius, circumscribedRadius);
     poly.setPosition(500, 500);
-    poly.setFillGradient(Gradient(Greens::Chartreuse, Cyans::Teal, 45));
+    poly.setGradient(Gradient(Greens::Chartreuse, Cyans::Teal, 45));
     //poly.setTexture(&texture);
 
     PolygonShape circle(100, PolygonShape::CircumscribedRadius, 10);
-    circle.setFillColor(sf::Color(0,0,0,128));
+    circle.setColor(sf::Color(0,0,0,128));
     circle.setPosition(500, 500);
 
     //==========================================================================

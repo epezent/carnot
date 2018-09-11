@@ -28,10 +28,10 @@ struct nth<1, sf::Vector2f> {
 
 namespace sfvg {
 
-class Shape;
+class Points;
 
-extern ClipperLib::Path sfvgToClipper(const Shape& sfvg);
-extern Shape clipperToSfvg(const ClipperLib::Path& clipper);
+extern ClipperLib::Path sfvgToClipper(const Points& sfvg);
+extern Points clipperToSfvg(const ClipperLib::Path& clipper);
 
 }
 

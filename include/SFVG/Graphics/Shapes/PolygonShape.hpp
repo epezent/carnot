@@ -9,9 +9,9 @@ class PolygonShape : public Shape {
 public:
     enum Parameter { CircumscribedRadius, InscribedRadius, SideLength };
 
-    PolygonShape(std::size_t sideCount,
-                 Parameter parameter,
-                 float parameterValue);
+    PolygonShape(std::size_t sideCount = 6,
+                 Parameter parameter   = Parameter::CircumscribedRadius,
+                 float parameterValue  = 100);
 
     void setSideCount(std::size_t count);
 
