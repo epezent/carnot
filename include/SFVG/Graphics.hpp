@@ -18,6 +18,7 @@
 namespace sfvg {
 
 extern void sfvgInit();
+extern void sfvgFree();
 
 }
 

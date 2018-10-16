@@ -6,8 +6,6 @@
 
 namespace sfvg {
 
-namespace Color {
-
     /// \brief Creates a color from CMYK values
     ///
     /// \param c Cyan component [0..1]
@@ -21,8 +19,6 @@ namespace Color {
 
     /// Creates a color from hex code
     sf::Color hex(std::string hex);
-}
-
 
 //==============================================================================
 // NAMED COLORS
@@ -208,6 +204,15 @@ namespace Grays
     const extern sf::Color SlateGray;
     const extern sf::Color DarkSlateGray;
     const extern sf::Color Black;
+    const extern sf::Color Gray10;
+    const extern sf::Color Gray20;
+    const extern sf::Color Gray30;
+    const extern sf::Color Gray40;
+    const extern sf::Color Gray50;
+    const extern sf::Color Gray60;
+    const extern sf::Color Gray70;
+    const extern sf::Color Gray80;
+    const extern sf::Color Gray90;
 }
 
 } // namespace sfvg

@@ -37,32 +37,28 @@ sf::Texture* SFVG_WHITE_TEXTURE;
 sf::Shader*  SFVG_SOLID_SHADER;
 sf::Shader*  SFVG_GRADIENT_SHADER;
 
-struct ResourceLoader {
-
-    ResourceLoader() {
-        // initialize resorces
-        SFVG_WHITE_IMAGE     = new sf::Image();
-        SFVG_WHITE_TEXTURE   = new sf::Texture();
-        SFVG_SOLID_SHADER    = new sf::Shader();
-        SFVG_GRADIENT_SHADER = new sf::Shader();
-        // load resources
-        SFVG_WHITE_IMAGE->create(1, 1, sf::Color::White);
-        SFVG_WHITE_TEXTURE->loadFromImage(*SFVG_WHITE_IMAGE);
-        SFVG_SOLID_SHADER->loadFromMemory(solidShaderGlsl, sf::Shader::Fragment);
-        SFVG_SOLID_SHADER->setUniform("u_texture", sf::Shader::CurrentTexture);
-        SFVG_GRADIENT_SHADER->loadFromMemory(gradientShaderGlsl, sf::Shader::Fragment);
-        SFVG_GRADIENT_SHADER->setUniform("u_texture", sf::Shader::CurrentTexture);
-        std::cout << "SFVG Resources Loaded" << std::endl;
-    }
-
-    ~ResourceLoader() {
-
-    }
-
-};
-
 void sfvgInit() {
-    ResourceLoader loader;
+    // initialize resorces
+    SFVG_WHITE_IMAGE     = new sf::Image();
+    SFVG_WHITE_TEXTURE   = new sf::Texture();
+    SFVG_SOLID_SHADER    = new sf::Shader();
+    SFVG_GRADIENT_SHADER = new sf::Shader();
+    // load resources
+    SFVG_WHITE_IMAGE->create(1, 1, sf::Color::White);
+    SFVG_WHITE_TEXTURE->loadFromImage(*SFVG_WHITE_IMAGE);
+    SFVG_SOLID_SHADER->loadFromMemory(solidShaderGlsl, sf::Shader::Fragment);
+    SFVG_SOLID_SHADER->setUniform("u_texture", sf::Shader::CurrentTexture);
+    SFVG_GRADIENT_SHADER->loadFromMemory(gradientShaderGlsl, sf::Shader::Fragment);
+    SFVG_GRADIENT_SHADER->setUniform("u_texture", sf::Shader::CurrentTexture);
+    std::cout << "SFVG Resources Loaded" << std::endl;
+}
+
+void sfvgFree() {
+    delete SFVG_WHITE_IMAGE;
+    delete SFVG_WHITE_TEXTURE;
+    delete SFVG_SOLID_SHADER;
+    delete SFVG_GRADIENT_SHADER;
+    std::cout << "SFVG Resources Freed" << std::endl;
 }
 
 

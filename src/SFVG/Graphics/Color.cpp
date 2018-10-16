@@ -6,7 +6,7 @@
 
 namespace sfvg {
 
-sf::Color Color::cmyk(float c, float m, float y, float k) {
+sf::Color cmyk(float c, float m, float y, float k) {
     c = clamp01(c);
     m = clamp01(m);
     y = clamp01(y);
@@ -17,7 +17,7 @@ sf::Color Color::cmyk(float c, float m, float y, float k) {
     return sf::Color(r,g,b);
 }
 
-sf::Color Color::hsv(float h, float s, float v) {
+sf::Color hsv(float h, float s, float v) {
     h = clamp01(h);
     s = clamp01(s);
     v = clamp01(v);
@@ -73,7 +73,7 @@ sf::Color Color::hsv(float h, float s, float v) {
     return sf::Color(r,g,b);
 }
 
-sf::Color Color::hex(std::string hex) {
+sf::Color hex(std::string hex) {
     if (hex[0] == '#')
         hex.erase(0,1);
     unsigned int r, g, b, a;
@@ -284,6 +284,15 @@ namespace Grays
     const sf::Color SlateGray(112,128,144);
     const sf::Color DarkSlateGray(47,79,79);
     const sf::Color Black(0,0,0);
+    const sf::Color Gray10(26,26,26);
+    const sf::Color Gray20(51,51,51);
+    const sf::Color Gray30(77,77,77);
+    const sf::Color Gray40(102,102,102);
+    const sf::Color Gray50(128,128,128);
+    const sf::Color Gray60(153,153,153);
+    const sf::Color Gray70(179,179,179);
+    const sf::Color Gray80(204,204,204);
+    const sf::Color Gray90(230,230,230);
 }
 
 } // namespace sfvg

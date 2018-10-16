@@ -5,12 +5,11 @@
 #include "SharedResources.hpp"
 #include "Detail/ExternalLibs.hpp"
 
-#define SFVG_PRECISION 10e-10
-
 namespace sfvg {
 
 Stroke::Stroke(std::size_t pointCount) :
     m_thickness(1),
+    m_miterLimit(4),
     m_texture(NULL),
     m_textureRect(),
     m_gradient(),
@@ -66,12 +65,21 @@ void Stroke::addPoint(float x, float y) {
 }
 
 void Stroke::setThicnkess(float thickness) {
-    m_thickness = thickness;
+    m_thickness = std::abs(thickness);
     m_needsUpdate = true;
 }
 
 float Stroke::getThickness() const {
     return m_thickness;
+}
+
+void Stroke::setMiterLimit(float miterLimit) {
+    m_miterLimit = miterLimit;
+    m_needsUpdate = true;
+}
+
+float Stroke::getMiterLimit() const {
+    return m_miterLimit;
 }
 
 void Stroke::setColor(const sf::Color &color) {
@@ -149,6 +157,95 @@ Stroke Stroke::fromShape(const sfvg::Shape &shape) {
 // PRIVATE
 //==============================================================================
 
+#define PUSH_BACK_TRIANGLE(a,b,c) \
+    m_vertexArray.push_back(a); \
+    m_vertexArray.push_back(b); \
+    m_vertexArray.push_back(c);
+
+void Stroke::updateVertexArray() const {
+
+    // can't draw a line with 0 or 1 points
+    if (m_points.size() < 2)
+        return;
+
+    // compute number triangles and vertices
+    std::size_t num_tris = (m_points.size() - 1) * 3;
+    std::size_t num_verts = num_tris * 3;
+
+    // clear and reserve vertex array
+    m_vertexArray.clear();
+    m_vertexArray.reserve(num_verts);
+
+    // declare variables
+    Point A, B, C, M1, M2, X1, X2;
+    sf::Vector2f N, T, M;
+    Point v0, v1, v2;
+    float lM, lX;
+    float halfThickness = m_thickness * 0.5f;
+
+    // first point
+    N = unit(normal(m_points[1] - m_points[0]));
+    v0 = m_points[0] + N * halfThickness;
+    v1 = m_points[0] - N * halfThickness;
+
+    // inner points
+    for (std::size_t i = 1; i < m_points.size() - 1; ++i) {
+        A = m_points[i - 1];                 // previous point
+        B = m_points[i];                     // this point
+        C = m_points[i + 1];                 // next point
+        N = unit(normal(B - A));             // normal vector to AB
+        T = unit(unit(C - B) + unit(B - A)); // tangent vector at B
+        M = normal(T);                       // miter direction
+        lM = halfThickness / dot(M, N);      // half miter length
+        M1 = B + M * lM;                     // first miter point
+        M2 = B - M * lM;                     // second miter point
+
+        if (lM > m_miterLimit * halfThickness) {
+
+            lX = halfThickness / dot(T, N);
+            X1 = B + T * lX;
+            X2 = B - T * lX;
+
+            //PUSH_BACK_TRIANGLE(v0, v1, X1);
+            //PUSH_BACK_TRIANGLE(v1, X1, X2);
+            //v0 = X2;
+            //v1 = X1;
+            
+            if (winding(A,B,C) < 0) { // ccw
+                PUSH_BACK_TRIANGLE(v0, v1, X1);
+                PUSH_BACK_TRIANGLE(v1, X1, M2);
+                PUSH_BACK_TRIANGLE(X1, M2, X2);
+                v0 = X2;
+                v1 = M2;
+            }
+            else {  // cw
+                PUSH_BACK_TRIANGLE(v0, v1, M1);
+                PUSH_BACK_TRIANGLE(v1, M1, X2);
+                PUSH_BACK_TRIANGLE(M1, X2, X1);
+                v0 = M1;
+                v1 = X1;
+            }
+            
+        }
+        else {
+            PUSH_BACK_TRIANGLE(v0, v1, M1);
+            PUSH_BACK_TRIANGLE(v1, M1, M2);
+            v0 = M1; // M1
+            v1 = M2; // M2
+        }
+    }
+
+    // last point
+    std::size_t i = m_points.size() - 1;
+    N = unit(normal(m_points[i] - m_points[i - 1]));
+    v2 = m_points[i] + N * halfThickness;
+
+    PUSH_BACK_TRIANGLE(v0, v1, v2);
+    PUSH_BACK_TRIANGLE(v1, v2, m_points[i] - N * halfThickness);
+
+}
+
+/*
 void Stroke::updateVertexArray() const {
     if (m_points.size() < 2)
         return;
@@ -173,6 +270,11 @@ void Stroke::updateVertexArray() const {
         M = normal(T);                   // miter direction
         float dotMN = dot(M,N);
         float offset = halfThickness / dotMN; // offset length along miter
+        // determine if angle is sharp!
+        if (std::abs(angle(B - A, B - C)) < 10.0f * DEG2RAD)
+            std::cout << "Sharp Angle!" << std::endl;
+
+
         // make sure AB an BC aren't parallel
         if (!approximately(dotMN, 1.0, SFVG_PRECISION))
         {
@@ -189,6 +291,7 @@ void Stroke::updateVertexArray() const {
     m_vertexArray.push_back(m_points[i] + N * halfThickness);
     m_vertexArray.push_back(m_points[i] - N * halfThickness);
 }
+*/
 
 void Stroke::updateBounds() const {
     m_bounds = m_points.getBounds();
@@ -243,7 +346,7 @@ void Stroke::draw(sf::RenderTarget& target, sf::RenderStates states) const {
         states.texture = SFVG_WHITE_TEXTURE;
     if (!m_hasSolidFill)
         states.shader = m_gradient.getShader();
-    target.draw(&m_vertexArray[0], m_vertexArray.size(), sf::TriangleStrip, states);
+    target.draw(&m_vertexArray[0], m_vertexArray.size(), sf::Triangles, states);
 
     if (m_showBoundsBox) {
         sf::VertexArray bounds(sf::LineStrip, 5);

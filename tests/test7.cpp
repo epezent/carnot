@@ -30,11 +30,23 @@ int main(int argc, char* argv[]) {
     stroke2.addPoint(500,500);
     stroke2.setThicnkess(10);
 
-    // stroke1.addPoint(100,100);
-    // stroke1.addPoint(200,100);
-    // stroke1.addPoint(300,100);
-    // stroke1.addPoint(300,200);
-    // stroke1.addPoint(300,300);
+
+    Stroke stroke3;
+    stroke3.setColor(sfvg::Blues::DeepSkyBlue);
+    stroke3.setPointCount(3);
+    stroke3.setPoint(0, 100, 500);
+    stroke3.setPoint(1, 500, 500);
+    stroke3.setPoint(2, 500, 900);
+    stroke3.setThicnkess(10);
+    stroke3.showWireFrame(true);
+
+    sf::Font font;
+    font.loadFromFile("../fonts/Roboto-Medium.ttf");
+
+    sf::Text text;
+    text.setFont(font);
+    text.setFillColor(sf::Color::White);
+    text.setCharacterSize(40);        
 
     sf::ContextSettings settings;
     settings.antialiasingLevel = 8;
@@ -84,11 +96,21 @@ int main(int argc, char* argv[]) {
             stroke1.setPoint(i, 1000 * t[i], 500 + 100 * std::sin(2*PI*t[i]*f));
         }
 
+        stroke3.setPoint(0, mousePosition);
+
         stroke1.setThicnkess(thk);
+
+        float a = std::abs(angle(stroke3.getPoint(1) - stroke3.getPoint(0), stroke3.getPoint(1) - stroke3.getPoint(2)) * RAD2DEG);
+
+
+
+        text.setString(std::to_string(a));
 
         window.clear(Grays::Black);
         window.draw(stroke1);
         window.draw(stroke2);
+        window.draw(stroke3);
+        window.draw(text);
         window.display();
     }
 

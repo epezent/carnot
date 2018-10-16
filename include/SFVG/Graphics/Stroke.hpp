@@ -51,6 +51,12 @@ public:
     /// Gets the thickness of the Stroke
     float getThickness() const;
 
+    /// Set the miter limit (ratio of miter length to thickness, default 4)
+    void setMiterLimit(float miterLimit);
+
+    /// Get the miter limit
+    float getMiterLimit() const;
+
     /// Sets the fill of a shape to a solid Color
     void setColor(const sf::Color& color);
 
@@ -104,6 +110,7 @@ private:
 
     Points m_points;
     float m_thickness;
+    float m_miterLimit;
     mutable std::vector<sf::Vertex> m_vertexArray;
     const sf::Texture* m_texture;
     sf::IntRect m_textureRect;

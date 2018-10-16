@@ -37,6 +37,8 @@ file(GLOB SRC_SHAPES
 )
 
 set(SFVG_SRC
+	include/SFVG/Math.hpp
+	include/SFVG/Math.inl
     src/SFVG/Graphics/SharedResources.cpp
     src/SFVG/Graphics/Gradient.cpp
     src/SFVG/Graphics/Detail/clipper.cpp
@@ -79,6 +81,9 @@ target_link_libraries(test7 sfvg sfml-audio sfml-graphics sfml-window sfml-syste
 
 add_executable(test8 tests/test8.cpp)
 target_link_libraries(test8 sfvg sfml-audio sfml-graphics sfml-window sfml-system sfml-network)
+
+add_executable(test9 tests/test9.cpp)
+target_link_libraries(test9 sfvg sfml-audio sfml-graphics sfml-window sfml-system sfml-network)
 
 add_executable(benchmark tests/benchmark.cpp)
 target_link_libraries(benchmark sfvg sfml-audio sfml-graphics sfml-window sfml-system sfml-network)

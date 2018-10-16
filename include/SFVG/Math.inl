@@ -21,14 +21,27 @@ inline float clamp01(float value) {
     return value <= 0.0f ? 0.0f : value >= 1.0f ? 1.0f : value;
 }
 
-inline float wrapTo2Pi(float angle) {
+inline float wrapToPi(float angle) {
+    angle = std::fmod(angle + PI, TWOPI);
     if (angle < 0)
-        return angle + 2 * PI;
+        angle += TWOPI;
+    return angle - PI;
+}
+
+
+inline float wrapTo2Pi(float angle) {
+    angle = std::fmod(angle, TWOPI);
+    if (angle < 0)
+        angle += TWOPI;
     return angle;
 }
 
 inline bool approximately(float a, float b, float delta) {
     return std::abs(a-b) < delta;
+}
+
+inline int sign(float value) {
+    return (0 < value) - (value < 0);
 }
 
 //==============================================================================
@@ -170,5 +183,16 @@ inline float polygonArea(const std::vector<sf::Vector2f>& polygon) {
     return area * 0.5f;
 }
 
+inline float angle(const sf::Vector2f& V1, const sf::Vector2f V2) {
+    return std::atan2(cross(V1, V2), dot(V1, V2));
+}
+
+inline int winding(const sf::Vector2f& a, const sf::Vector2f b) {
+    return sign(cross(a, b));
+}
+
+inline int winding(const sf::Vector2f& a, const sf::Vector2f& b, const sf::Vector2f& c) {
+    return winding((b - a), (c - b));
+}
 
 }  // namespace sfvg

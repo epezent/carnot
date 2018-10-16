@@ -14,6 +14,7 @@ namespace sfvg {
 
 static const float PI      = 3.1415927410125732421875f;
 static const float HALFPI  = PI * 0.5f;
+static const float TWOPI   = 2.0f * PI;
 static const float DEG2RAD = PI / 180.0f;
 static const float RAD2DEG = 180.0f / PI;
 static const float SQRT2   = std::sqrt(2.0f);
@@ -34,11 +35,17 @@ inline float clamp(float value, float min, float max);
 /// Clamps a float between 0 and 1
 inline float clamp01(float value);
 
-/// Wraps an angle in radians to within 2 PI
+/// Wraps an angle in radians to within [-PI, PI)
+inline float wrapToPi(float angle);
+
+/// Wraps an angle in radians to within [0, 2*PI)
 inline float wrapTo2Pi(float angle);
 
 /// Determines if two floats a and b are approximately equal
 inline bool approximately(float a, float b, float delta = EPS);
+
+/// Determins sign of a number (-1 negative, +1 positive, or 0)
+inline int sign(float value);
 
 //==============================================================================
 // VECTOR ALGEBRA
@@ -83,7 +90,7 @@ inline bool intersect(const sf::Vector2f& a1, const sf::Vector2f& a2,
 inline sf::Vector2f intersection(const sf::Vector2f& a1, const sf::Vector2f& a2,
                                  const sf::Vector2f& b1, const sf::Vector2f& b2);
 
-// Determines if a point P lies on and within the endpoints of a line L
+/// Determines if a point P lies on and within the endpoints of a line L
 inline bool insideLine(const sf::Vector2f& l1, const sf::Vector2f& l2,
                        const sf::Vector2f& p);
 
@@ -97,6 +104,16 @@ inline bool insidePolygon(const std::vector<sf::Vector2f>& polygon,
 
 /// Computes the area of polygon defined by vector of outer vertices
 inline float polygonArea(const std::vector<sf::Vector2f>& polygon);
+
+/// Computes angle between to vectors V1 and V2
+inline float angle(const sf::Vector2f& V1, const sf::Vector2f V2);
+
+/// Returns winding of two vectors
+inline int winding(const sf::Vector2f& a, const sf::Vector2f b);
+
+/// Returns 1 if three conesecutive points are in clockwise order,
+/// -1 if counter-clockwise, and 0 if colinear
+inline int winding(const sf::Vector2f& a, const sf::Vector2f& b, const sf::Vector2f& c);
 
 
 }  // namespace sfvg
