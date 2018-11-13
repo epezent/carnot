@@ -36,25 +36,28 @@ file(GLOB SRC_SHAPES
     "${CMAKE_SOURCE_DIR}/src/SFVG/Graphics/Shapes/*.cpp"
 )
 
-set(SFVG_SRC
-	include/SFVG/Math.hpp
-	include/SFVG/Math.inl
-    src/SFVG/Graphics/SharedResources.cpp
-    src/SFVG/Graphics/Gradient.cpp
-    src/SFVG/Graphics/Detail/clipper.cpp
-    src/SFVG/Graphics/Detail/ExternalLibs.cpp
-    src/SFVG/Animation/Animation.cpp
-    src/SFVG/Graphics/Color.cpp
-    src/SFVG/Graphics/Shape.cpp
-    src/SFVG/Graphics/Stroke.cpp
-    src/SFVG/Graphics/Path.cpp
-    src/SFVG/Graphics/Anchor.cpp
-    src/SFVG/Graphics/Points.cpp
-    ${SRC_SHAPES}
-)
+# set(SFVG_SRC
+# 	include/SFVG/Math.hpp
+# 	include/SFVG/Math.inl
+#     src/SFVG/Graphics/SharedResources.cpp
+#     src/SFVG/Graphics/Gradient.cpp
+#     src/SFVG/Graphics/Detail/clipper.cpp
+#     src/SFVG/Graphics/Detail/ExternalLibs.cpp
+#     src/SFVG/Animation/Animation.cpp
+#     src/SFVG/Graphics/Color.cpp
+#     src/SFVG/Graphics/Shape.cpp
+#     src/SFVG/Graphics/Stroke.cpp
+#     src/SFVG/Graphics/Path.cpp
+#     src/SFVG/Graphics/Anchor.cpp
+#     src/SFVG/Graphics/Points.cpp
+#     ${SRC_SHAPES}
+# )
+
+file(GLOB_RECURSE SFVG_INCLUDE "${CMAKE_SOURCE_DIR}/include/SFVG/*.hpp")
+file(GLOB_RECURSE SFVG_SRC "${CMAKE_SOURCE_DIR}/src/SFVG/*.cpp" "${CMAKE_SOURCE_DIR}/src/SFVG/*.hpp")
 
 # create SFVG library
-add_library(sfvg ${SFVG_SRC})
+add_library(sfvg ${SFVG_INCLUDE} ${SFVG_SRC})
 target_link_libraries(sfvg sfml-audio sfml-graphics sfml-window sfml-system sfml-network)
 
 # TESTS

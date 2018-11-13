@@ -1,4 +1,4 @@
-#include <SFVG/Detail/Triangulate.hpp>
+#include "Triangulate.hpp"
 #include <SFVG/Math.hpp>
 #include <algorithm>
 
