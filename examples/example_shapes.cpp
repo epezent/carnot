@@ -37,8 +37,6 @@ int main(int argc, char* argv[]) {
     cross.setPosition(100, 300);
     cross.setColor(Blues::DeepSkyBlue);
 
-
-
     while (window.isOpen()) {
         sf::Event event;
         while (window.pollEvent(event)) {

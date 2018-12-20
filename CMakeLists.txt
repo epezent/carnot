@@ -30,70 +30,50 @@ include_directories(
     "src"
 )
 
-# get source files
-file(GLOB SRC_SHAPES
-    "${CMAKE_SOURCE_DIR}/include/SFVG/Graphics/Shapes/*.hpp"
-    "${CMAKE_SOURCE_DIR}/src/SFVG/Graphics/Shapes/*.cpp"
-)
-
-# set(SFVG_SRC
-# 	include/SFVG/Math.hpp
-# 	include/SFVG/Math.inl
-#     src/SFVG/Graphics/SharedResources.cpp
-#     src/SFVG/Graphics/Gradient.cpp
-#     src/SFVG/Graphics/Detail/clipper.cpp
-#     src/SFVG/Graphics/Detail/ExternalLibs.cpp
-#     src/SFVG/Animation/Animation.cpp
-#     src/SFVG/Graphics/Color.cpp
-#     src/SFVG/Graphics/Shape.cpp
-#     src/SFVG/Graphics/Stroke.cpp
-#     src/SFVG/Graphics/Path.cpp
-#     src/SFVG/Graphics/Anchor.cpp
-#     src/SFVG/Graphics/Points.cpp
-#     ${SRC_SHAPES}
-# )
-
 file(GLOB_RECURSE SFVG_INCLUDE "${CMAKE_SOURCE_DIR}/include/SFVG/*.hpp")
 file(GLOB_RECURSE SFVG_SRC "${CMAKE_SOURCE_DIR}/src/SFVG/*.cpp" "${CMAKE_SOURCE_DIR}/src/SFVG/*.hpp")
 
 # create SFVG library
 add_library(sfvg ${SFVG_INCLUDE} ${SFVG_SRC})
-target_link_libraries(sfvg sfml-audio sfml-graphics sfml-window sfml-system sfml-network)
+target_link_libraries(sfvg ws2_32 winmm Pdh Psapi XInput sfml-audio sfml-graphics sfml-window sfml-system sfml-network)
 
 # TESTS
-add_executable(test1 tests/test1.cpp)
-target_link_libraries(test1 sfvg sfml-audio sfml-graphics sfml-window sfml-system sfml-network)
+# add_executable(test1 tests/test1.cpp)
+# target_link_libraries(test1 sfvg sfml-audio sfml-graphics sfml-window sfml-system sfml-network)
 
-add_executable(test2 tests/test2.cpp)
-target_link_libraries(test2 sfvg sfml-audio sfml-graphics sfml-window sfml-system sfml-network)
+# add_executable(test2 tests/test2.cpp)
+# target_link_libraries(test2 sfvg sfml-audio sfml-graphics sfml-window sfml-system sfml-network)
 
-add_executable(test3 tests/test3.cpp)
-target_link_libraries(test3 sfvg sfml-audio sfml-graphics sfml-window sfml-system sfml-network)
+# add_executable(test3 tests/test3.cpp)
+# target_link_libraries(test3 sfvg sfml-audio sfml-graphics sfml-window sfml-system sfml-network)
 
-add_executable(test4 tests/test4.cpp)
-target_link_libraries(test4 sfvg sfml-audio sfml-graphics sfml-window sfml-system sfml-network)
+# add_executable(test4 tests/test4.cpp)
+# target_link_libraries(test4 sfvg sfml-audio sfml-graphics sfml-window sfml-system sfml-network)
 
-add_executable(test5 tests/test5.cpp)
-target_link_libraries(test5 sfvg sfml-audio sfml-graphics sfml-window sfml-system sfml-network)
+# add_executable(test5 tests/test5.cpp)
+# target_link_libraries(test5 sfvg sfml-audio sfml-graphics sfml-window sfml-system sfml-network)
 
-add_executable(test6 tests/test6.cpp)
-target_link_libraries(test6 sfvg sfml-audio sfml-graphics sfml-window sfml-system sfml-network)
+# add_executable(test6 tests/test6.cpp)
+# target_link_libraries(test6 sfvg sfml-audio sfml-graphics sfml-window sfml-system sfml-network)
 
-add_executable(test7 tests/test7.cpp)
-target_link_libraries(test7 sfvg sfml-audio sfml-graphics sfml-window sfml-system sfml-network)
+# add_executable(test7 tests/test7.cpp)
+# target_link_libraries(test7 sfvg sfml-audio sfml-graphics sfml-window sfml-system sfml-network)
 
-add_executable(test8 tests/test8.cpp)
-target_link_libraries(test8 sfvg sfml-audio sfml-graphics sfml-window sfml-system sfml-network)
+# add_executable(test8 tests/test8.cpp)
+# target_link_libraries(test8 sfvg sfml-audio sfml-graphics sfml-window sfml-system sfml-network)
 
-add_executable(test9 tests/test9.cpp)
-target_link_libraries(test9 sfvg sfml-audio sfml-graphics sfml-window sfml-system sfml-network)
+# add_executable(test9 tests/test9.cpp)
+# target_link_libraries(test9 sfvg sfml-audio sfml-graphics sfml-window sfml-system sfml-network)
 
-add_executable(benchmark tests/benchmark.cpp)
-target_link_libraries(benchmark sfvg sfml-audio sfml-graphics sfml-window sfml-system sfml-network)
+# add_executable(benchmark tests/benchmark.cpp)
+# target_link_libraries(benchmark sfvg sfml-audio sfml-graphics sfml-window sfml-system sfml-network)
 
 # EXAMPLES
-add_executable(example_tween examples/example_tween.cpp)
-target_link_libraries(example_tween sfvg sfml-audio sfml-graphics sfml-window sfml-system sfml-network)
+# add_executable(example_tween examples/example_tween.cpp)
+# target_link_libraries(example_tween sfvg sfml-audio sfml-graphics sfml-window sfml-system sfml-network)
 
-add_executable(example_shapes examples/example_shapes.cpp)
-target_link_libraries(example_shapes sfvg sfml-audio sfml-graphics sfml-window sfml-system sfml-network)
+# add_executable(example_shapes examples/example_shapes.cpp)
+# target_link_libraries(example_shapes sfvg sfml-audio sfml-graphics sfml-window sfml-system sfml-network)
+
+add_executable(pong examples/example_pong.cpp)
+target_link_libraries(pong ws2_32 winmm Pdh Psapi XInput sfvg sfml-audio sfml-graphics sfml-window sfml-system sfml-network)
