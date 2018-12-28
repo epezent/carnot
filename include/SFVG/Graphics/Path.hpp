@@ -1,5 +1,4 @@
-#ifndef SFVG_PATH_HPP
-#define SFVG_PATH_HPP
+#pragma once
 
 #include <SFML/Graphics/Drawable.hpp>
 #include <SFML/Graphics/Transformable.hpp>
@@ -40,5 +39,3 @@ private:
 };
 
 }  // namespace sfvg
-
-#endif  // SFVG_PATH_HPP

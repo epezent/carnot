@@ -2,6 +2,8 @@
 #include <unordered_map>
 #include <cassert>
 
+namespace sfvg {
+
 static std::hash<std::string> g_hasher;
 static std::unordered_map<Id, std::string> g_idMap;
 
@@ -38,3 +40,5 @@ const Name& getName(Id id) {
 }
 
 }
+
+} // namespace sfvg

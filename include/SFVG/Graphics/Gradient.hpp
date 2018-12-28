@@ -1,5 +1,4 @@
-#ifndef SFVG_GRADIENT_HPP
-#define SFVG_GRADIENT_HPP
+#pragma once
 
 #include <SFML/Graphics.hpp>
 #include <array>
@@ -52,5 +51,3 @@ Gradient& operator -=(Gradient& left, const Gradient& right);
 Gradient& operator *=(Gradient& left, const Gradient& right);
 
 } // namespace sfvg
-
-#endif // SFVG_GRADIENT_HPP

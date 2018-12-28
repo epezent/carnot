@@ -1,6 +1,6 @@
 #include <SFVG/Engine/Object.hpp>
 #include <SFVG/Engine/Engine.hpp>
-#include <SFVG/Engine/Fonts/RobotoBold.hpp>
+#include <SFVG/Graphics.hpp>
 
 using namespace sfvg;
 
@@ -23,9 +23,9 @@ public:
     // Object Update
     void update() override {
         if (Input::getKey(Key::Left))
-            move(-m_speed * Clock::deltaTime(), 0.0f);
+            move(-m_speed * Engine::deltaTime(), 0.0f);
         if (Input::getKey(Key::Right))
-            move(m_speed * Clock::deltaTime(), 0.0f);
+            move(m_speed * Engine::deltaTime(), 0.0f);
     }
 
     // Object Draw (called once per frame after update)
@@ -56,7 +56,7 @@ public:
 
     // Object Update
     void update() override {
-        move(m_velocityVector * m_speed * Clock::deltaTime());
+        move(m_velocityVector * m_speed * Engine::deltaTime());
     }
 
     // Object Draw (called once per frame after update)
@@ -101,7 +101,7 @@ public:
         m_player = makeChild<Player>();
         m_ball = makeChild<Ball>();
 
-        m_font.loadFromMemory(Roboto_Bold_ttf, Roboto_Bold_ttf_len);
+        m_font.loadFromFile("../../fonts/Roboto-Bold.ttf");
         m_text.setFont(m_font);
         m_text.setCharacterSize(30);
         m_text.setPosition(10, 10);

@@ -6,74 +6,149 @@
 
 namespace sfvg {
 
-sf::Color cmyk(float c, float m, float y, float k) {
-    c = clamp01(c);
-    m = clamp01(m);
-    y = clamp01(y);
-    k = clamp01(k);
-    sf::Uint8 r = static_cast<sf::Uint8>(255.0f * (1.0f - c) * (1.0f - k));
-    sf::Uint8 g = static_cast<sf::Uint8>(255.0f * (1.0f - m) * (1.0f - k));
-    sf::Uint8 b = static_cast<sf::Uint8>(255.0f * (1.0f - y) * (1.0f - k));
+namespace {
+struct RGB {
+
+    RGB() : r(0.0), g(0.0), b(0.0) {}
+
+    RGB(const sf::Color& color) :
+        r(((double)color.r)/255.0),
+        g(((double)color.g)/255.0),
+        b(((double)color.b)/255.0)
+    {}
+
+    sf::Color toColor() {
+        sf::Color color;
+        color.r = static_cast<sf::Uint8>(255.0 * r);
+        color.g = static_cast<sf::Uint8>(255.0 * g);
+        color.b = static_cast<sf::Uint8>(255.0 * b);
+        return color;
+    }
+
+    double r;       // a fraction between 0 and 1
+    double g;       // a fraction between 0 and 1
+    double b;       // a fraction between 0 and 1
+};
+}
+
+sf::Color cmykToRgb(const CMYK& cmyk) {
+    sf::Uint8 r = static_cast<sf::Uint8>(255.0 * (1.0 - clamp01(cmyk.c)) * (1.0 - clamp01(cmyk.k)));
+    sf::Uint8 g = static_cast<sf::Uint8>(255.0 * (1.0 - clamp01(cmyk.m)) * (1.0 - clamp01(cmyk.k)));
+    sf::Uint8 b = static_cast<sf::Uint8>(255.0 * (1.0 - clamp01(cmyk.y)) * (1.0 - clamp01(cmyk.k)));
     return sf::Color(r,g,b);
 }
 
-sf::Color hsv(float h, float s, float v) {
-    h = clamp01(h);
-    s = clamp01(s);
-    v = clamp01(v);
-    float hh, p, q, t, ff;
-    if (s == 0.0f){
-        sf::Uint8 rgb = static_cast<sf::Uint8>(255.0f * v);
-        return sf::Color(rgb, rgb, rgb);
+/// Computes CMYK values for a color
+CMYK rgbToCmyk(const sf::Color& color) {
+    RGB in(color);
+    CMYK out;
+    out.k = 1.0 - std::max(std::max(in.r, in.g), in.b);
+    out.c = (1.0 - in.r - out.k) / (1.0 - out.k);
+    out.m = (1.0 - in.g - out.k) / (1.0 - out.k);
+    out.y = (1.0 - in.b - out.k) / (1.0 - out.k);
+    return out;
+}
+
+// https://stackoverflow.com/questions/3018313/algorithm-to-convert-rgb-to-hsv-and-hsv-to-rgb-in-range-0-255-for-both
+
+sf::Color hsvToRgb(const HSV& in) {
+    double      hh, p, q, t, ff;
+    long        i;
+    RGB         out;
+
+    if(in.s <= 0.0) {       // < is bogus, just shuts up warnings
+        out.r = in.v;
+        out.g = in.v;
+        out.b = in.v;
+        return out.toColor();
     }
-    hh = h;
-    if (hh == 1.0f)
-        hh = 0.0f;
-    hh *= 6.0f;
-    long i = (long)hh;
+    hh = in.h;
+    if(hh >= 360.0) hh = 0.0;
+    hh /= 60.0;
+    i = (long)hh;
     ff = hh - i;
-    p = v * (1.0f - s);
-    q = v * (1.0f - s * ff);
-    t = v * (1.0f - s * (1.0f - ff));
-    sf::Uint8 r, g, b;
+    p = in.v * (1.0 - in.s);
+    q = in.v * (1.0 - (in.s * ff));
+    t = in.v * (1.0 - (in.s * (1.0 - ff)));
+
     switch(i) {
     case 0:
-        r = static_cast<sf::Uint8>(255.0f * v);
-        g = static_cast<sf::Uint8>(255.0f * t);
-        b = static_cast<sf::Uint8>(255.0f * p);
+        out.r = in.v;
+        out.g = t;
+        out.b = p;
         break;
     case 1:
-        r = static_cast<sf::Uint8>(255.0f * q);
-        g = static_cast<sf::Uint8>(255.0f * v);
-        b = static_cast<sf::Uint8>(255.0f * p);
+        out.r = q;
+        out.g = in.v;
+        out.b = p;
         break;
     case 2:
-        r = static_cast<sf::Uint8>(255.0f * p);
-        g = static_cast<sf::Uint8>(255.0f * v);
-        b = static_cast<sf::Uint8>(255.0f * t);
+        out.r = p;
+        out.g = in.v;
+        out.b = t;
         break;
+
     case 3:
-        r = static_cast<sf::Uint8>(255.0f * p);
-        g = static_cast<sf::Uint8>(255.0f * q);
-        b = static_cast<sf::Uint8>(255.0f * v);
+        out.r = p;
+        out.g = q;
+        out.b = in.v;
         break;
     case 4:
-        r = static_cast<sf::Uint8>(255.0f * t);
-        g = static_cast<sf::Uint8>(255.0f * p);
-        b = static_cast<sf::Uint8>(255.0f * v);
+        out.r = t;
+        out.g = p;
+        out.b = in.v;
         break;
     case 5:
     default:
-        r = static_cast<sf::Uint8>(255.0f * v);
-        g = static_cast<sf::Uint8>(255.0f * p);
-        b = static_cast<sf::Uint8>(255.0f * q);
+        out.r = in.v;
+        out.g = p;
+        out.b = q;
         break;
     }
-
-    return sf::Color(r,g,b);
+    return out.toColor();
 }
 
-sf::Color hex(std::string hex) {
+HSV rgbToHsv(const sf::Color& color) {
+    RGB in(color);
+    HSV         out;
+    double      min, max, delta;
+    min = in.r < in.g ? in.r : in.g;
+    min = min  < in.b ? min  : in.b;
+    max = in.r > in.g ? in.r : in.g;
+    max = max  > in.b ? max  : in.b;
+    out.v = max;                                // v
+    delta = max - min;
+    if (delta < 0.00001)
+    {
+        out.s = 0;
+        out.h = 0; // undefined, maybe nan?
+        return out;
+    }
+    if( max > 0.0 ) { // NOTE: if Max is == 0, this divide would cause a crash
+        out.s = (delta / max);                  // s
+    } else {
+        // if max is 0, then r = g = b = 0
+        // s = 0, h is undefined
+        out.s = 0.0;
+        out.h = NAN;                            // its now undefined
+        return out;
+    }
+    if( in.r >= max )                           // > is bogus, just keeps compilor happy
+        out.h = ( in.g - in.b ) / delta;        // between yellow & magenta
+    else
+    if( in.g >= max )
+        out.h = 2.0 + ( in.b - in.r ) / delta;  // between cyan & yellow
+    else
+        out.h = 4.0 + ( in.r - in.g ) / delta;  // between magenta & cyan
+    out.h *= 60.0;                              // degrees
+    if( out.h < 0.0 )
+        out.h += 360.0;
+    return out;
+}
+
+
+
+sf::Color hexToRgb(std::string hex) {
     if (hex[0] == '#')
         hex.erase(0,1);
     unsigned int r, g, b, a;

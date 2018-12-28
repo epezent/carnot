@@ -86,6 +86,9 @@
 		},
 		{
 			"path": "../../SFML/include/SFML"
+		},
+		{
+			"path": "C:/Git/Chipmunk2D/include/chipmunk"
 		}
 	]
 }

@@ -1,5 +1,4 @@
-#ifndef SFVG_POINTS_HPP
-#define SFVG_POINTS_HPP
+#pragma once
 
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Graphics/Rect.hpp>
@@ -73,5 +72,3 @@ bool operator !=(const Points& left, const Points& right);
 // TODO: Add overloads between Points and Point
 
 } // namespace sfvg
-
-#endif // SFVG_POINTS_HPP

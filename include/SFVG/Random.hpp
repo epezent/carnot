@@ -1,5 +1,9 @@
 #pragma once
 
+#include <SFVG/Imports.hpp>
+
+namespace sfvg {
+
 /// @brief Returns an int random number in the interval [min, max].
 /// @pre min <= max
 int random(int min, int max);
@@ -20,3 +24,7 @@ float randomDev(float middle, float deviation);
 /// @details Setting the seed manually is useful when you want to reproduce a given sequence of random
 ///  numbers. Without calling this function, the seed is different at each program startup.
 void setRandomSeed(unsigned long seed);
+
+Color randomColor();
+
+}

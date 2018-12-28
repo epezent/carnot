@@ -1,13 +1,30 @@
 #pragma once
 
 #include <vector>
-#include <SFVG/Engine/Engine.hpp>
+#include <set>
+#include <SFVG/Imports.hpp>
+#include <SFVG/Engine/Handle.hpp>
+#include <SFVG/Engine/Id.hpp>
+#include <SFVG/Print.hpp>
+#include <SFVG/Random.hpp>
+#include <SFVG/Engine/Coroutine.hpp>
+
+namespace sfvg {
+
+//==============================================================================
+// Forward Declarations / Typedefs
+//==============================================================================
+
+class Engine;
+class Object;
+
+typedef std::vector<std::vector<std::pair<const Object*, RenderStates>>> RenderQue;
 
 //==============================================================================
 // CLASS: Object
 //==============================================================================
 
-class Object : public Drawable, private NonCopyable {
+class Object : private NonCopyable {
 
 public:
 
@@ -178,6 +195,19 @@ public:
     /// Returns true if this Object is a child of the passed Object
     bool isChildOf(Handle<Object> object);
 
+    //==========================================================================
+    // Coroutine Functions
+    //==========================================================================
+
+    /// Starts a new coroutine
+    Handle<Coroutine> startCoroutine(Enumerator&& routine);
+    /// Stops all running coroutines
+    void stopAllCoroutines();
+    /// Returns true if the Object has running coroutines
+    bool hasCoroutines() const;
+    /// Returns the number of coroutines currently running
+    std::size_t getCoroutineCount() const;
+
 public:
 
     //==========================================================================
@@ -228,6 +258,9 @@ private:
     /// Ques the Object for rendering and the recursively ques all of its children
     void queRender(RenderQue& renderQue, RenderStates states) const;
 
+    /// Resumes all active coroutines
+    void resumeCoroutines();
+
 private:
 
     //==========================================================================
@@ -260,6 +293,9 @@ private:
     mutable bool      m_globalTransformNeedUpdate;  ///< Does the transform need to be recomputed?
     mutable bool      m_inverseTransformNeedUpdate; ///< Does the transform need to be recomputed?
     mutable bool      m_invGlobTransformNeedUpdate; ///< Does the transform need to be recomputed?
+
+    std::vector<Enumerator> m_coroutines;           ///< Coroutines
+
 };
 
 //==============================================================================
@@ -298,3 +334,5 @@ template <typename T, typename ...Args>
 Ptr<T> Object::make(Args... args) {
     return std::make_shared<T>(args...);
 }
+
+} // namespace sfvg

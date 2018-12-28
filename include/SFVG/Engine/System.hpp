@@ -1,5 +1,8 @@
-# pragma once
+#pragma once
+
 #include <cstddef>
+
+namespace sfvg {
 
 /// Gets the operating system's ID number of the calling thread
 unsigned int get_thread_id();
@@ -27,3 +30,5 @@ std::size_t ram_used_total();
 
 /// Gets the RAM used by this process in bytes
 std::size_t ram_used_process();
+
+} // namespace sfvg

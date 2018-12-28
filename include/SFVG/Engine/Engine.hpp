@@ -1,24 +1,29 @@
 #pragma once
 
 #include <memory>
-#include <SFVG/Engine/Imports.hpp>
+#include <SFVG/Imports.hpp>
+#include <SFVG/Print.hpp>
+#include <SFVG/Random.hpp>
 #include <SFVG/Engine/ResourceManager.hpp>
-#include <SFVG/Engine/Clock.hpp>
 #include <SFVG/Engine/Input.hpp>
-#include <SFVG/Engine/Print.hpp>
-#include <SFVG/Engine/Random.hpp>
-#include <SFVG/Engine/Layer.hpp>
 #include <SFVG/Engine/Handle.hpp>
 #include <SFVG/Engine/Id.hpp>
 #include <SFVG/Engine/System.hpp>
+#include <SFVG/Engine/Object.hpp>
 
-class Object;
-
-typedef std::vector<std::vector<std::pair<const Object*, RenderStates>>> RenderQue;
+namespace sfvg {
 
 class Engine : private NonCopyable {
 public:
+
+    /// Constructor
     Engine();
+    /// Destructor
+    ~Engine();
+
+    /// Makes a root Object of a specifc type and returns a handle to it
+    template <typename T, typename ...Args> Handle<T> makeRoot(Args... args);
+
     /// Sets the root Object of the Engine
     void setRoot(Ptr<Object> root);
     /// Gets a Handle to the root Object of the Engine
@@ -31,7 +36,6 @@ public:
     void setWindowTitle(const std::string& name);
     void showMouseCursor(bool show);
     void setBackgroundColor(const sf::Color& color);
-    ///
     void setScaleFactor(float scaleFactor);
     /// Return window size in pixels
     sf::Vector2f getWindowSize() const;
@@ -45,6 +49,13 @@ public:
     void setLayerCount(std::size_t count);
     /// Get the number of layers drawn by the Engine (default 1)
     std::size_t getLayerCount() const;
+
+public:
+
+    /// Returns the current Engine time
+    static float time();
+    /// Returns the elapsed time since the last frame update
+    static float deltaTime();
 
 private:
     void initWindow();
@@ -66,3 +77,16 @@ private:
     float m_scaleFactor;
     Color m_backgroundColor;
 };
+
+//==============================================================================
+// Template / Inline Function Implementations
+//==============================================================================
+
+template <typename T, typename ...Args>
+Handle<T> Engine::makeRoot(Args... args) {
+    auto root = Object::make<T>(args...);
+    setRoot(root);
+    return getRoot().as<T>();
+}
+
+} // namespace sfvg

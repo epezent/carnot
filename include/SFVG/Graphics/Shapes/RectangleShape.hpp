@@ -1,5 +1,4 @@
-#ifndef SFVG_RECTANGLESHAPE_HPP
-#define SFVG_RECTANGLESHAPE_HPP
+#pragma once
 
 #include <SFVG/Graphics/Shape.hpp>
 
@@ -30,5 +29,3 @@ private:
 };
 
 } // namespace sfvg
-
-#endif // SFVG_RECTANGLESHAPE_HPP

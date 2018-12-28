@@ -1,5 +1,4 @@
-#ifndef SFVG_SHAPE_HPP
-#define SFVG_SHAPE_HPP
+#pragma once
 
 #include <SFML/Graphics/Drawable.hpp>
 #include <SFML/Graphics/Transformable.hpp>
@@ -178,5 +177,3 @@ private:
 };
 
 } // namespace sfvg
-
-#endif  // SFVG_SHAPE_HPP

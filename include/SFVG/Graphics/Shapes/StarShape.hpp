@@ -1,5 +1,4 @@
-#ifndef SFVG_STARSHAPE_HPP
-#define SFVG_STARSHAPE_HPP
+#pragma once
 
 #include <SFVG/Graphics/Shape.hpp>
 
@@ -32,5 +31,3 @@ private:
 };
 
 } // namespace sfvg
-
-#endif // SFVG_STARSHAPE_HPP

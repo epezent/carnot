@@ -1,5 +1,4 @@
-#ifndef SFVG_CIRCLE_SHAPE_HPP
-#define SFVG_CIRCLE_SHAPE_HPP
+#pragma once
 
 #include <SFVG/Graphics/Shape.hpp>
 
@@ -28,4 +27,3 @@ private:
 
 }  // namespace sfvg
 
-#endif  // SFVG_CIRCLE_SHAPE_HPP

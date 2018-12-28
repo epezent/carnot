@@ -1,5 +1,4 @@
-#ifndef SFVG_ANIMATION_HPP
-#define SFVG_ANIMATION_HPP
+#pragma once
 
 #include <SFML/System/Time.hpp>
 #include <SFVG/Animation/Frame.hpp>
@@ -181,5 +180,3 @@ void Animation<Ps...>::applyTo(S* subject) {
 }
 
 }  // namespace sfvg
-
-#endif  // SFVG_ANIMATION_HPP

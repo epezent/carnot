@@ -1,5 +1,4 @@
-#ifndef SFVG_FRAME_HPP
-#define SFVG_FRAME_HPP
+#pragma once
 
 #include <SFVG/Animation/Detail/Detail.hpp>
 #include <SFVG/Animation/Property.hpp>
@@ -133,5 +132,3 @@ P& Frame<Ps...>::setFrom(S* subject) {
 }
 
 }  // namespace sfvg
-
-#endif  // SFVG_FRAME_HPP

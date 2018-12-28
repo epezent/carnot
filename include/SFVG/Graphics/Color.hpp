@@ -1,24 +1,39 @@
-#ifndef SFVG_COLOR_HPP
-#define SFVG_COLOR_HPP
+#pragma once
 
 #include <SFML/Graphics/Color.hpp>
 #include <string>
 
 namespace sfvg {
 
-    /// \brief Creates a color from CMYK values
-    ///
-    /// \param c Cyan component [0..1]
-    /// \param m Magenta component [0..1]
-    /// \param y Yellow component [0..1]
-    /// \param k Black component [0..1]
-    sf::Color cmyk(float c, float m, float y, float k);
+    /// HSV Color representation
+    struct HSV {
+        double h; // angle in degrees [0 to 360]
+        double s; // a fraction [0 to 1]
+        double v; // a fraction [0 to 1]
+    };
 
     /// Creates a color from HSV values
-    sf::Color hsv(float h, float s, float v);
+    sf::Color hsvToRgb(const HSV& hsv);
+
+    /// Computes HSV values for a color
+    HSV rgbToHsv(const sf::Color& color);
+
+    /// CMYK Color representation
+    struct CMYK {
+        double c; // Cyan component [0 to 1]
+        double m; // Magenta component [0 to 1]
+        double y; // Yellow component [0 to 1]
+        double k; // Black component [0 to 1]
+    };
+
+    /// Creates a color from CMYK values
+    sf::Color cmykToRgb(const CMYK& cmyk);
+
+    /// Computes CMYK values for a color
+    CMYK rgbToCmyk(const sf::Color& color);
 
     /// Creates a color from hex code
-    sf::Color hex(std::string hex);
+    sf::Color hexToRgb(std::string hex);
 
 //==============================================================================
 // NAMED COLORS
@@ -216,5 +231,3 @@ namespace Grays
 }
 
 } // namespace sfvg
-
-#endif // SFVG_COLOR_HPP

@@ -1,5 +1,4 @@
-#ifndef SFVG_POLYGONSHAPE_HPP
-#define SFVG_POLYGONSHAPE_HPP
+#pragma once
 
 #include <SFVG/Graphics/Shape.hpp>
 
@@ -38,5 +37,3 @@ private:
 };
 
 } // namespace sfvg
-
-#endif  // SFVG_POLYGONSHAPE_HPP

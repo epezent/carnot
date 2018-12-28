@@ -1,7 +1,7 @@
-#ifndef SFVG_MATH_HPP
-#define SFVG_MATH_HPP
+#pragma once
 
 #include <SFML/System/Vector2.hpp>
+#include <SFML/Graphics/Rect.hpp>
 #include <cmath>
 #include <vector>
 #include <limits>
@@ -46,6 +46,46 @@ inline bool approximately(float a, float b, float delta = EPS);
 
 /// Determins sign of a number (-1 negative, +1 positive, or 0)
 inline int sign(float value);
+
+/// Returns true if an integer is even
+inline bool isEven(int value);
+
+/// Returns true if an integer is odd
+inline bool isOdd(int value);
+
+/// Computes the sum of a vector of floats
+inline float sum(const std::vector<float>& data);
+
+/// Computes the mean of a vector of floats
+inline float mean(const std::vector<float>& data);
+
+/// Computes standard deviation of vector of floats
+inline float stddev(const std::vector<float>& data, float& meanOut);
+
+/// Interpolate values
+inline float interp(float x, float x0, float x1, float y0, float y1);
+
+/// Determine order of magnitude of number
+inline int orderOfMagnitude(float value);
+
+/// Precison
+inline std::size_t precision(int order);
+
+/// Rounds a float up to the nearest interval
+inline float roundUpToNearest(float value, float interval);
+
+/// Rounds a float down to the nearest interval
+inline float roundDownToNearest(float value, float interval);
+
+/// Rounds a float up or down to the nearest interval
+inline float roundToNearest(float value, float interval);
+
+
+inline bool inBounds(const sf::Vector2f& position, const sf::FloatRect& bounds);
+
+inline bool inBounds(const sf::Vector2f& position, const sf::Vector2f& size);
+
+inline std::string numToStr(float number);
 
 //==============================================================================
 // VECTOR ALGEBRA
@@ -115,9 +155,6 @@ inline int winding(const sf::Vector2f& a, const sf::Vector2f b);
 /// -1 if counter-clockwise, and 0 if colinear
 inline int winding(const sf::Vector2f& a, const sf::Vector2f& b, const sf::Vector2f& c);
 
-
 }  // namespace sfvg
 
-#include <SFVG/Math.inl>
-
-#endif  // SFVG_MATH_HPP
+#include <SFVG/Detail/Math.inl>

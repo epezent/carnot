@@ -4,26 +4,38 @@
 #include <sstream>
 #include <SFVG/Engine/Engine.hpp>
 #include <SFVG/Engine/Object.hpp>
-#include <SFVG/Engine/Fonts/RobotoMonoBold.hpp>
+#include <SFVG/Graphics.hpp>
+#include "RobotoMonoBold.hpp"
 #include <cassert>
 
 #define REF_WIDTH  3840.0f
+
+namespace sfvg {
 
 //==============================================================================
 // PUBLIC MEMBER VARIABLES
 //==============================================================================
 
+namespace {
+
 static bool g_engineLoaded = false;
+sf::Clock g_timeClock      = sf::Clock();
+sf::Clock g_deltaTimeClock = sf::Clock();
+float g_timeValue           = 0.0f;
+float g_deltaTimeValue      = 0.0f;
+
+} // private namespace
 
 Engine::Engine() :
     m_renderQue(1),
     m_window(),
     m_windowSize(500,500),
-    m_appName("My Application"),
+    m_appName("SFVG Application"),
     m_debugText(),
     m_showDebug(false),
     m_scaleFactor((float)sf::VideoMode::getDesktopMode().width / REF_WIDTH)
 {
+    sfvgInit();
     assert(!g_engineLoaded);
     m_font.loadFromMemory(&RobotoMono_Bold_ttf, RobotoMono_Bold_ttf_len);
     m_debugText.setFont(m_font);
@@ -31,6 +43,10 @@ Engine::Engine() :
     m_debugText.setCharacterSize(20);
     m_debugText.setFillColor(Color::Magenta);
     g_engineLoaded = true;
+}
+
+Engine::~Engine() {
+    sfvgFree();
 }
 
 void Engine::setRoot(Ptr<Object> root) {
@@ -76,9 +92,11 @@ std::size_t Engine::getLayerCount() const {
 void Engine::run() {
     assert(m_root != nullptr);
     initWindow();
-    Clock::start();
+    g_timeClock.restart();
+    g_deltaTimeClock.restart();
     while (m_window.isOpen()) {
-        Clock::tick();
+        g_deltaTimeValue = g_deltaTimeClock.restart().asSeconds();
+        g_timeValue      = g_timeClock.getElapsedTime().asSeconds();
         processEvents();
         update();
         updateStats();
@@ -125,7 +143,7 @@ void Engine::processEvents() {
 }
 
 void Engine::update() {
-    if (Input::getKeyDown(Key::Escape) && Input::getKey(Key::LControl))
+    if (Input::getKeyDown(Key::Escape))
         m_window.close();
     if (Input::getKeyDown(Key::Tilde) && Input::getKey(Key::LControl))
         m_showDebug = !m_showDebug;
@@ -182,7 +200,7 @@ void Engine::updateStats() {
     frames++;
     cpuSum += cpu_usage_process();
     ramSum += ram_used_process() / 1000000;
-    elapsedTime += Clock::deltaTime();
+    elapsedTime += g_deltaTimeValue;
 
     // update every second
     if (elapsedTime >= 1.0) {
@@ -199,7 +217,7 @@ void Engine::updateStats() {
 
     // form string
     ss.str(std::string());
-    ss << "CLK:  " << (int)Clock::time() << " s\n";
+    ss << "CLK:  " << (int)g_timeValue << " s\n";
     ss << "FPS:  " << framesDisplay << "\n";
     ss << "CPU:  " << std::setprecision(3) << cpuDisplay << "\%\n";
     ss << "RAM:  " << ramDisplay << " MB\n";
@@ -219,5 +237,15 @@ void Engine::showMouseCursor(bool show) {
    m_window.setMouseCursorVisible(show);
 }
 
+float Engine::time() {
+    return g_timeValue;
+}
+
+float Engine::deltaTime() {
+    return g_deltaTimeValue;
+}
+
 // How does Unity's GetComponent() work?
 // https://stackoverflow.com/questions/44105058/how-does-unitys-getcomponent-work
+
+} // namespace sfvg

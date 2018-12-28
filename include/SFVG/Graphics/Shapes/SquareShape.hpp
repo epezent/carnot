@@ -1,5 +1,4 @@
-#ifndef SFVG_SQUARESHAPE_HPP
-#define SFVG_SQUARESHAPE_HPP
+#pragma once
 
 #include <SFVG/Graphics/Shape.hpp>
 
@@ -25,5 +24,3 @@ private:
 };
 
 } // namespace sfvg
-
-#endif // SFVG_SQUARESHAPE_HPP

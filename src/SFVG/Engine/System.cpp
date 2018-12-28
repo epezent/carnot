@@ -18,6 +18,8 @@
 #include <unistd.h>
 #endif
 
+namespace sfvg {
+
 unsigned int get_thread_id() {
     #ifdef _WIN32
     return GetCurrentThreadId();
@@ -174,3 +176,5 @@ std::size_t ram_used_process() {
 }
 
 #endif
+
+} // namespace sfvg

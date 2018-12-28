@@ -1,8 +1,7 @@
-#ifndef SFVG_PROPERTY_HPP
-#define SFVG_PROPERTY_HPP
+#pragma once
 
 #include <SFVG/Graphics/Points.hpp>
-#include <SFVG/Animation/Tween.hpp>
+#include <SFVG/Tween.hpp>
 #include <iostream>
 #include <vector>
 
@@ -71,5 +70,3 @@ SFVG_PROPERTY(PPoints,       Points,       setPoints,       getPoints);
 SFVG_PROPERTY(PRadii,  std::vector<float>, setRadii,        getRadii);
 
 }  // namespace sfvg
-
-#endif  // SFVG_PROPERTY_HPP

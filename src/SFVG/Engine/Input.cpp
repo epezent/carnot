@@ -1,7 +1,9 @@
 #include <SFVG/Engine/Input.hpp>
-#include <SFVG/Engine/Print.hpp>
+#include <SFVG/Print.hpp>
 #include <SFVG/Engine/Engine.hpp>
 #include <array>
+
+namespace sfvg {
 
 //==============================================================================
 // STATIC VARIABLES
@@ -68,7 +70,7 @@ void Input::processEvent(const sf::Event& event) {
             dragStartTable[event.mouseButton.button] = worldPosition;
             dragLastTable[event.mouseButton.button]  = worldPosition;
             // double click
-            float now = Clock::time();
+            float now = Engine::time();
             if ((now - dblClkTimes[event.mouseButton.button]) < dblClkDelay) {
                 dblClkTable[event.mouseButton.button] = true;
                 dragStartedTable[event.mouseButton.button] = false;
@@ -218,3 +220,5 @@ const sf::String& Input::getTextEntered() {
 bool Input::getAnyInput() {
     return anyInputBool;
 }
+
+} // namespace sfvg

@@ -1,5 +1,4 @@
-#ifndef SFVG_ANIMATION_DETAIL_HPP
-#define SFVG_ANIMATION_DETAIL_HPP
+#pragma once
 
 #ifdef __GNUC__
   #define ATTR_UNUSED __attribute__((unused))
@@ -60,5 +59,3 @@ void for_each_in_tuple3(std::tuple<Ts...>& t1,
 }  // namespace detail
 
 }  // namespace sfvg
-
-#endif  // SFVG_ANIMATION_DETAIL_HPP

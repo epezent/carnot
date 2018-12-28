@@ -1,5 +1,9 @@
 #pragma once
+
 #include <memory>
+#include <cassert>
+
+namespace sfvg {
 
 /// Alias std::shared_ptr for convenience
 template <typename T>
@@ -34,6 +38,9 @@ public:
 
     /// Returns this Handle cast as another Handle type
     template <typename U> Handle<U> as();
+
+    /// Returns a shared pointer from Handle
+    Ptr<T> lock() const;
 
     /// Get underlying raw pointer (use sparingly!)
     T* get() const;
@@ -104,12 +111,17 @@ Handle<T>::operator bool() const {
 
 template <typename T>
 bool Handle<T>::isValid() const {
-    return !m_wkPtr.expired();
+    return !m_wkPtr.expired() && get() != nullptr;
 }
 
 template <typename T>
 T* Handle<T>::get() const {
     return m_wkPtr.lock().get();
+}
+
+template <typename T>
+Ptr<T> Handle<T>::lock() const {
+    return m_wkPtr.lock();
 }
 
 template <typename T>
@@ -131,3 +143,5 @@ template <typename T, typename U>
 bool operator !=(const Handle<T>& lhs, const Handle<U>& rhs) {
     return static_cast<void*>(lhs.get()) != static_cast<void*>(rhs.get());
 }
+
+} // namespace sfvg

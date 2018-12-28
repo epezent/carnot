@@ -1,6 +1,8 @@
 #pragma once
 
-#include <SFVG/Engine/Imports.hpp>
+#include <SFVG/Imports.hpp>
+
+namespace sfvg {
 
 class Engine;
 
@@ -42,3 +44,5 @@ private:
     static void updatePositions(const Vector2i& mousePosition, const Vector2f& worldPosition);
     static void clearState();
 };
+
+} // namespace sfvg

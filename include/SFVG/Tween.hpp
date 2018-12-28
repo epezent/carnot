@@ -1,5 +1,4 @@
-#ifndef SFVG_TWEEN_HPP
-#define SFVG_TWEEN_HPP
+#pragma once
 
 namespace sfvg {
 
@@ -102,6 +101,4 @@ namespace Tween
 
 } // namespace sfvg
 
-#include <SFVG/Animation/Detail/Tween.inl>
-
-#endif // SFVG_TWEEN_HPP
+#include <SFVG/Detail/Tween.inl>

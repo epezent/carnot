@@ -1,9 +1,10 @@
-#include <SFVG/Engine/Random.hpp>
+#include <SFVG/Random.hpp>
 #include <SFML/Config.hpp>
 #include <cassert>
 #include <ctime>
 #include <random>
 
+namespace sfvg {
 namespace {
 
 #ifdef THOR_USE_STD_RANDOMENGINE
@@ -82,4 +83,15 @@ float randomDev(float middle, float deviation) {
 
 void setRandomSeed(unsigned long seed) {
     globalEngine.seed(seed);
+}
+
+Color randomColor() {
+    Color color;
+    color.r = (sf::Uint8)random(0,255);
+    color.g = (sf::Uint8)random(0,255);
+    color.b = (sf::Uint8)random(0,255);
+    return color;
+}
+
+
 }

@@ -1,5 +1,5 @@
-#ifndef SFVG_CROSSSHAPE_HPP
-#define SFVG_CROSSSHAPE_HPP
+#pragma once
+
 
 #include <SFVG/Graphics/Shape.hpp>
 
@@ -36,4 +36,3 @@ private:
 
 } // namespace sfvg
 
-#endif // SFVG_CROSSSHAPE_HPP

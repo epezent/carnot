@@ -1,5 +1,4 @@
-#ifndef SFVG_ANCHOR_HPP
-#define SFVG_ANCHOR_HPP
+#pragma once
 
 #include <SFVG/Graphics/Points.hpp>
 
@@ -20,5 +19,3 @@ private:
 };
 
 } // namespace sfvg
-
-#endif // SFVG_ANCHOR_HPP

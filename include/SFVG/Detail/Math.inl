@@ -1,5 +1,9 @@
 #include <iostream>
 #include <cassert>
+#include <algorithm>
+#include <numeric>
+#include <iomanip>
+#include <sstream>
 
 namespace sfvg {
 
@@ -42,6 +46,127 @@ inline bool approximately(float a, float b, float delta) {
 
 inline int sign(float value) {
     return (0 < value) - (value < 0);
+}
+
+inline bool isEven(int value) {
+    return !(value % 2);
+}
+
+inline bool isOdd(int value) {
+    return (value % 2);
+}
+
+inline float sum(const std::vector<float>& data) {
+    float s = 0.0f;
+    for (std::size_t i = 0; i < data.size(); ++i)
+        s += data[i];
+    return s;
+}
+
+inline float mean(const std::vector<float>& data) {
+    float den = 1.0f / data.size();
+    float mean = 0.0f;
+    for (std::size_t i = 0; i < data.size(); ++i)
+        mean += data[i] * den;
+    return mean;
+}
+
+inline float stddev(const std::vector<float>& data, float& meanOut) {
+    if (data.size() > 0) {
+        meanOut = mean(data);
+        std::vector<float> diff(data.size());
+        std::transform(data.begin(), data.end(), diff.begin(), [meanOut](float x) { return x - meanOut; });
+        float sq_sum = std::inner_product(diff.begin(), diff.end(), diff.begin(), 0.0);
+        return std::sqrt(sq_sum / data.size());
+    }
+    else {
+        return 0;
+    }
+}
+
+inline float interp(float x, float x0, float x1, float y0, float y1) {
+    return y0 + (x - x0) * (y1 - y0) / (x1 - x0);
+}
+
+inline int orderOfMagnitude(float value) {
+    if (value == 0.0f)
+        return 0;
+    else
+        return static_cast<int>(floor(log10(std::abs(value))));
+}
+
+inline std::size_t precision(int order) {
+    std::size_t prec;
+    if (order >= 1)
+        prec = 0;
+    else if (order == 0)
+        prec = 1;
+    else
+        prec = -order + 1;
+    return prec;
+}
+
+inline float roundUpToNearest(float value, float interval)
+{
+    if (interval == 0)
+        return value;
+    float remainder = fmod(abs(value), interval);
+    if (remainder == 0)
+        return value;
+    if (value < 0)
+        return -(abs(value) - remainder);
+    else
+        return value + interval - remainder;
+}
+
+inline float roundDownToNearest(float value, float interval) {
+    if (interval == 0)
+        return value;
+    float remainder = fmod(abs(value), interval);
+    if (remainder == 0)
+        return value;
+    if (value < 0)
+        return -(abs(value) - remainder);
+    else
+        return value - remainder;
+}
+
+inline float roundToNearest(float value, float interval) {
+    if (value >= 0) {
+        float rem = fmod(value, interval);
+        value = rem > interval * 0.5f ? value + interval - rem : value - rem;
+    }
+    else {
+        value = -value;
+        float rem = fmod(value, interval);
+        value = rem > interval * 0.5f ? value + interval - rem : value - rem;
+        value = -value;
+
+    }
+    return value;
+}
+
+
+inline bool inBounds(const sf::Vector2f& position, const sf::FloatRect& bounds) {
+    return position.x >= bounds.left &&
+           position.x < bounds.left + bounds.width &&
+           position.y >= bounds.top &&
+           position.y < bounds.top + bounds.height;
+}
+
+inline bool inBounds(const sf::Vector2f& position, const sf::Vector2f& size) {
+    return position.x >= 0 &&
+           position.x < size.x &&
+           position.y >= 0 &&
+           position.y < size.y;
+}
+
+inline std::string numToStr(float number) {
+    int order = orderOfMagnitude(number);
+    std::size_t prec = precision(order);
+    std::stringstream stream;
+    stream << std::fixed << std::setprecision(prec) << number;
+    return stream.str();
 }
 
 //==============================================================================

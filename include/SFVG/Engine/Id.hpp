@@ -2,6 +2,8 @@
 
 #include <string>
 
+namespace sfvg {
+
 /// Unique identifier for Engine types
 typedef std::size_t Id;
 typedef std::string Name;
@@ -20,4 +22,6 @@ extern Id getId(const Name& name);
 /// Gets the string name associated with an Id if it exists
 extern const Name& getName(Id id);
 
-}
+} // namespace ID
+
+} // namespace sfvg

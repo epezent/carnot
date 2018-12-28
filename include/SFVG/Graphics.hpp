@@ -1,7 +1,7 @@
-#ifndef SFVG_GRAPHICS_HPP
-#define SFVG_GRAPHICS_HPP
+#pragma once
 
 #include <SFVG/Math.hpp>
+#include <SFVG/Tween.hpp>
 #include <SFVG/Graphics/Points.hpp>
 #include <SFVG/Graphics/Color.hpp>
 #include <SFVG/Graphics/Gradient.hpp>
@@ -21,5 +21,3 @@ extern void sfvgInit();
 extern void sfvgFree();
 
 }
-
-#endif // SFVG_GRAPHICS_HPP

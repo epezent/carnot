@@ -1,5 +1,4 @@
-#ifndef SFVG_STROKE_HPP
-#define SFVG_STROKE_HPP
+#pragma once
 
 #include <SFML/Graphics/Drawable.hpp>
 #include <SFML/Graphics/Transformable.hpp>
@@ -125,5 +124,3 @@ private:
 };
 
 } // namespace sfvg
-
-#endif // SFVG_STROKE_HPP

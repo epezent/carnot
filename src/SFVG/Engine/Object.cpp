@@ -2,8 +2,12 @@
 
 #include <SFVG/Engine/Engine.hpp>
 #include <SFVG/Engine/Object.hpp>
+#include <SFVG/Engine/Coroutine.hpp>
+#include <SFVG/Graphics.hpp>
 #include <algorithm>
 #include <cmath>
+
+namespace sfvg {
 
 //==============================================================================
 // Constructor/Destructor
@@ -13,11 +17,11 @@ static std::size_t g_nameIndex = 0;
 static std::size_t g_objectCount = 0;
 
 Object::Object() :
+    m_enabled(true),
     m_layer(0),
     m_children(),
     m_parent(nullptr),
     m_index(0),
-    m_enabled(true),
     m_isRoot(false),
     m_iteratingChildren(false),
     m_origin(0, 0),
@@ -39,18 +43,32 @@ Object::Object() :
 }
 
 Object::Object(const Name& name) :
+    m_enabled(true),
     m_layer(0),
     m_children(),
     m_parent(nullptr),
     m_index(0),
-    m_enabled(true),
-    m_isRoot(false)
+    m_isRoot(false),
+    m_iteratingChildren(false),
+    m_origin(0, 0),
+    m_position(0, 0),
+    m_rotation(0),
+    m_scale(1, 1),
+    m_transform(),
+    m_globalTransform(),
+    m_inverseTransform(),
+    m_inverseGlobalTransform(),
+    m_transformNeedUpdate(true),
+    m_globalTransformNeedUpdate(true),
+    m_inverseTransformNeedUpdate(true),
+    m_invGlobTransformNeedUpdate(true)
 {
     m_id = ID::makeId(name);
     g_objectCount++;
 }
 
 Object::~Object() {
+    stopAllCoroutines();
     g_objectCount--;
     ID::freeId(m_id);
 }
@@ -485,6 +503,9 @@ void Object::updateAll() {
     if (m_enabled) {
         // update this
         update();
+        // resume coroutines
+        if (hasCoroutines())
+            resumeCoroutines();
         // update children
         m_iteratingChildren = true;
         for (const auto& child : m_children)
@@ -513,3 +534,55 @@ void Object::queRender(RenderQue& renderQue, RenderStates states) const {
         m_iteratingChildren = false;
     }
 }
+
+//=============================================================================
+// Coroutines
+//=============================================================================
+
+
+Handle<Coroutine> Object::startCoroutine(Enumerator&& e) {
+    auto h = e.getCoroutine();
+    m_coroutines.push_back(std::move(e));
+    return h;
+}
+
+void Object::resumeCoroutines() {
+    std::vector<Enumerator> coroutinesCopy;
+    coroutinesCopy.swap(m_coroutines);
+    for (auto& coro : coroutinesCopy) {
+        auto curr = coro.currentValue();
+        if (curr) { // current yield instruction is valid and not nullptr
+            if (curr->isOver()) { // current yield instruction is done
+                // resume coroutine
+                if (coro.next()) // coroutine isn't done
+                    // reque coroutine
+                    m_coroutines.push_back(std::move(coro));
+            }
+            else {
+                // reque coroutine
+                m_coroutines.push_back(std::move(coro));
+            }
+        }
+        else { // current yield instruction is nullptr
+            if (coro.next()) {
+                // reque coroutine
+                m_coroutines.push_back(std::move(coro));
+            }
+        }
+    }
+}
+
+void Object::stopAllCoroutines() {
+    // delete all coroutines
+    m_coroutines.clear();
+}
+
+bool Object::hasCoroutines() const {
+    return m_coroutines.size() > 0;
+}
+
+std::size_t Object::getCoroutineCount() const {
+    return m_coroutines.size();
+}
+
+} // namespace sfvg
