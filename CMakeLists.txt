@@ -1,10 +1,46 @@
 cmake_minimum_required(VERSION 3.7)
 
+# create project
+project(SFVG VERSION 1.0.0 LANGUAGES CXX)
+
 # enable C++11
 set(CMAKE_CXX_STANDARD 14)
 
-# create project
-project(SFVG)
+# declare dependencies
+set(SFML_STATIC_LIBRARIES TRUE)
+find_package(SFML 2.5 REQUIRED COMPONENTS audio graphics window system network)
+
+# create target and add an alias
+file(GLOB_RECURSE SFVG_INCLUDE "${CMAKE_SOURCE_DIR}/include/SFVG/*.hpp")
+file(GLOB_RECURSE SFVG_SRC "${CMAKE_SOURCE_DIR}/src/SFVG/*.cpp" "${CMAKE_SOURCE_DIR}/src/SFVG/*.hpp")
+add_library(sfvg
+	${SFVG_INCLUDE}
+	${SFVG_SRC}
+)
+add_library(SFVG::sfvg ALIAS sfvg)
+
+# set target properties
+target_include_directories(sfvg
+	PUBLIC
+		$<INSTALL_INTERFACE:include>
+		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+	PRIVATE
+		${CMAKE_CURRENT_SOURCE_DIR}/src
+)
+
+target_compile_features(sfvg 
+	PRIVATE cxx_std_11)
+target_compile_options(sfvg
+	PRIVATE $<$<CXX_COMPILER_ID:GNU>:"-Wall">
+		$<$<CXX_COMPILER_ID:MSVC>:"/W4">
+		$<$<CXX_COMPILER_ID:MSVC>:"/MP">
+)
+
+target_link_libraries(sfvg
+	PUBLIC
+		ws2_32 winmm Pdh Psapi XInput sfml-audio sfml-graphics sfml-window sfml-system sfml-network
+	PRIVATE
+)
 
 # set binary output location (optional, but recommended)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
@@ -12,68 +48,68 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib)
 
 # add definitons
-# add_definitions(-D_CRT_SECURE_NO_WARNINGS -DNOMINMAX -D_WINSOCK_DEPRECATED_NO_WARNINGS)
+add_definitions(-D_CRT_SECURE_NO_WARNINGS -DNOMINMAX -D_WINSOCK_DEPRECATED_NO_WARNINGS)
 
-if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-    set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wall -O3") # ALL WARNINGS
-elseif(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
-    set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} /W4") # WARNING LEVEL 4
-    set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} /MP") # MULTICORE BUILDS
-endif()
-
-set(SFML_STATIC_LIBRARIES TRUE)
-find_package(SFML 2.5 COMPONENTS audio graphics window system network REQUIRED)
-
-# include directories
-include_directories(
-    "include"
-    "src"
+# install the library
+include(GNUInstallDirs)
+set(INSTALL_CONFIGDIR ${CMAKE_INSTALL_LIBDIR}/cmake/SFVG)
+install(TARGETS sfvg
+	EXPORT sfvg-targets
+	LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+	ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
 
-file(GLOB_RECURSE SFVG_INCLUDE "${CMAKE_SOURCE_DIR}/include/SFVG/*.hpp")
-file(GLOB_RECURSE SFVG_SRC "${CMAKE_SOURCE_DIR}/src/SFVG/*.cpp" "${CMAKE_SOURCE_DIR}/src/SFVG/*.hpp")
+set_target_properties(sfvg PROPERTIES EXPORT_NAME SFVG)
 
-# create SFVG library
-add_library(sfvg ${SFVG_INCLUDE} ${SFVG_SRC})
-target_link_libraries(sfvg ws2_32 winmm Pdh Psapi XInput sfml-audio sfml-graphics sfml-window sfml-system sfml-network)
+install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
-# TESTS
-# add_executable(test1 tests/test1.cpp)
-# target_link_libraries(test1 sfvg sfml-audio sfml-graphics sfml-window sfml-system sfml-network)
+# export the targets to a script
+install(EXPORT sfvg-targets
+	DESTINATION
+		${INSTALL_CONFIGDIR}
+	FILE
+		SFVGTargets.cmake
+	NAMESPACE
+		SFVG::
+	
+)
 
-# add_executable(test2 tests/test2.cpp)
-# target_link_libraries(test2 sfvg sfml-audio sfml-graphics sfml-window sfml-system sfml-network)
+# include helper functions for creating config files that can be included by other projects to find and use a package
+include(CMakePackageConfigHelpers)
 
-# add_executable(test3 tests/test3.cpp)
-# target_link_libraries(test3 sfvg sfml-audio sfml-graphics sfml-window sfml-system sfml-network)
+# generate a package configuration file and a package version file
+configure_package_config_file(${CMAKE_CURRENT_LIST_DIR}/cmake/SFVGConfig.cmake.in
+	${CMAKE_CURRENT_BINARY_DIR}/SFVGConfig.cmake
+	INSTALL_DESTINATION ${INSTALL_CONFIGDIR}
+)
+write_basic_package_version_file(
+	${CMAKE_CURRENT_BINARY_DIR}/SFVGConfigVersion.cmake
+	VERSION ${PROJECT_VERSION}
+	COMPATIBILITY AnyNewerVersion
+)
 
-# add_executable(test4 tests/test4.cpp)
-# target_link_libraries(test4 sfvg sfml-audio sfml-graphics sfml-window sfml-system sfml-network)
+# install the config and configversion modules 
+install(FILES
+	${CMAKE_CURRENT_BINARY_DIR}/SFVGConfig.cmake
+	${CMAKE_CURRENT_BINARY_DIR}/SFVGConfigVersion.cmake
+	DESTINATION ${INSTALL_CONFIGDIR}
+)
 
-# add_executable(test5 tests/test5.cpp)
-# target_link_libraries(test5 sfvg sfml-audio sfml-graphics sfml-window sfml-system sfml-network)
+# export from the build tree
+export(EXPORT sfvg-targets
+	NAMESPACE SFVG:: 
+	FILE ${CMAKE_CURRENT_BINARY_DIR}/SFVGTargets.cmake)
 
-# add_executable(test6 tests/test6.cpp)
-# target_link_libraries(test6 sfvg sfml-audio sfml-graphics sfml-window sfml-system sfml-network)
+# register package in user's package registry
+export(PACKAGE SFVG)
 
-# add_executable(test7 tests/test7.cpp)
-# target_link_libraries(test7 sfvg sfml-audio sfml-graphics sfml-window sfml-system sfml-network)
+# build tests
+add_subdirectory(tests)
 
-# add_executable(test8 tests/test8.cpp)
-# target_link_libraries(test8 sfvg sfml-audio sfml-graphics sfml-window sfml-system sfml-network)
+# build examples
+add_subdirectory(examples)
 
-# add_executable(test9 tests/test9.cpp)
-# target_link_libraries(test9 sfvg sfml-audio sfml-graphics sfml-window sfml-system sfml-network)
 
-# add_executable(benchmark tests/benchmark.cpp)
-# target_link_libraries(benchmark sfvg sfml-audio sfml-graphics sfml-window sfml-system sfml-network)
 
-# EXAMPLES
-# add_executable(example_tween examples/example_tween.cpp)
-# target_link_libraries(example_tween sfvg sfml-audio sfml-graphics sfml-window sfml-system sfml-network)
 
-# add_executable(example_shapes examples/example_shapes.cpp)
-# target_link_libraries(example_shapes sfvg sfml-audio sfml-graphics sfml-window sfml-system sfml-network)
 
-add_executable(pong examples/example_pong.cpp)
-target_link_libraries(pong ws2_32 winmm Pdh Psapi XInput sfvg sfml-audio sfml-graphics sfml-window sfml-system sfml-network)
