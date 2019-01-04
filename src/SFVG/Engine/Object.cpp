@@ -16,40 +16,15 @@ namespace sfvg {
 static std::size_t g_nameIndex = 0;
 static std::size_t g_objectCount = 0;
 
-Object::Object() :
-    m_enabled(true),
-    m_layer(0),
-    m_children(),
-    m_parent(nullptr),
-    m_index(0),
-    m_isRoot(false),
-    m_iteratingChildren(false),
-    m_origin(0, 0),
-    m_position(0, 0),
-    m_rotation(0),
-    m_scale(1, 1),
-    m_transform(),
-    m_globalTransform(),
-    m_inverseTransform(),
-    m_inverseGlobalTransform(),
-    m_transformNeedUpdate(true),
-    m_globalTransformNeedUpdate(true),
-    m_inverseTransformNeedUpdate(true),
-    m_invGlobTransformNeedUpdate(true)
-{
-    m_id = ID::makeId("obj" + std::to_string(g_nameIndex));
-    g_nameIndex++;
-    g_objectCount++;
-}
-
 Object::Object(const Name& name) :
     m_enabled(true),
     m_layer(0),
-    m_children(),
+    m_iteratingChildren(false),
+    m_startCalled(false),
     m_parent(nullptr),
     m_index(0),
+    m_engine(nullptr),
     m_isRoot(false),
-    m_iteratingChildren(false),
     m_origin(0, 0),
     m_position(0, 0),
     m_rotation(0),
@@ -65,6 +40,11 @@ Object::Object(const Name& name) :
 {
     m_id = ID::makeId(name);
     g_objectCount++;
+}
+
+Object::Object() :
+    Object("obj" + std::to_string(g_nameIndex++))
+{
 }
 
 Object::~Object() {
@@ -104,6 +84,10 @@ void Object::setEnabled(bool enabled) {
 
 bool Object::isEnabled() const {
     return m_enabled;
+}
+
+bool Object::isActive() const {
+    return m_enabled && getParent()->isActive();
 }
 
 void Object::destroy() {
@@ -457,13 +441,17 @@ std::size_t Object::getObjectCount() {
 // Protected Functions
 //==============================================================================
 
-Engine& Object::getEngine() const {
+Engine& Object::engine() const {
     return *m_engine;
 }
 
 //==============================================================================
 // Virtual Functions
 //==============================================================================
+
+void Object::start() {
+    // do nothing by default
+}
 
 void Object::update() {
     // do nothing by default
@@ -492,33 +480,46 @@ void Object::updateChildIndices() {
         m_children[i]->m_index = i;
 }
 
-void Object::updateAll() {
-    // add Objects in additions
+void Object::updateChildren() {
+    m_iteratingChildren = true;
+    for (const auto& child : m_children)
+        child->updateAll();
+    m_iteratingChildren = false;
+}
+
+void Object::processAdditions() {
+    // process children
     if (m_additions.size() > 0) {
-        for (std::size_t i = 0; i < m_additions.size(); ++i) {
+        for (std::size_t i = 0; i < m_additions.size(); ++i)
             attachChild(std::move(m_additions[i]));
-        }
         m_additions.clear();
     }
-    if (m_enabled) {
-        // update this
-        update();
-        // resume coroutines
-        if (hasCoroutines())
-            resumeCoroutines();
-        // update children
-        m_iteratingChildren = true;
-        for (const auto& child : m_children)
-            child->updateAll();
-        m_iteratingChildren = false;
-    }
-    // destroy Objects in deletions
+    // process Components
+}
+
+void Object::processDeletions() {
+    // process children
     if (m_deletions.size() > 0) {
-        for (std::size_t i = 0; i < m_deletions.size(); ++i) {
+        for (std::size_t i = 0; i < m_deletions.size(); ++i)
             detachChild(m_deletions[i]->getIndex());
-        }
         m_deletions.clear();
     }
+    // process Components
+}
+
+void Object::updateAll() {
+    processAdditions();
+    if (m_enabled) {
+        if (!m_startCalled) {
+            start();
+            m_startCalled = true;
+        }
+        update();
+        if (hasCoroutines())
+            resumeCoroutines();
+        updateChildren();
+    }
+    processDeletions();
 }
 
 void Object::queRender(RenderQue& renderQue, RenderStates states) const {
@@ -526,7 +527,7 @@ void Object::queRender(RenderQue& renderQue, RenderStates states) const {
         // set states
         states.transform *= getTransform();
         // que this Object
-        renderQue[m_layer].push_back({ this, states });
+        renderQue[m_layer].emplace_back(this, states);
         // que children
         m_iteratingChildren = true;
         for (const auto& child : m_children)
@@ -546,34 +547,12 @@ Handle<Coroutine> Object::startCoroutine(Enumerator&& e) {
     return h;
 }
 
-void Object::resumeCoroutines() {
-    std::vector<Enumerator> coroutinesCopy;
-    coroutinesCopy.swap(m_coroutines);
-    for (auto& coro : coroutinesCopy) {
-        auto curr = coro.currentValue();
-        if (curr) { // current yield instruction is valid and not nullptr
-            if (curr->isOver()) { // current yield instruction is done
-                // resume coroutine
-                if (coro.next()) // coroutine isn't done
-                    // reque coroutine
-                    m_coroutines.push_back(std::move(coro));
-            }
-            else {
-                // reque coroutine
-                m_coroutines.push_back(std::move(coro));
-            }
-        }
-        else { // current yield instruction is nullptr
-            if (coro.next()) {
-                // reque coroutine
-                m_coroutines.push_back(std::move(coro));
-            }
-        }
-    }
+void Object::stopCoroutine(Handle<Coroutine> routine) {
+    if (routine)
+        routine->stop();
 }
 
 void Object::stopAllCoroutines() {
-    // delete all coroutines
     m_coroutines.clear();
 }
 
@@ -584,5 +563,15 @@ bool Object::hasCoroutines() const {
 std::size_t Object::getCoroutineCount() const {
     return m_coroutines.size();
 }
+
+void Object::resumeCoroutines() {
+    std::vector<Enumerator> coroutinesCopy;
+    coroutinesCopy.swap(m_coroutines);
+    for (auto& coro : coroutinesCopy) {
+        if (coro.moveNext())
+            m_coroutines.push_back(std::move(coro));
+    }
+}
+
 
 } // namespace sfvg

@@ -1,42 +1,121 @@
 #pragma once
 
-#include <SFML/Graphics/Color.hpp>
+#include <SFVG/Imports.hpp>
 #include <string>
 
 namespace sfvg {
 
-    /// HSV Color representation
-    struct HSV {
-        double h; // angle in degrees [0 to 360]
-        double s; // a fraction [0 to 1]
-        double v; // a fraction [0 to 1]
-    };
+struct RGB;
+struct HSV;
+struct CMYK;
 
-    /// Creates a color from HSV values
-    sf::Color hsvToRgb(const HSV& hsv);
+//=============================================================================
+// Color
+//=============================================================================
 
-    /// Computes HSV values for a color
-    HSV rgbToHsv(const sf::Color& color);
+/// Color class with advanced capabilities
+class XColor {
+public:
 
-    /// CMYK Color representation
-    struct CMYK {
-        double c; // Cyan component [0 to 1]
-        double m; // Magenta component [0 to 1]
-        double y; // Yellow component [0 to 1]
-        double k; // Black component [0 to 1]
-    };
+    /// Constructs default Color (opaque black)
+    XColor();
+    /// Construct Color from RGB
+    XColor(const RGB& rgb);
+    /// Construct Color from RGB
+    XColor(Uint8 r, Uint8 g, Uint8 b, Uint8 alpha = 255);
+    /// Construct Color from HSV
+    XColor(const HSV& hsv);
+    /// Construct Color from HSV
+    XColor(float h, float s, float v, float a);
+    /// Construct Color from CMYK
+    XColor(const CMYK& cmyk);
+    /// Construct Color from CMYK
+    XColor(float c, float m, float y, float k, float a);
+    /// Conversion constructor from sf::Color
+    XColor(const sf::Color& color);
+    /// Conversion operator to sf::Color
+    operator Color() const;
 
-    /// Creates a color from CMYK values
-    sf::Color cmykToRgb(const CMYK& cmyk);
+    HSV getHsv() const;
+    void setHsv(const HSV& hsv);
 
-    /// Computes CMYK values for a color
-    CMYK rgbToCmyk(const sf::Color& color);
+    float getH() const;
+    void setH(float h);
 
-    /// Creates a color from hex code
-    sf::Color hexToRgb(std::string hex);
+    float getS() const;
+    void setS(float s);
+
+    float getV() const;
+    void setV(float v);
+
+    CMYK getCmyk() const;
+    void setCmyk(const CMYK& cmyk);
+
+    float getC() const;
+    void setC(float c);
+
+    float getM() const;
+    void setM(float m);
+
+    float getY() const;
+    void setY(float y);
+
+    float getK() const;
+    void setK(float k);
+
+    float getA() const;
+    void setA(float a);
+
+public:
+    Uint8 r, g, b, a;
+};
+
+//=============================================================================
+// Helper Structs/Functions
+//=============================================================================
+
+/// RGB Color representation
+struct RGB {
+    Uint8 r; /// red component [0 to 255]
+    Uint8 g; /// blue component [0 to 255]
+    Uint8 b; /// green component [0 to 255]
+    Uint8 a; /// alpha component [0 to 255]
+};
+
+/// HSV Color representation
+struct HSV {
+    float h; // angle in degrees [0 to 360]
+    float s; // a fraction [0 to 1]
+    float v; // a fraction [0 to 1]
+    float a; // alpha component [0 to 1]
+};
+
+/// CMYK Color representation
+struct CMYK {
+    float c; // Cyan component [0 to 1]
+    float m; // Magenta component [0 to 1]
+    float y; // Yellow component [0 to 1]
+    float k; // Black component [0 to 1]
+    float a; // alpha component [0 to 1]
+};
+
+/// Creates a color from HSV values
+RGB hsvToRgb(const HSV& hsv);
+
+/// Computes HSV values for a color
+HSV rgbToHsv(const RGB& color);
+
+/// Creates a color from CMYK values
+RGB cmykToRgb(const CMYK& cmyk);
+
+/// Computes CMYK values for a color
+CMYK rgbToCmyk(const RGB& color);
+
+/// Creates a color from hex code
+RGB hexToRgb(std::string hex);
 
 //==============================================================================
-// NAMED COLORS
+// Named Colors
 //==============================================================================
 
 namespace Pinks

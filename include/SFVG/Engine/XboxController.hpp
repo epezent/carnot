@@ -37,25 +37,34 @@ public:
 
 public:
     /// Constructor
-    XboxController(int controller_number = 0);
+    XboxController(int instance = 0);
 
     /// Destructor
     ~XboxController();
 
     /// Returns true if the controller is connected
-    bool is_connected();
+    bool isConnected();
 
-    /// Returns true if the button is pressed
-    bool is_button_pressed(Button button);
+    /// Returns true if the is held
+    bool getButton(Button button);
+
+    /// Returns true if the button was pressed (updateEvents() must be called)
+    bool getButtonDown(Button button);
+
+    /// Returns true if the button was released (updateEvents() must be called)
+    bool getButtonUp(Button button);
 
     /// Returns current state of axsis in range -1.0 (or 0.0) to 1.0
-    double get_axis(Axis axis);
+    float getAxis(Axis axis);
 
     /// Sets the deadzone of an axis in range 0.0 to 1.0
-    void set_deadzone(Axis axis, double deadzone = 0.0);
+    void setDeadzone(Axis axis, float deadzone = 0.0);
 
     /// Vibriates the controller in range 0.0 to 1.0
-    void vibrate(double left_motor = 0.0, double right_motor = 0.0);
+    void vibrate(float left_motor = 0.0, float right_motor = 0.0);
+
+    /// Updates button up/down events (call once per frame)
+    void updateEvents();
 
 private:
     class Impl;                   ///< Pimpl idiom

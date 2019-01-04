@@ -50,7 +50,6 @@ void sfvgInit() {
     SFVG_SOLID_SHADER->setUniform("u_texture", sf::Shader::CurrentTexture);
     SFVG_GRADIENT_SHADER->loadFromMemory(gradientShaderGlsl, sf::Shader::Fragment);
     SFVG_GRADIENT_SHADER->setUniform("u_texture", sf::Shader::CurrentTexture);
-    std::cout << "SFVG Resources Loaded" << std::endl;
 }
 
 void sfvgFree() {
@@ -58,7 +57,6 @@ void sfvgFree() {
     delete SFVG_WHITE_TEXTURE;
     delete SFVG_SOLID_SHADER;
     delete SFVG_GRADIENT_SHADER;
-    std::cout << "SFVG Resources Freed" << std::endl;
 }
 
 

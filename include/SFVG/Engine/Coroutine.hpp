@@ -17,7 +17,6 @@ class Object;
 using SuspendAlawys = std::experimental::suspend_always;
 using SuspendNever  = std::experimental::suspend_never;
 
-
 //==============================================================================
 // YieldInsruction
 //==============================================================================
@@ -53,26 +52,37 @@ struct PromiseType {
     SuspendAlawys yield_value(YieldInstruction* value);
     SuspendAlawys yield_value(Ptr<YieldInstruction> value);
     SuspendAlawys yield_value(Handle<YieldInstruction> value);
-    Ptr<YieldInstruction> m_currentValue;
+    Ptr<YieldInstruction> m_instruction;
 };
 
 //==============================================================================
 // Coroutine
 //==============================================================================
 
-using CoroutineHandle = std::experimental::coroutine_handle<PromiseType>;
-
-struct Coroutine : public YieldInstruction
+struct Coroutine : public YieldInstruction, private NonCopyable
 {
+
+    /// Destructor
+    ~Coroutine();
+    /// Stops the Coroutine
+    void stop();
+    /// Returns true if the Coroutine is over
     bool isOver() override;
+    /// Move semantics
+    Coroutine(Coroutine &&other);
 
 private:
 
+    friend class Object;
     friend class Enumerator;
-    Coroutine(CoroutineHandle coroutine);
+    friend struct PromiseType;
+
+    /// Constructor
+    Coroutine(std::experimental::coroutine_handle<PromiseType> coroutine);
 
 private:
-    CoroutineHandle m_coroutine;
+    std::experimental::coroutine_handle<PromiseType> m_coroutine; ///< underlying handle
+    bool m_stop;
 };
 
 //==============================================================================
@@ -88,6 +98,8 @@ public:
     ~Enumerator();
     /// Move semantics
     Enumerator(Enumerator &&e);
+    /// Advances Enumerator and returns true until completion
+    bool moveNext();
 
 private:
 
@@ -95,16 +107,11 @@ private:
     friend struct PromiseType;
 
     /// Constructor
-    Enumerator(CoroutineHandle h);
-    /// Advance Enumerator, returns true if coroutine not done
-    bool next();
-    /// Gets the current YieldInstruction
-    Handle<YieldInstruction> currentValue();
-
+    Enumerator(Ptr<Coroutine> h);
+    /// Gets the Coroutine
     Handle<Coroutine> getCoroutine();
 
 private:
-    CoroutineHandle m_coroutine;  ///< coroutine handle
     Ptr<Coroutine> m_ptr;
 };
 

@@ -168,8 +168,7 @@ private:
 int main()
 {
     sfvg::sfvgInit();
-    Engine engine;
-    engine.setWindowSize(Vector2f(500,500));
+    Engine engine(500,500);
     engine.setWindowTitle("Pong!");
     auto game = Object::make<PongGame>();
     game->setName("game");

@@ -1,3 +1,5 @@
+namespace sfvg {
+
 template <typename Resource, typename Identifier>
 void ResourceManager<Resource, Identifier>::load(Identifier id, const std::string& filename)
 {
@@ -48,3 +50,5 @@ void ResourceManager<Resource, Identifier>::insertResource(Identifier id, std::u
     auto inserted = mResourceMap.insert(std::make_pair(id, std::move(resource)));
     assert(inserted.second);
 }
+
+} // namespace sfvg

@@ -11,37 +11,55 @@
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Graphics/Text.hpp>
 #include <SFML/Graphics/Color.hpp>
+#include <SFML/Graphics.hpp>
 #include <SFML/System/Time.hpp>
 #include <SFML/Graphics/RenderStates.hpp>
 #include <SFML/Graphics/RenderStates.hpp>
+#include <SFML/Network.hpp>
+
+namespace sfvg {
 
 //==============================================================================
 // SFML Imports
-//=============================================================================
+//==============================================================================
 
-using Key           = sf::Keyboard::Key;
-using MouseButton   = sf::Mouse::Button;
-using Event         = sf::Event;
-using Drawable      = sf::Drawable;
-using Transformable = sf::Transformable;
-using Transform     = sf::Transform;
-using NonCopyable   = sf::NonCopyable;
-using Vector2f      = sf::Vector2f;
-using Vector2i      = sf::Vector2i;
-using Vector2u      = sf::Vector2u;
-using FloatRect     = sf::FloatRect;
-using Font          = sf::Font;
-using RenderWindow  = sf::RenderWindow;
-using Text          = sf::Text;
-using Time          = sf::Time;
-using Clock         = sf::Clock;
-using Color         = sf::Color;
-using View          = sf::View;
-using RenderStates  = sf::RenderStates;
-using RenderTarget  = sf::RenderTarget;
-using String        = sf::String;
+using sf::Event;
+using sf::Drawable;
+using sf::Transformable;
+using sf::Transform;
+using sf::NonCopyable;
+using sf::Vector2f;
+using sf::Vector2i;
+using sf::Vector2u;
+using sf::FloatRect;
+using sf::Font;
+using sf::RenderWindow;
+using sf::Text;
+using sf::Time;
+using sf::Clock;
+using sf::Color;
+using sf::View;
+using sf::RenderStates;
+using sf::RenderTarget;
+using sf::Uint8;
+using sf::Packet;
+using sf::Socket;
+using sf::SocketSelector;
+using sf::UdpSocket;
+using sf::TcpSocket;
+using sf::TcpListener;
+using sf::IpAddress;
+using sf::Sprite;
+using sf::Texture;
+using sf::Image;
+
+using Key            = sf::Keyboard::Key;
+using MouseButton    = sf::Mouse::Button;
 
 using sf::seconds;
 using sf::milliseconds;
 using sf::microseconds;
 
+namespace WindowStyle = sf::Style;
+
+} // namespace sfvg

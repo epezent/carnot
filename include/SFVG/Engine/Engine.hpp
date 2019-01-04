@@ -16,39 +16,60 @@ namespace sfvg {
 class Engine : private NonCopyable {
 public:
 
+    //=========================================================================
+    // GENERAL
+    //=========================================================================
+
     /// Constructor
-    Engine();
+    Engine(unsigned int windowWidth, unsigned int windowHeight, unsigned int style = WindowStyle::Close);
     /// Destructor
     ~Engine();
 
-    /// Makes a root Object of a specifc type and returns a handle to it
-    template <typename T, typename ...Args> Handle<T> makeRoot(Args... args);
-
-    /// Sets the root Object of the Engine
-    void setRoot(Ptr<Object> root);
-    /// Gets a Handle to the root Object of the Engine
-    Handle<Object> getRoot() const;
     /// Starts running the Engine
     void run();
-    /// Sets the window size of the Engine
-    void setWindowSize(const Vector2f& windowSize);
-    /// Sets the window title
-    void setWindowTitle(const std::string& name);
-    void showMouseCursor(bool show);
-    void setBackgroundColor(const sf::Color& color);
-    void setScaleFactor(float scaleFactor);
+    /// Shows basic engine info
+    void showInfo(bool show);
+
+    //=========================================================================
+    // WINDOW
+    //=========================================================================
+
     /// Return window size in pixels
-    sf::Vector2f getWindowSize() const;
-    /// Return globel size of Engine
-    sf::Vector2f getGlobalSize() const;
+    void setWindowTitle(const std::string& name);
+    /// Sets the window size of the Engine
+    void setWindowSize(unsigned int width, unsigned int height);
+    /// Return window size in pixels
+    Vector2u getWindowSize() const;
+    /// Get the underlying RenderWindow of the Engine
+    RenderWindow& getWindow();
 
-    /// Shows engine debug info
-    void showDebugInfo(bool show);
+    //=========================================================================
+    // RENDERING
+    //=========================================================================
 
+    /// Gets an Engine view (i.e. a camera)
+    View& getView(std::size_t index);
+    /// Add a new view to the Engine
+    void addView();
+    /// Returns the current size of the Window in world units
+    Vector2f getWorldSize() const;
+    /// Set color Window is cleared with
+    void setBackgroundColor(const Color& color);
     /// Set the number of layers drawn by the Engine (default 1)
     void setLayerCount(std::size_t count);
     /// Get the number of layers drawn by the Engine (default 1)
     std::size_t getLayerCount() const;
+
+    //=========================================================================
+    // ROOT OBJECT
+    //=========================================================================
+
+    /// Makes a root Object of a specifc type and returns a handle to it
+    template <typename T, typename ...Args> Handle<T> makeRoot(Args... args);
+    /// Sets the root Object of the Engine
+    void setRoot(Ptr<Object> root);
+    /// Gets a Handle to the root Object of the Engine
+    Handle<Object> getRoot() const;
 
 public:
 
@@ -58,23 +79,26 @@ public:
     static float deltaTime();
 
 private:
-    void initWindow();
     void processEvents();
     void update();
     void render();
     void updateStats();
 
+public:
+
+    ResourceManager<Texture, std::string> textures;
+    ResourceManager<Font,    std::string> fonts;
+
 private:
     Ptr<Object> m_root;
-    RenderQue m_renderQue;
     RenderWindow m_window;
-    Vector2f m_windowSize;
-    std::string m_appName;
-    View m_view;
+    std::vector<View> m_views;
+    RenderQue m_renderQue;
+
     Font m_font;
-    Text m_debugText;
-    bool m_showDebug;
-    float m_scaleFactor;
+    bool m_showTitleBar;
+    Text m_infoText;
+    bool m_showInfo;
     Color m_backgroundColor;
 };
 

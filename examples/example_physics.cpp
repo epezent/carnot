@@ -10,8 +10,8 @@ using namespace sfvg;
 // WORLD
 //=============================================================================
 
-#define WORLD_WIDTH  3600.0f
-#define WORLD_HEIGHT 2000.0f
+#define WORLD_WIDTH  3600
+#define WORLD_HEIGHT 2000
 
 class World : public Object {
 public:
@@ -216,7 +216,6 @@ public:
         m_world(world),
         m_particleCount(particleCount),
         m_xbox(ctrl),
-        m_color(rgbToHsv(color)),
         m_boost(0.5f),
         m_boostLossRate(0.5f),
         m_boostGainRate(0.1f)
@@ -226,32 +225,35 @@ public:
         // CircleShape shape(10);
         for (std::size_t i = 0; i < m_particleCount; ++i) {
             auto particle = makeChild<Particle>(world, shape, 1.0f, 0.5f, 0.5f, color);
-            particle->reposition(random(0.0f, WORLD_WIDTH), random(0.0f, WORLD_HEIGHT), random(0.0f, 90.0f));
+            particle->reposition(random(0, WORLD_WIDTH), random(0, WORLD_HEIGHT), random(0.0f, 90.0f));
             m_particles.push_back(particle);
         }
 
-        if (m_xbox.is_connected()) {
-            m_xbox.set_deadzone(XboxController::Axis::LX, 0.2f);
-            m_xbox.set_deadzone(XboxController::Axis::LY, 0.2f);
-            m_xbox.set_deadzone(XboxController::Axis::RX, 0.2f);
+        if (m_xbox.isConnected()) {
+            m_xbox.setDeadzone(XboxController::Axis::LX, 0.2f);
+            m_xbox.setDeadzone(XboxController::Axis::LY, 0.2f);
+            m_xbox.setDeadzone(XboxController::Axis::RX, 0.2f);
         }
         else
             print("Xbox Controller Not Connected!");
+
+        RGB rgb{color.r,color.g,color.b,color.a};
+        m_color = rgbToHsv(rgb);
     }
 
     void update() override {
 
-        float fx   = m_xbox.get_axis(XboxController::LX) * 2000.0f;
-        float fy   = -m_xbox.get_axis(XboxController::LY) * 2000.0f;
+        float fx   = m_xbox.getAxis(XboxController::LX) * 2000.0f;
+        float fy   = -m_xbox.getAxis(XboxController::LY) * 2000.0f;
 
-        float pull = (m_xbox.get_axis(XboxController::RT) - m_xbox.get_axis(XboxController::LT)) * 1000;
-        float spin = -(m_xbox.get_axis(XboxController::RX)) * 100;
+        float pull = (m_xbox.getAxis(XboxController::RT) - m_xbox.getAxis(XboxController::LT)) * 1000;
+        float spin = -(m_xbox.getAxis(XboxController::RX)) * 100;
 
         updateSwarmCenter();
 
         m_boost += Engine::deltaTime() * m_boostGainRate * (1.0f - m_packingFactor) * 5.0f;
 
-        if (m_xbox.is_button_pressed(XboxController::A)) {
+        if (m_xbox.getButton(XboxController::A)) {
             m_boost -= Engine::deltaTime() * m_boostLossRate;
             fx   += fx * 4.0f * m_boost;
             fy   += fy * 4.0f * m_boost;
@@ -307,24 +309,24 @@ public:
         m_color.s = interp(m_boost, 0.0f, 1.0f, 0.5f, 1.0f);
         auto color = hsvToRgb(m_color);
         for (auto& particle : m_particles)
-            particle->setColor(color);
+            particle->setColor(Color(color.r,color.g,color.b,color.a));
     }
 
     void draw(sf::RenderTarget& target, sf::RenderStates states) const override {
-        Stroke stroke1(2);
-        stroke1.setPoint(0, m_mean - m_v1 * 1000.0f);
-        stroke1.setPoint(1, m_mean + m_v1 * 1000.0f);
-        stroke1.setColor(Blues::DeepSkyBlue);
-        stroke1.setThicnkess(1.0f);
+        // Stroke stroke1(2);
+        // stroke1.setPoint(0, m_mean - m_v1 * 1000.0f);
+        // stroke1.setPoint(1, m_mean + m_v1 * 1000.0f);
+        // stroke1.setColor(Blues::DeepSkyBlue);
+        // stroke1.setThicnkess(1.0f);
 
-        Stroke stroke2(2);
-        stroke2.setPoint(0, m_mean - m_v2 * 500.0f);
-        stroke2.setPoint(1, m_mean + m_v2 * 500.0f);
-        stroke2.setColor(Blues::DeepSkyBlue);
-        stroke2.setThicnkess(1.0f);
+        // Stroke stroke2(2);
+        // stroke2.setPoint(0, m_mean - m_v2 * 500.0f);
+        // stroke2.setPoint(1, m_mean + m_v2 * 500.0f);
+        // stroke2.setColor(Blues::DeepSkyBlue);
+        // stroke2.setThicnkess(1.0f);
 
-        target.draw(stroke1, states);
-        target.draw(stroke2, states);
+        // target.draw(stroke1, states);
+        // target.draw(stroke2, states);
     }
 
 private:
@@ -417,8 +419,7 @@ private:
 
 int main()
 {
-    Engine engine;
-    engine.setWindowSize(Vector2f(WORLD_WIDTH,WORLD_HEIGHT));
+    Engine engine(WORLD_WIDTH, WORLD_HEIGHT);
     engine.setWindowTitle("Physics Demo");
     engine.setLayerCount(2);
 
@@ -429,11 +430,11 @@ int main()
     world->makeChild<Boundary>(world, WORLD_WIDTH, WORLD_HEIGHT, 500);
     // make swarms
     auto swarm1 = world->makeChild<Swarm>(world, 0, Blues::DeepSkyBlue, 400);
-    // auto swarm2 = world->makeChild<Swarm>(world, 1, Color(255,48,48), 400);
+    auto swarm2 = world->makeChild<Swarm>(world, 1, Color(255,48,48), 400);
 
     //world->makeChild<Particle>(world, CircleShape(25.0f), 5.0f, 0.0f, 1.0f, Whites::White)->reposition(WORLD_WIDTH/2,WORLD_HEIGHT/2,0);
     world->makeChild<Particle>(world, CircleShape(25), 5.0f, 0.0f, 5.0f, Whites::White)->reposition(WORLD_WIDTH/2,WORLD_HEIGHT/2,0);
-    //world->makeChild<Scoreboard>(swarm1, swarm2);
+    world->makeChild<Scoreboard>(swarm1, swarm2);
 
     // Run game
     engine.run();

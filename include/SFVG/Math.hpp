@@ -80,12 +80,9 @@ inline float roundDownToNearest(float value, float interval);
 /// Rounds a float up or down to the nearest interval
 inline float roundToNearest(float value, float interval);
 
-
 inline bool inBounds(const sf::Vector2f& position, const sf::FloatRect& bounds);
 
 inline bool inBounds(const sf::Vector2f& position, const sf::Vector2f& size);
-
-inline std::string numToStr(float number);
 
 //==============================================================================
 // VECTOR ALGEBRA

@@ -5,9 +5,12 @@
 #include <memory>
 #include <stdexcept>
 #include <string>
+#include <SFVG/Imports.hpp>
+
+namespace sfvg {
 
 template <typename Resource, typename Identifier>
-class ResourceManager {
+class ResourceManager : private NonCopyable {
 public:
     void load(Identifier id, const std::string& filename);
 
@@ -25,5 +28,7 @@ private:
 private:
     std::map<Identifier, std::unique_ptr<Resource>> mResourceMap;
 };
+
+} // namespace sfvg
 
 #include <SFVG/Engine/ResourceManager.inl>

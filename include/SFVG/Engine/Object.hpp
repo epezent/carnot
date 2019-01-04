@@ -1,7 +1,6 @@
 #pragma once
 
 #include <vector>
-#include <set>
 #include <SFVG/Imports.hpp>
 #include <SFVG/Engine/Handle.hpp>
 #include <SFVG/Engine/Id.hpp>
@@ -55,6 +54,8 @@ public:
     void setEnabled(bool enabled);
     /// Returns true if the Object is enabled, false otherwise
     bool isEnabled() const;
+    /// Returns true if the Object is active (i.e. all parents enabled)
+    bool isActive() const;
     /// Ques the Object to be destroyed at the end of the parent Object's update
     void destroy();
     /// Returns ture if the Object is the root Engine object
@@ -201,6 +202,8 @@ public:
 
     /// Starts a new coroutine
     Handle<Coroutine> startCoroutine(Enumerator&& routine);
+    /// Stop a running coroutine
+    void stopCoroutine(Handle<Coroutine> routine);
     /// Stops all running coroutines
     void stopAllCoroutines();
     /// Returns true if the Object has running coroutines
@@ -226,12 +229,14 @@ protected:
     // Protected Functions
     //==========================================================================
 
-    Engine& getEngine() const;
+    Engine& engine() const;
 
     //==========================================================================
     // Virtual Functions
     //==========================================================================
 
+    /// Called once during the lifetime of the Object before any calls to update
+    virtual void start();
     /// Called once per frame when the Object updates
     virtual void update();
     /// Called once per frame when the Object is drawn
@@ -252,6 +257,9 @@ private:
 
     /// Updates the m_index member variable of all children
     void updateChildIndices();
+    void updateChildren();
+    void processAdditions();
+    void processDeletions();
 
     /// Updates the Object and then recursively updates all of its children
     void updateAll();
@@ -270,14 +278,17 @@ private:
     Id m_id;                              ///< unique Id of the Object
     bool m_enabled;                       ///< whether or not the Object is enabled
     std::size_t m_layer;                  ///< the render layer of the Object
+
     std::vector<Ptr<Object>> m_children;  ///< list of current child Objects
     std::vector<Ptr<Object>> m_additions; ///< list of child Objects to be added
     std::vector<Object*> m_deletions;     ///< list of child Objects to be destroyed
+    mutable bool m_iteratingChildren;     ///< true if children currently being iterated
+    mutable bool m_startCalled;           ///< Has start() been called?
+
     Object* m_parent;                     ///< pointer to parent Object
     std::size_t m_index;                  ///< sibling index within parent Object
     Engine* m_engine;                     ///< pointer to Engine Object is managed by
     bool m_isRoot;                        ///< whether ot not the Object is the root Engine Object
-    mutable bool m_iteratingChildren;     ///< true if children currently being iterated
 
     Vector2f          m_origin;                     ///< Origin of translation/rotation/scaling of the object
     Vector2f          m_position;                   ///< Position of the object in the 2D world

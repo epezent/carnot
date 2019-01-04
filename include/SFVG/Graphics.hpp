@@ -1,7 +1,9 @@
 #pragma once
 
+#include <SFVG/Graphics/Alignment.hpp>
 #include <SFVG/Math.hpp>
 #include <SFVG/Tween.hpp>
+#include <SFVG/Sequence.hpp>
 #include <SFVG/Graphics/Points.hpp>
 #include <SFVG/Graphics/Color.hpp>
 #include <SFVG/Graphics/Gradient.hpp>
@@ -14,6 +16,7 @@
 #include <SFVG/Graphics/Shapes/RectangleShape.hpp>
 #include <SFVG/Graphics/Shapes/SquareShape.hpp>
 #include <SFVG/Graphics/Shapes/StarShape.hpp>
+
 
 namespace sfvg {
 

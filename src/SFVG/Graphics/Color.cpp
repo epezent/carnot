@@ -6,70 +6,214 @@
 
 namespace sfvg {
 
+//==============================================================================
+// Color
+//==============================================================================
+
+XColor::XColor() :
+    r(255), g(255), b(255), a(255)
+{ }
+
+XColor::XColor(const RGB& rgb) :
+    r(rgb.r), g(rgb.g), b(rgb.b), a(rgb.a)
+{ }
+
+XColor::XColor(Uint8 red, Uint8 green, Uint8 blue, Uint8 alpha) :
+    r(red), g(green), b(blue), a(alpha)
+{ }
+
+XColor::XColor(const HSV& hsv) :
+    XColor(hsvToRgb(hsv))
+{ }
+
+XColor::XColor(float h, float s, float v, float a) :
+    XColor(hsvToRgb(HSV{h,s,v,a}))
+{ }
+
+XColor::XColor(const CMYK& cmyk) :
+    XColor(cmykToRgb(cmyk))
+{ }
+
+XColor::XColor(float c, float m, float y, float k, float a) :
+    XColor(cmykToRgb(CMYK{c,m,y,k,a}))
+{ }
+
+XColor::XColor(const Color& color) :
+    r(color.r), g(color.g), b(color.b), a(color.a)
+{ }
+
+XColor::operator Color() const {
+    return Color(r,g,b,a);
+}
+
+HSV XColor::getHsv() const {
+    return rgbToHsv(RGB{r,g,b,a});
+}
+
+void XColor::setHsv(const HSV& hsv) {
+    *this = XColor(hsv);
+}
+
+float XColor::getH() const {
+    return getHsv().h;
+}
+
+void XColor::setH(float h) {
+    auto hsv = getHsv();
+    hsv.h = h;
+    setHsv(hsv);
+}
+
+float XColor::getS() const {
+    return getHsv().s;
+}
+
+void XColor::setS(float s) {
+    auto hsv = getHsv();
+    hsv.s = s;
+    setHsv(hsv);
+}
+
+float XColor::getV() const {
+    return getHsv().v;
+}
+
+void XColor::setV(float v) {
+    auto hsv = getHsv();
+    hsv.v = v;
+    setHsv(hsv);
+}
+
+CMYK XColor::getCmyk() const {
+    return rgbToCmyk(RGB{r,g,b,a});
+}
+
+void XColor::setCmyk(const CMYK &cmyk) {
+    *this = XColor(cmyk);
+}
+
+float XColor::getC() const {
+    return getCmyk().c;
+}
+
+void XColor::setC(float c) {
+    auto cmyk = getCmyk();
+    cmyk.c = c;
+    setCmyk(cmyk);
+}
+
+float XColor::getM() const {
+    return getCmyk().m;
+}
+
+void XColor::setM(float m) {
+    auto cmyk = getCmyk();
+    cmyk.m = m;
+    setCmyk(cmyk);
+}
+
+float XColor::getY() const {
+    return getCmyk().y;
+}
+
+void XColor::setY(float y) {
+    auto cmyk = getCmyk();
+    cmyk.y = y;
+    setCmyk(cmyk);
+}
+
+float XColor::getK() const {
+    return getCmyk().k;
+}
+
+void XColor::setK(float k) {
+    auto cmyk = getCmyk();
+    cmyk.k = k;
+    setCmyk(cmyk);
+}
+
+float XColor::getA() const {
+    return static_cast<float>(a) / 255.0f;
+}
+
+void XColor::setA(float alpha) {
+    a = static_cast<Uint8>(alpha * 255.0f);
+}
+
+//==============================================================================
+// Helper
+//==============================================================================
+
 namespace {
-struct RGB {
+struct RGB_ {
 
-    RGB() : r(0.0), g(0.0), b(0.0) {}
+    RGB_() : r(1.0f), g(1.0f), b(1.0f), a(1.0f) {}
 
-    RGB(const sf::Color& color) :
-        r(((double)color.r)/255.0),
-        g(((double)color.g)/255.0),
-        b(((double)color.b)/255.0)
+    RGB_(const RGB& color) :
+        r(((float)color.r)/255.0f),
+        g(((float)color.g)/255.0f),
+        b(((float)color.b)/255.0f),
+        a(((float)color.a)/255.0f)
     {}
 
-    sf::Color toColor() {
-        sf::Color color;
-        color.r = static_cast<sf::Uint8>(255.0 * r);
-        color.g = static_cast<sf::Uint8>(255.0 * g);
-        color.b = static_cast<sf::Uint8>(255.0 * b);
+    RGB to8bit() {
+        RGB color;
+        color.r = static_cast<Uint8>(255.0f * r);
+        color.g = static_cast<Uint8>(255.0f * g);
+        color.b = static_cast<Uint8>(255.0f * b);
+        color.a = static_cast<Uint8>(255.0f * a);
         return color;
     }
 
-    double r;       // a fraction between 0 and 1
-    double g;       // a fraction between 0 and 1
-    double b;       // a fraction between 0 and 1
+    float r;       // a fraction between 0 and 1
+    float g;       // a fraction between 0 and 1
+    float b;       // a fraction between 0 and 1
+    float a;       // a fraction between 0 and 1
 };
 }
 
-sf::Color cmykToRgb(const CMYK& cmyk) {
-    sf::Uint8 r = static_cast<sf::Uint8>(255.0 * (1.0 - clamp01(cmyk.c)) * (1.0 - clamp01(cmyk.k)));
-    sf::Uint8 g = static_cast<sf::Uint8>(255.0 * (1.0 - clamp01(cmyk.m)) * (1.0 - clamp01(cmyk.k)));
-    sf::Uint8 b = static_cast<sf::Uint8>(255.0 * (1.0 - clamp01(cmyk.y)) * (1.0 - clamp01(cmyk.k)));
-    return sf::Color(r,g,b);
+RGB cmykToRgb(const CMYK& cmyk) {
+    Uint8 r = static_cast<Uint8>(255.0f * (1.0f - clamp01(cmyk.c)) * (1.0f - clamp01(cmyk.k)));
+    Uint8 g = static_cast<Uint8>(255.0f * (1.0f - clamp01(cmyk.m)) * (1.0f - clamp01(cmyk.k)));
+    Uint8 b = static_cast<Uint8>(255.0f * (1.0f - clamp01(cmyk.y)) * (1.0f - clamp01(cmyk.k)));
+    Uint8 a = static_cast<Uint8>(255.0f * cmyk.a);
+    return RGB{r,g,b,a};
 }
 
 /// Computes CMYK values for a color
-CMYK rgbToCmyk(const sf::Color& color) {
-    RGB in(color);
+CMYK rgbToCmyk(const RGB& color) {
+    RGB_ in(color);
     CMYK out;
-    out.k = 1.0 - std::max(std::max(in.r, in.g), in.b);
-    out.c = (1.0 - in.r - out.k) / (1.0 - out.k);
-    out.m = (1.0 - in.g - out.k) / (1.0 - out.k);
-    out.y = (1.0 - in.b - out.k) / (1.0 - out.k);
+    out.k = 1.0f - std::max(std::max(in.r, in.g), in.b);
+    out.c = (1.0f - in.r - out.k) / (1.0f - out.k);
+    out.m = (1.0f - in.g - out.k) / (1.0f - out.k);
+    out.y = (1.0f - in.b - out.k) / (1.0f - out.k);
+    out.a = in.a;
     return out;
 }
 
 // https://stackoverflow.com/questions/3018313/algorithm-to-convert-rgb-to-hsv-and-hsv-to-rgb-in-range-0-255-for-both
 
-sf::Color hsvToRgb(const HSV& in) {
-    double      hh, p, q, t, ff;
+RGB hsvToRgb(const HSV& in) {
+    float      hh, p, q, t, ff;
     long        i;
-    RGB         out;
+    RGB_        out;
 
-    if(in.s <= 0.0) {       // < is bogus, just shuts up warnings
+    if(in.s <= 0.0f) {       // < is bogus, just shuts up warnings
         out.r = in.v;
         out.g = in.v;
         out.b = in.v;
-        return out.toColor();
+        out.a = in.a;
+        return out.to8bit();
     }
     hh = in.h;
-    if(hh >= 360.0) hh = 0.0;
-    hh /= 60.0;
+    if(hh >= 360.0f) hh = 0.0f;
+    hh /= 60.0f;
     i = (long)hh;
     ff = hh - i;
-    p = in.v * (1.0 - in.s);
-    q = in.v * (1.0 - (in.s * ff));
-    t = in.v * (1.0 - (in.s * (1.0 - ff)));
+    p = in.v * (1.0f - in.s);
+    q = in.v * (1.0f - (in.s * ff));
+    t = in.v * (1.0f - (in.s * (1.0f - ff)));
 
     switch(i) {
     case 0:
@@ -105,31 +249,34 @@ sf::Color hsvToRgb(const HSV& in) {
         out.b = q;
         break;
     }
-    return out.toColor();
+
+    out.a = in.a;
+    return out.to8bit();
 }
 
-HSV rgbToHsv(const sf::Color& color) {
-    RGB in(color);
+HSV rgbToHsv(const RGB& color) {
+    RGB_ in(color);
     HSV         out;
-    double      min, max, delta;
+    out.a = in.a;
+    float      min, max, delta;
     min = in.r < in.g ? in.r : in.g;
     min = min  < in.b ? min  : in.b;
     max = in.r > in.g ? in.r : in.g;
     max = max  > in.b ? max  : in.b;
     out.v = max;                                // v
     delta = max - min;
-    if (delta < 0.00001)
+    if (delta < 0.00001f)
     {
         out.s = 0;
         out.h = 0; // undefined, maybe nan?
         return out;
     }
-    if( max > 0.0 ) { // NOTE: if Max is == 0, this divide would cause a crash
+    if( max > 0.0f ) { // NOTE: if Max is == 0, this divide would cause a crash
         out.s = (delta / max);                  // s
     } else {
         // if max is 0, then r = g = b = 0
         // s = 0, h is undefined
-        out.s = 0.0;
+        out.s = 0.0f;
         out.h = NAN;                            // its now undefined
         return out;
     }
@@ -137,18 +284,16 @@ HSV rgbToHsv(const sf::Color& color) {
         out.h = ( in.g - in.b ) / delta;        // between yellow & magenta
     else
     if( in.g >= max )
-        out.h = 2.0 + ( in.b - in.r ) / delta;  // between cyan & yellow
+        out.h = 2.0f + ( in.b - in.r ) / delta;  // between cyan & yellow
     else
-        out.h = 4.0 + ( in.r - in.g ) / delta;  // between magenta & cyan
-    out.h *= 60.0;                              // degrees
-    if( out.h < 0.0 )
-        out.h += 360.0;
+        out.h = 4.0f + ( in.r - in.g ) / delta;  // between magenta & cyan
+    out.h *= 60.0f;                              // degrees
+    if( out.h < 0.0f )
+        out.h += 360.0f;
     return out;
 }
 
-
-
-sf::Color hexToRgb(std::string hex) {
+RGB hexToRgb(std::string hex) {
     if (hex[0] == '#')
         hex.erase(0,1);
     unsigned int r, g, b, a;
@@ -158,7 +303,7 @@ sf::Color hexToRgb(std::string hex) {
         #else
             sscanf(hex.c_str(), "%02x%02x%02x", &r, &g, &b);
         #endif
-        return sf::Color(static_cast<sf::Uint8>(r),static_cast<sf::Uint8>(g),static_cast<sf::Uint8>(b));
+        return RGB{static_cast<Uint8>(r),static_cast<Uint8>(g),static_cast<Uint8>(b),255};
     }
     else if (hex.length() == 8) {
         #ifdef _WIN32
@@ -166,15 +311,14 @@ sf::Color hexToRgb(std::string hex) {
         #else
             sscanf(hex.c_str(), "%02x%02x%02x%02x", &r, &g, &b, &a);
         #endif
-        return sf::Color(static_cast<sf::Uint8>(r),static_cast<sf::Uint8>(g),static_cast<sf::Uint8>(b),static_cast<sf::Uint8>(a));
+        return RGB{static_cast<Uint8>(r),static_cast<Uint8>(g),static_cast<Uint8>(b),static_cast<Uint8>(a)};
     }
     else
-        return sf::Color();
+        return RGB{255,255,255,255};
 }
 
-
 //==============================================================================
-// NAMED COLORS
+// Named Colors
 //==============================================================================
 
 namespace Pinks

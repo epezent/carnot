@@ -16,21 +16,21 @@ public:
 
     ~Impl();
 
-    void update_state();
+    void updateState();
 
-    bool is_button_pressed(Button button);
+    bool getButton(Button button);
 
-    double get_axis(Axis axis);
+    float getAxis(Axis axis);
 
-    void set_deadzone(Axis axis, double deadzone);
+    void setDeadzone(Axis axis, float deadzone);
 
-    bool is_connected();
+    bool isConnected();
 
-    void vibrate(double left_motor, double right_motor);
+    void vibrate(float left_motor, float right_motor);
 
     int controller_number_;
 
-    std::array<double, 6> deadzones_;
+    std::array<float, 6> deadzones_;
 
     XINPUT_STATE state_;
 };
@@ -40,13 +40,12 @@ XboxController::Impl::Impl(int controller_number)
 
 XboxController::Impl::~Impl() {}
 
-void XboxController::Impl::update_state() {
+void XboxController::Impl::updateState() {
     ZeroMemory(&state_, sizeof(XINPUT_STATE));
     XInputGetState(controller_number_, &state_);
 }
 
-bool XboxController::Impl::is_button_pressed(Button button) {
-    update_state();
+bool XboxController::Impl::getButton(Button button) {
     switch (button) {
         case Button::A:
             return (state_.Gamepad.wButtons & XINPUT_GAMEPAD_A);
@@ -80,12 +79,11 @@ bool XboxController::Impl::is_button_pressed(Button button) {
     return false;
 }
 
-double XboxController::Impl::get_axis(Axis axis) {
-    update_state();
-    double norm, value;
+float XboxController::Impl::getAxis(Axis axis) {
+    float norm, value;
     switch (axis) {
         case Axis::LX:
-            norm = max(-1.0, (double)state_.Gamepad.sThumbLX / 32767.0);
+            norm = max(-1.0, (float)state_.Gamepad.sThumbLX / 32767.0);
             value =
                 (std::abs(norm) < deadzones_[LX]
                      ? 0
@@ -94,7 +92,7 @@ double XboxController::Impl::get_axis(Axis axis) {
                 value /= 1 - deadzones_[LX];
             return value;
         case Axis::LY:
-            norm = max(-1.0, (double)state_.Gamepad.sThumbLY / 32767.0);
+            norm = max(-1.0, (float)state_.Gamepad.sThumbLY / 32767.0);
             value =
                 (std::abs(norm) < deadzones_[LY]
                      ? 0
@@ -103,9 +101,9 @@ double XboxController::Impl::get_axis(Axis axis) {
                 value /= 1 - deadzones_[LY];
             return value;
         case Axis::LT:
-            return (double)state_.Gamepad.bLeftTrigger / 255.0;
+            return (float)state_.Gamepad.bLeftTrigger / 255.0;
         case Axis::RX:
-            norm = max(-1.0, (double)state_.Gamepad.sThumbRX / 32767.0);
+            norm = max(-1.0, (float)state_.Gamepad.sThumbRX / 32767.0);
             value =
                 (std::abs(norm) < deadzones_[RX]
                      ? 0
@@ -114,7 +112,7 @@ double XboxController::Impl::get_axis(Axis axis) {
                 value /= 1 - deadzones_[RX];
             return value;
         case Axis::RY:
-            norm = max(-1.0, (double)state_.Gamepad.sThumbRY / 32767.0);
+            norm = max(-1.0, (float)state_.Gamepad.sThumbRY / 32767.0);
             value =
                 (std::abs(norm) < deadzones_[RY]
                      ? 0
@@ -123,16 +121,16 @@ double XboxController::Impl::get_axis(Axis axis) {
                 value /= 1 - deadzones_[RY];
             return value;
         case Axis::RT:
-            return (double)state_.Gamepad.bRightTrigger / 255.0;
+            return (float)state_.Gamepad.bRightTrigger / 255.0;
     }
     return 0.0;
 }
 
-void XboxController::Impl::set_deadzone(Axis axis, double deadzone) {
+void XboxController::Impl::setDeadzone(Axis axis, float deadzone) {
     deadzones_[axis] = deadzone;
 }
 
-bool XboxController::Impl::is_connected() {
+bool XboxController::Impl::isConnected() {
     ZeroMemory(&state_, sizeof(XINPUT_STATE));
     DWORD Result = XInputGetState(controller_number_, &state_);
     if (Result == ERROR_SUCCESS)
@@ -141,7 +139,7 @@ bool XboxController::Impl::is_connected() {
         return false;
 }
 
-void XboxController::Impl::vibrate(double left_motor, double right_motor) {
+void XboxController::Impl::vibrate(float left_motor, float right_motor) {
     left_motor = clamp01(left_motor);
     right_motor = clamp01(right_motor);
     XINPUT_VIBRATION vibration;
@@ -155,29 +153,35 @@ void XboxController::Impl::vibrate(double left_motor, double right_motor) {
 // CLASS DEFINITIONS
 //=============================================================================
 
-XboxController::XboxController(int controller_number)
-    : impl_(new XboxController::Impl(controller_number)) {}
+XboxController::XboxController(int instance)
+    : impl_(new XboxController::Impl(instance)) {}
 
 XboxController::~XboxController() {}
 
-bool XboxController::is_button_pressed(Button button) {
-    return impl_->is_button_pressed(button);
+bool XboxController::getButton(Button button) {
+    impl_->updateState();
+    return impl_->getButton(button);
 }
 
-double XboxController::get_axis(Axis axis) {
-    return impl_->get_axis(axis);
+float XboxController::getAxis(Axis axis) {
+    impl_->updateState();
+    return impl_->getAxis(axis);
 }
 
-void XboxController::set_deadzone(Axis axis, double deadzone) {
-    impl_->set_deadzone(axis, deadzone);
+void XboxController::setDeadzone(Axis axis, float deadzone) {
+    impl_->setDeadzone(axis, deadzone);
 }
 
-bool XboxController::is_connected() {
-    return impl_->is_connected();
+bool XboxController::isConnected() {
+    return impl_->isConnected();
 }
 
-void XboxController::vibrate(double left_motor, double right_motor) {
+void XboxController::vibrate(float left_motor, float right_motor) {
     return impl_->vibrate(left_motor, right_motor);
+}
+
+void XboxController::updateEvents() {
+
 }
 
 }  // namespace mel

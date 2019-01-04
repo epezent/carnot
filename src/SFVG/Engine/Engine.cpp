@@ -8,7 +8,6 @@
 #include "RobotoMonoBold.hpp"
 #include <cassert>
 
-#define REF_WIDTH  3840.0f
 
 namespace sfvg {
 
@@ -26,72 +25,46 @@ float g_deltaTimeValue      = 0.0f;
 
 } // private namespace
 
-Engine::Engine() :
-    m_renderQue(1),
+//==============================================================================
+// GENERAL
+//==============================================================================
+
+Engine::Engine(unsigned int width, unsigned int height, unsigned int style) :
     m_window(),
-    m_windowSize(500,500),
-    m_appName("SFVG Application"),
-    m_debugText(),
-    m_showDebug(false),
-    m_scaleFactor((float)sf::VideoMode::getDesktopMode().width / REF_WIDTH)
+    m_views(1),
+    m_renderQue(1),
+    m_showTitleBar(true),
+    m_infoText(),
+    m_showInfo(false)
 {
-    sfvgInit();
     assert(!g_engineLoaded);
+    sfvgInit();
     m_font.loadFromMemory(&RobotoMono_Bold_ttf, RobotoMono_Bold_ttf_len);
-    m_debugText.setFont(m_font);
-    m_debugText.setPosition(5, 5);
-    m_debugText.setCharacterSize(20);
-    m_debugText.setFillColor(Color::Magenta);
+    m_infoText.setFont(m_font);
+    m_infoText.setPosition(5, 5);
+    m_infoText.setCharacterSize(20);
+    m_infoText.setFillColor(Color::Magenta);
+
+    // create Window and set settings
+    sf::ContextSettings settings;
+    settings.antialiasingLevel = 8;
+    m_window.create(sf::VideoMode(width, height), "", style, settings);
+    m_window.setFramerateLimit(60);
+    m_window.requestFocus();
+    // set Window view
+    m_views[0] = m_window.getDefaultView();
+    m_views[0].setCenter(width * 0.5f, height * 0.5f);
+    // loaded
     g_engineLoaded = true;
 }
 
 Engine::~Engine() {
+    g_engineLoaded = false;
     sfvgFree();
-}
-
-void Engine::setRoot(Ptr<Object> root) {
-    m_root = root;
-    m_root->setEngine(this);
-    m_root->m_isRoot = true;
-}
-
-
-Handle<Object> Engine::getRoot() const {
-    return Handle<Object>(m_root);
-}
-
-void Engine::setWindowSize(const Vector2f& windowSize) {
-    m_windowSize = windowSize;
-}
-
-void Engine::setBackgroundColor(const Color &color) {
-    m_backgroundColor = color;
-}
-
-void Engine::setScaleFactor(float scaleFactor) {
-    m_scaleFactor = scaleFactor;
-}
-
-sf::Vector2f Engine::getWindowSize() const {
-    return Vector2f(m_window.getSize());
-}
-
-sf::Vector2f Engine::getGlobalSize() const {
-    return m_window.mapPixelToCoords(sf::Vector2i(m_window.getSize()), m_view);
-}
-
-void Engine::setLayerCount(std::size_t count) {
-    assert(count > 0);
-    m_renderQue.resize(count);
-}
-
-std::size_t Engine::getLayerCount() const {
-    return m_renderQue.size();
 }
 
 void Engine::run() {
     assert(m_root != nullptr);
-    initWindow();
     g_timeClock.restart();
     g_deltaTimeClock.restart();
     while (m_window.isOpen()) {
@@ -104,24 +77,80 @@ void Engine::run() {
     }
 }
 
-void Engine::initWindow() {
-    // create Window and set settings
-    sf::ContextSettings settings;
-    settings.antialiasingLevel = 8;
-    m_window.create(sf::VideoMode(m_windowSize.x * m_scaleFactor, m_windowSize.y * m_scaleFactor), m_appName, sf::Style::Default, settings);
-    m_window.setFramerateLimit(60);
-    m_window.requestFocus();
+void Engine::showInfo(bool show) {
+    m_showInfo = show;
+}
 
-    // set Window view
-    m_view = m_window.getDefaultView();
-    m_view.setSize(m_windowSize.x, m_windowSize.y);
-    m_view.setCenter(m_windowSize.x * 0.5f, m_windowSize.y * 0.5f);
+//==============================================================================
+// WINDOW
+//==============================================================================
+
+void Engine::setWindowTitle(const std::string& name) {
+    m_window.setTitle(name);
+}
+
+void Engine::setWindowSize(unsigned int width, unsigned int height) {
+    m_window.setSize(Vector2u(width, height));
+}
+
+sf::Vector2u Engine::getWindowSize() const {
+    return m_window.getSize();
+}
+
+RenderWindow& Engine::getWindow() {
+    return m_window;
+}
+
+//==============================================================================
+// RENDERING
+//==============================================================================
+
+
+View& Engine::getView(std::size_t index) {
+    return m_views[index];
+}
+
+void Engine::addView() {
+    View view = m_window.getDefaultView();
+    m_views.push_back(view);
+}
+
+
+sf::Vector2f Engine::getWorldSize() const {
+    return m_window.mapPixelToCoords(sf::Vector2i(m_window.getSize()), m_views[0]);
+}
+
+void Engine::setBackgroundColor(const Color &color) {
+    m_backgroundColor = color;
+}
+
+void Engine::setLayerCount(std::size_t count) {
+    assert(count > 0);
+    m_renderQue.resize(count);
+}
+
+std::size_t Engine::getLayerCount() const {
+    return m_renderQue.size();
+}
+
+//==============================================================================
+// ROOT OBJECT
+//==============================================================================
+
+void Engine::setRoot(Ptr<Object> root) {
+    m_root = root;
+    m_root->setEngine(this);
+    m_root->m_isRoot = true;
+}
+
+Handle<Object> Engine::getRoot() const {
+    return Handle<Object>(m_root);
 }
 
 void Engine::processEvents() {
     Input::clearState();
     auto mousePosition = sf::Mouse::getPosition(m_window);
-    Input::updatePositions(mousePosition, m_window.mapPixelToCoords(mousePosition, m_view));
+    Input::updatePositions(mousePosition, m_window.mapPixelToCoords(mousePosition, m_views[0]));
     Event event;
     while (m_window.pollEvent(event)) {
         Input::processEvent(event);
@@ -131,9 +160,9 @@ void Engine::processEvents() {
                 break;
             }
             case Event::Resized: {
-                FloatRect size(0, 0, event.size.width / m_scaleFactor, event.size.height / m_scaleFactor);
-                View view(size);
-                m_view = view;
+                FloatRect size(0.0f, 0.0f, (float)event.size.width, (float)event.size.height);
+                // View view(size);
+                // m_view = view;
                 break;
             }
             default:
@@ -146,8 +175,7 @@ void Engine::update() {
     if (Input::getKeyDown(Key::Escape))
         m_window.close();
     if (Input::getKeyDown(Key::Tilde) && Input::getKey(Key::LControl))
-        m_showDebug = !m_showDebug;
-
+        m_showInfo = !m_showInfo;
     m_root->updateAll();
 }
 
@@ -161,27 +189,24 @@ void Engine::render() {
     m_root->queRender(m_renderQue, sf::RenderStates::Default);
     // clear window
     m_window.clear(m_backgroundColor);
-    // set view for resolution independance
-    m_window.setView(m_view);
-    // iterate over layers and draw
-    for (auto& layer : m_renderQue) {
-        for (auto& pair : layer) {
-            pair.first->draw(m_window, pair.second);
+    // iterate over views
+    for (auto& view : m_views) {
+        // set view
+        m_window.setView(view);
+        // iterate over layers and draw
+        for (auto& layer : m_renderQue) {
+            for (auto& pair : layer) {
+                pair.first->draw(m_window, pair.second);
+            }
         }
     }
-
-    // m_root->draw(m_window, sf::RenderStates::Default);
-
     // render stats
-    if (m_showDebug) {
-        m_window.draw(m_debugText);
+    if (m_showInfo) {
+        m_window.setView(m_window.getDefaultView());
+        m_window.draw(m_infoText);
     }
     // display window
     m_window.display();
-}
-
-void Engine::showDebugInfo(bool show) {
-    m_showDebug = show;
 }
 
 void Engine::updateStats() {
@@ -224,17 +249,7 @@ void Engine::updateStats() {
     ss << "PIX:  " << Input::getRawMousePosition().x << "," << Input::getRawMousePosition().y << " px\n";
     ss << "X,Y:  " << std::fixed << Input::getMousePosition().x << "," << Input::getMousePosition().y << "\n";
     ss << "OBJ:  " << Object::getObjectCount() << "\n";
-    m_debugText.setString(ss.str()) ;
-}
-
-void Engine::setWindowTitle(const std::string& name) {
-    if (m_window.isOpen())
-        m_window.setTitle(name);
-    m_appName = name;
-}
-
-void Engine::showMouseCursor(bool show) {
-   m_window.setMouseCursorVisible(show);
+    m_infoText.setString(ss.str()) ;
 }
 
 float Engine::time() {

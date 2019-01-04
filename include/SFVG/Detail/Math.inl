@@ -3,7 +3,6 @@
 #include <algorithm>
 #include <numeric>
 #include <iomanip>
-#include <sstream>
 
 namespace sfvg {
 
@@ -76,7 +75,7 @@ inline float stddev(const std::vector<float>& data, float& meanOut) {
         meanOut = mean(data);
         std::vector<float> diff(data.size());
         std::transform(data.begin(), data.end(), diff.begin(), [meanOut](float x) { return x - meanOut; });
-        float sq_sum = std::inner_product(diff.begin(), diff.end(), diff.begin(), 0.0);
+        float sq_sum = std::inner_product(diff.begin(), diff.end(), diff.begin(), 0.0f);
         return std::sqrt(sq_sum / data.size());
     }
     else {
@@ -161,13 +160,7 @@ inline bool inBounds(const sf::Vector2f& position, const sf::Vector2f& size) {
            position.y < size.y;
 }
 
-inline std::string numToStr(float number) {
-    int order = orderOfMagnitude(number);
-    std::size_t prec = precision(order);
-    std::stringstream stream;
-    stream << std::fixed << std::setprecision(prec) << number;
-    return stream.str();
-}
+
 
 //==============================================================================
 // VECTOR ALGEBRA

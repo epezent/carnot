@@ -7,11 +7,9 @@ namespace sfvg {
 //==============================================================================
 
 YieldInstruction::YieldInstruction() {
-    print("YieldInstruction Created");
 }
 
 YieldInstruction::~YieldInstruction() {
-    print("YieldInstruction Destroyed");
 }
 
 bool YieldInstruction::isOver() {
@@ -33,27 +31,25 @@ bool WaitForSeconds::isOver() {
 //==============================================================================
 
 PromiseType::PromiseType() :
-   m_currentValue(nullptr)
+   m_instruction(nullptr)
 {
-   print("PROMISE CONSTRUCTED");
 }
 
 PromiseType::~PromiseType() {
-   print("PROMISE DESTRUCTED");
 }
 
 SuspendAlawys PromiseType::initial_suspend() {
-   print("CORO STARTED");
-   return SuspendAlawys{}; // changing this will make coroutine start immmediately or after update
+   return SuspendAlawys{}; // changing this to change start
 }
 
 SuspendAlawys PromiseType::final_suspend() {
-   print("CORO FINISHED");
    return SuspendAlawys{};
 }
 
 Enumerator PromiseType::get_return_object() {
-   return Enumerator{ CoroutineHandle::from_promise(*this) };
+    auto h = std::experimental::coroutine_handle<PromiseType>::from_promise(*this);
+    Ptr<Coroutine> coro(new Coroutine(h));
+    return Enumerator(coro);
 }
 
 void PromiseType::unhandled_exception() {
@@ -65,17 +61,17 @@ SuspendNever PromiseType::return_void() {
 }
 
 SuspendAlawys PromiseType::yield_value(YieldInstruction* value) {
-   m_currentValue = std::shared_ptr<YieldInstruction>(value);
+   m_instruction = std::shared_ptr<YieldInstruction>(value);
    return SuspendAlawys{};
 }
 
 SuspendAlawys PromiseType::yield_value(Ptr<YieldInstruction> value) {
-    m_currentValue = value;
+    m_instruction = value;
     return SuspendAlawys{};
 }
 
 SuspendAlawys PromiseType::yield_value(Handle<YieldInstruction> value) {
-    m_currentValue = value.lock();
+    m_instruction = value.lock();
     return SuspendAlawys{};
 }
 
@@ -83,135 +79,75 @@ SuspendAlawys PromiseType::yield_value(Handle<YieldInstruction> value) {
 // Coroutine
 //==============================================================================
 
-Coroutine::Coroutine(CoroutineHandle coroutine) :
+Coroutine::Coroutine(std::experimental::coroutine_handle<PromiseType> coroutine) :
     YieldInstruction(),
-    m_coroutine(coroutine)
+    m_coroutine(coroutine),
+    m_stop(false)
 {
-    
+}
+
+Coroutine::Coroutine(Coroutine &&other) :
+    m_coroutine(other.m_coroutine)
+{
+    other.m_coroutine = nullptr;
+}
+
+Coroutine::~Coroutine() {
+    if (m_coroutine) {
+        m_coroutine.destroy();
+    }
 }
 
 bool Coroutine::isOver() {
     return m_coroutine.done();
 }
 
+void Coroutine::stop() {
+    m_stop = true;
+}
+
+
 //==============================================================================
 // Enumerator
 //==============================================================================
 
-bool Enumerator::next() {
-   m_coroutine.resume();
-   return !m_coroutine.done();
+bool Enumerator::moveNext() {
+    if (m_ptr->m_stop) // coroutine has request stop
+        return false;
+    auto instruction = m_ptr->m_coroutine.promise().m_instruction;
+    if (instruction) { // there is an instruction
+        if (instruction->isOver()) { // yield instruction is over
+            m_ptr->m_coroutine.resume();
+            return !m_ptr->m_coroutine.done();
+        }
+        else { // yield instruction is not over
+            return true;
+        }
+    }
+    else { // no yield instruction
+        m_ptr->m_coroutine.resume();
+        return !m_ptr->m_coroutine.done();
+    }
 }
 
-Handle<YieldInstruction> Enumerator::currentValue() {
-    return m_coroutine.promise().m_currentValue;
-}
-
-Enumerator::Enumerator(CoroutineHandle h)
-    : m_coroutine(h),
-    m_ptr(new Coroutine(h))
+Enumerator::Enumerator(Ptr<Coroutine> h) :
+    m_ptr(h)
 {
 }
 
 Enumerator::~Enumerator() {
-    if (m_coroutine) {
-        m_coroutine.destroy();
-        print("Coroutine Handle Destroyed");
-    }
+
 }
 
 Enumerator::Enumerator(Enumerator &&e) :
-    m_coroutine(e.m_coroutine),
-    m_ptr(e.m_ptr)
+    m_ptr(std::move(e.m_ptr))
 {
-    e.m_coroutine = nullptr;
     e.m_ptr = nullptr;
 };
 
 Handle<Coroutine> Enumerator::getCoroutine() {
-    return m_ptr;
+    return Handle<Coroutine>(m_ptr);
 }
 
 } // namespac sfvg
 
-//==============================================================================
-// Enumerator (Old)
-//==============================================================================
-
-/*
-class Enumerator {
-public:
-
-    struct promise_type;
-    using coroutine_handle = std::experimental::coroutine_handle<promise_type>;
-    struct promise_type {
-
-        promise_type() :
-            m_currentValue(nullptr)
-        {
-        }
-
-        ~promise_type() {
-            if (m_currentValue)
-                delete m_currentValue;
-        }
-
-        auto initial_suspend() {
-            return std::experimental::suspend_always{}; // changing this will make coroutine start immmediately or after update
-        }
-
-        auto final_suspend() {
-            return std::experimental::suspend_always{};
-        }
-
-        auto get_return_object() {
-            return Enumerator{ coroutine_handle::from_promise(*this) };
-        }
-
-        void unhandled_exception() {
-            std::exit(1);
-        }
-
-        auto return_void() {
-            return std::experimental::suspend_never{};
-        }
-
-        auto yield_value(YieldInstruction* value) {
-            if (m_currentValue) {
-                delete m_currentValue;
-            }
-            m_currentValue = value;
-            return std::experimental::suspend_always{};
-        }
-        YieldInstruction* m_currentValue;
-    };
-
-
-    bool next() {
-        coro.resume();
-        return !coro.done();
-    }
-
-    YieldInstruction* currentValue() {
-        return coro.promise().m_currentValue;
-    }
-
-    Enumerator(coroutine_handle h)
-        : coro(h)
-    {
-    }
-
-    ~Enumerator() {
-        if (coro)
-            coro.destroy();
-    }
-
-    Enumerator(const Enumerator &) = delete;
-    Enumerator(Enumerator &&g)
-        : coro(g.coro) {
-        g.coro = nullptr;
-    };
-
-    coroutine_handle coro;
-};
-*/

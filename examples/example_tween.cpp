@@ -1,6 +1,6 @@
 #include <SFML/Graphics.hpp>
 #include <SFVG/Graphics.hpp>
-#include <SFVG/Animation/Tween.hpp>
+#include <SFVG/Tween.hpp>
 
 using namespace sfvg;
 
@@ -18,7 +18,7 @@ int main() {
     window.setVerticalSyncEnabled(true);
 
     sf::Font font;
-    font.loadFromFile("../fonts/Roboto-Medium.ttf");
+    font.loadFromFile("RobotoMono-Bold.ttf");
 
     sf::Text text;
     text.setFont(font);
@@ -28,7 +28,7 @@ int main() {
 
     PolygonShape poly(6, PolygonShape::CircumscribedRadius, 50.0f);
     poly.setPosition(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);
-    poly.setGradient(Gradient(hex("#0094FFFF"), hex("#00137FFF"), 45.0f));
+    poly.setGradient(Gradient(Blues::DeepSkyBlue, Reds::FireBrick, 45.0f));
     sf::Clock moveClock;
     sf::Vector2f moveFrom = poly.getPosition();
     sf::Vector2f moveTo   = poly.getPosition();
