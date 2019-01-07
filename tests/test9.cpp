@@ -51,7 +51,7 @@ void drawTriangle(Point a, Point b, Point c, sf::Color color) {
     Point center = (a + b + c) * (1.0f / 3.0f);
 
 
-    SquareShape p(6);
+    SquareShape p(3);
     p.setPosition(center);
     p.setColor(color);
 
@@ -63,7 +63,7 @@ void drawLabel(Point position, const std::string& str) {
     sf::Text text;
     text.setFillColor(sf::Color::White);
     text.setFont(*G_FONT);
-    text.setCharacterSize(20);
+    text.setCharacterSize(10);
     text.setString(str);
     text.setPosition(position);
     auto rect = text.getLocalBounds();
@@ -82,28 +82,28 @@ int main(int argc, char* argv[]) {
     sf::Text text;
     text.setFont(font);
     text.setFillColor(sf::Color::White);
-    text.setCharacterSize(30);
+    text.setCharacterSize(15);
     text.setString("Text");
     text.setPosition(10, 10);
 
     sf::ContextSettings settings;
     settings.antialiasingLevel = 8;
-    sf::RenderWindow window(sf::VideoMode(1500, 1500), "SFVG Shapes", sf::Style::Close, settings);
+    sf::RenderWindow window(sf::VideoMode(750, 750), "SFVG Shapes", sf::Style::Close, settings);
     window.setFramerateLimit(120);
 
     G_WINDOW = &window;
 
-    SquareShape background(1500);
+    SquareShape background(750);
     background.setGradient(Gradient(Grays::Gray50, Grays::Gray40));
-    background.setPosition(750, 750);
+    background.setPosition(375, 375);
 
     // points
-    Point A(200, 750);
-    Point B(750, 200);
-    Point C(750, 1300);
-    Point D(1300, 750);
+    Point A(100, 375);
+    Point B(375, 100);
+    Point C(375, 650);
+    Point D(650, 375);
 
-    float thickness = 100;
+    float thickness = 50;
     float miterLimit = 4.0;
 
     Stroke stroke(4);
