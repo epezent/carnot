@@ -16,43 +16,60 @@ public:
     Sprite sprite;
 };
 
-class MyObject : public Object {
+class BoxCollider : public Object {
 public:
+    BoxCollider(float width, float height) :
+        m_width(width), m_height(height)
+    {
 
-    MyObject() {
-        m_sqr.setGradient(Gradient(Blues::DeepSkyBlue,Reds::FireBrick));
-        m_sqr.setSideLength(250);
-        m_bg.setSideLength(1000);
-        m_bg.setColor(Whites::White);
-    }
-
-    void start() override {
-        m_sr = makeChild<SpriteRenderer>();
-        m_sr->sprite.setTexture(engine().textures.get("paper"));
-        print("Start!");
-        m_sr->sprite.setColor(Reds::FireBrick);
-        m_sr->sprite.setScale(250.0f/2048.0f, 250.0f/2048.0f);
-        alignBottomCenter(m_sr->sprite);
-    }
-
-    void update() override {
-        if (Input::getKeyDown(Key::Up)) {
-            engine().getView(0).move(Vector2f(0,-10));
-        }
-        if (Input::getKeyDown(Key::Down)) {
-            engine().getView(0).move(Vector2f(0,10));
-        }
     }
 
     void draw(RenderTarget& target, RenderStates states) const override {
-        target.draw(m_bg, states);
-        target.draw(m_sqr, states);
+        std::array<sf::Vertex, 5> verts;
+        verts[0].position = Vector2f(-m_width/2,-m_height/2);
+        verts[1].position = Vector2f( m_width/2,-m_height/2);
+        verts[2].position = Vector2f( m_width/2, m_height/2);
+        verts[3].position = Vector2f(-m_width/2, m_height/2);
+        verts[4].position = Vector2f(-m_width/2,-m_height/2);
+        for (auto& v : verts)
+            v.color = randomColor();
+        target.draw(&verts[0], 5, sf::LineStrip, states);
+    }
+
+    float m_width;
+    float m_height;
+
+};
+
+template <typename Renderable>
+class Renderer : public Object {
+public:
+
+    void draw(RenderTarget& target, RenderStates states) const override {
+        target.draw(renderable, states);
+    }
+
+    Renderable renderable;
+};
+
+class MyObject : public Object {
+public:
+
+    void start() override {
+        // m_sqr = makeChild<Renderer<SquareShape>>();
+        // m_sqr->renderable.setSideLength(250);
+        // m_sqr->renderable.setGradient(Gradient(Blues::DeepSkyBlue,Reds::FireBrick));
+        m_col = makeChild<BoxCollider>(250,250);
+    }
+
+    void update() override {
+        if (Input::getKey(Key::R))
+            rotate(60*Engine::deltaTime());
     }
 
 private:
-    SquareShape m_sqr;
-    SquareShape m_bg;
-    Handle<SpriteRenderer> m_sr;
+    Handle<Renderer<SquareShape>> m_sqr;
+    Handle<BoxCollider> m_col;
 };
 
 

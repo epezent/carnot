@@ -26,7 +26,7 @@ endif()
 
 set(SFML_STATIC_LIBRARIES TRUE)
 find_package(SFML 2.5 COMPONENTS audio graphics window system network REQUIRED)
-find_package(SDL2 REQUIRED)
+# find_package(SDL2 REQUIRED)
 
 # include directories
 include_directories(
@@ -36,7 +36,7 @@ include_directories(
     # "C:/Program Files/SDL2/include"
 )
 
-link_directories("C:/Git/Chipmunk2D/msvc/vc14/chipmunk/x64/Release")
+link_directories("C:/Git/Chipmunk2D/build-msvc/src/Release")
 # link_directories("C:/Program Files/SDL2/lib")
 
 file(GLOB_RECURSE SFVG_INCLUDE "${CMAKE_SOURCE_DIR}/include/SFVG/*.hpp")
