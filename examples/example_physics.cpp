@@ -83,8 +83,8 @@ public:
     void update() override {
         auto position = cpBodyGetPosition(m_body);
         auto angle = cpBodyGetAngle(m_body);
-        setPosition(position.x, position.y);
-        setRotation(angle * RAD2DEG);
+        transform.setPosition(position.x, position.y);
+        transform.setRotation(angle * RAD2DEG);
     }
 
     // Draw
@@ -420,7 +420,7 @@ private:
 int main()
 {
     Engine engine(WORLD_WIDTH, WORLD_HEIGHT);
-    engine.setWindowTitle("Physics Demo");
+    engine.window.setTitle("Physics Demo");
     engine.setLayerCount(2);
 
     // make world

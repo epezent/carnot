@@ -13,39 +13,30 @@ namespace sfvg {
 // Constructor/Destructor
 //==============================================================================
 
-static std::size_t g_nameIndex = 0;
-static std::size_t g_objectCount = 0;
+namespace {
+std::size_t g_nameIndex = 0;
+std::size_t g_objectCount = 0;
+}
 
 Object::Object(const Name& name) :
+    m_id(ID::makeId(name)),
     m_enabled(true),
     m_layer(0),
     m_iteratingChildren(false),
     m_startCalled(false),
+    m_iteratingComponents(false),
     m_parent(nullptr),
     m_index(0),
     m_engine(nullptr),
     m_isRoot(false),
-    m_origin(0, 0),
-    m_position(0, 0),
-    m_rotation(0),
-    m_scale(1, 1),
-    m_transform(),
-    m_globalTransform(),
-    m_inverseTransform(),
-    m_inverseGlobalTransform(),
-    m_transformNeedUpdate(true),
-    m_globalTransformNeedUpdate(true),
-    m_inverseTransformNeedUpdate(true),
-    m_invGlobTransformNeedUpdate(true)
+    transform(*attachComponent(std::make_shared<Transform>()).as<Transform>().get())
 {
-    m_id = ID::makeId(name);
     g_objectCount++;
 }
 
 Object::Object() :
     Object("obj" + std::to_string(g_nameIndex++))
-{
-}
+{ }
 
 Object::~Object() {
     stopAllCoroutines();
@@ -131,192 +122,6 @@ void Object::sendToFront() {
 }
 
 //==============================================================================
-// Local Transformatioins
-//==============================================================================
-
-void Object::setPosition(float x, float y) {
-    m_position.x = x;
-    m_position.y = y;
-    m_transformNeedUpdate = true;
-    m_inverseTransformNeedUpdate = true;
-    m_globalTransformNeedUpdate = true;
-    m_invGlobTransformNeedUpdate = true;
-}
-
-void Object::setPosition(const Vector2f& position) {
-    setPosition(position.x, position.y);
-}
-
-void Object::setRotation(float angle) {
-    m_rotation = static_cast<float>(fmod(angle, 360));
-    if (m_rotation < 0)
-        m_rotation += 360.f;
-
-    m_transformNeedUpdate = true;
-    m_inverseTransformNeedUpdate = true;
-    m_globalTransformNeedUpdate = true;
-    m_invGlobTransformNeedUpdate = true;
-}
-
-void Object::setScale(float factorX, float factorY) {
-    m_scale.x = factorX;
-    m_scale.y = factorY;
-    m_transformNeedUpdate = true;
-    m_inverseTransformNeedUpdate = true;
-    m_globalTransformNeedUpdate = true;
-    m_invGlobTransformNeedUpdate = true;
-}
-
-void Object::setScale(const Vector2f& factors) {
-    setScale(factors.x, factors.y);
-}
-
-void Object::setOrigin(float x, float y) {
-    m_origin.x = x;
-    m_origin.y = y;
-    m_transformNeedUpdate = true;
-    m_inverseTransformNeedUpdate = true;
-    m_globalTransformNeedUpdate = true;
-    m_invGlobTransformNeedUpdate = true;
-}
-
-void Object::setOrigin(const Vector2f& origin) {
-    setOrigin(origin.x, origin.y);
-}
-
-const Vector2f& Object::getPosition() const {
-    return m_position;
-}
-
-float Object::getRotation() const {
-    return m_rotation;
-}
-
-const Vector2f& Object::getScale() const {
-    return m_scale;
-}
-
-const Vector2f& Object::getOrigin() const {
-    return m_origin;
-}
-
-void Object::move(float offsetX, float offsetY) {
-    setPosition(m_position.x + offsetX, m_position.y + offsetY);
-}
-
-
-void Object::move(const Vector2f& offset) {
-    setPosition(m_position.x + offset.x, m_position.y + offset.y);
-}
-
-void Object::rotate(float angle) {
-    setRotation(m_rotation + angle);}
-
-
-void Object::scale(float factorX, float factorY) {
-    setScale(m_scale.x * factorX, m_scale.y * factorY);
-}
-
-void Object::scale(const Vector2f& factor) {
-    setScale(m_scale.x * factor.x, m_scale.y * factor.y);
-}
-
-const Transform& Object::getTransform() const
-{
-    // Recompute the combined transform if needed
-    if (m_transformNeedUpdate)
-    {
-        float angle = -m_rotation * 3.141592654f / 180.f;
-        float cosine = static_cast<float>(std::cos(angle));
-        float sine = static_cast<float>(std::sin(angle));
-        float sxc = m_scale.x * cosine;
-        float syc = m_scale.y * cosine;
-        float sxs = m_scale.x * sine;
-        float sys = m_scale.y * sine;
-        float tx = -m_origin.x * sxc - m_origin.y * sys + m_position.x;
-        float ty = m_origin.x * sxs - m_origin.y * syc + m_position.y;
-
-        m_transform = Transform(sxc, sys, tx,
-                               -sxs, syc, ty,
-                                0.f, 0.f, 1.f);
-        m_transformNeedUpdate = false;
-    }
-
-    return m_transform;
-}
-
-const Transform& Object::getInverseTransform() const
-{
-    // Recompute the inverse transform if needed
-    if (m_inverseTransformNeedUpdate)
-    {
-        m_inverseTransform = getTransform().getInverse();
-        m_inverseTransformNeedUpdate = false;
-    }
-
-    return m_inverseTransform;
-}
-
-//==============================================================================
-// Global Transformatioins
-//==============================================================================
-
-Transform Object::getGlobalTransform() const {
-    Transform transform = Transform::Identity;
-    for (const Object* node = this; node != nullptr; node = node->m_parent)
-        transform = node->getTransform() * transform;
-    return transform;
-}
-
-Transform Object::getInverseGlobalTransform() const {
-    return getGlobalTransform().getInverse();
-}
-
-void Object::setGlobalPosition(const Vector2f& position) {
-    setPosition(getInverseGlobalTransform().transformPoint(position));
-}
-void Object::setGlobalPosition(float x, float y) {
-    setGlobalPosition(Vector2f(x, y));
-}
-
-Vector2f Object::getGlobalPosition() const {
-    return getGlobalTransform() * Vector2f();
-}
-
-void Object::setGlobalRotation(float angle) {
-    rotate(angle - getGlobalRotation());
-}
-
-float Object::getGlobalRotation() const {
-    auto m = getGlobalTransform().getMatrix();
-    float angle = std::atan2(m[1] , m[5]) * sfvg::RAD2DEG;
-    angle = static_cast<float>(fmod(angle, 360));
-    if (angle < 0)
-        angle += 360.f;
-    return angle;
-}
-
-void Object::setGlobalScale(float factorX, float factorY) {
-    setGlobalScale(Vector2f(factorX, factorY));
-}
-
-
-void Object::setGlobalScale(const Vector2f& factors) {
-    auto scaleBy = getGlobalScale();
-    scaleBy.x = factors.x / scaleBy.x;
-    scaleBy.y = factors.y / scaleBy.y;
-    scale(scaleBy);
-}
-
-const Vector2f Object::getGlobalScale() const {
-    auto m = getGlobalTransform().getMatrix();
-    Vector2f scale;
-    scale.x = std::sqrt(m[0] * m[0] + m[1] * m[1]);
-    scale.y = std::sqrt(m[4] * m[4] + m[5] * m[5]);
-    return scale;
-}
-
-//==============================================================================
 // Children
 //==============================================================================
 
@@ -332,7 +137,7 @@ void Object::attachChild(Ptr<Object> gameObject) {
         updateChildIndices();
     }
     else {
-        m_additions.push_back(std::move(gameObject));
+        m_childrenAdd.push_back(std::move(gameObject));
     }
 }
 
@@ -358,13 +163,12 @@ Ptr<Object> Object::detachChild(std::size_t index) {
 
 void Object::destroyChild(std::size_t index) {
     assert(index < m_children.size());
-    m_deletions.push_back(m_children[index].get());
+    m_childrenDel.push_back(m_children[index].get());
 }
 
 void Object::destroyChildren() {
-    for (std::size_t i = 0; i < m_children.size(); ++i) {
-        m_deletions.push_back(m_children[i].get());
-    }
+    for (auto& child : m_children)
+        m_childrenDel.push_back(child.get());
 }
 
 Handle<Object> Object::getChild(std::size_t index) {
@@ -391,9 +195,9 @@ void Object::makeChildLast(std::size_t index) {
 }
 
 Handle<Object> Object::findChild(Id id) {
-    for (std::size_t i = 0; i < m_children.size(); ++i) {
-        if (m_children[i]->m_id == id)
-            return Handle<Object>(m_children[i]);
+    for (auto& child : m_children) {
+        if (child->m_id == id)
+            return Handle<Object>(child);
     }
     return Handle<Object>();
 }
@@ -426,6 +230,53 @@ std::size_t Object::getIndex() const {
 
 bool Object::isChildOf(Handle<Object> object) {
     return m_parent == object.get();
+}
+
+//==============================================================================
+// Component
+//==============================================================================
+
+void Object::updateComponentIndices() {
+    for (std::size_t i = 0; i < m_components.size(); ++i)
+        m_components[i]->m_index = i;
+}
+
+void Object::updateComponents() {
+    m_iteratingComponents = true;
+    for (const auto& comp : m_components)
+        comp->updateAll();
+    m_iteratingComponents = false;
+}
+
+std::size_t Object::getComponentCount() const {
+    return m_components.size();
+}
+
+void Object::removeComponent(std::size_t index) {
+    assert (index < m_componentsDel.size());
+    if (!m_iteratingComponents) {
+        m_components.erase(m_components.begin() + index);
+        updateComponentIndices();
+    }
+    else {
+        m_componentsDel.push_back(m_components[index].get());
+    }
+}
+
+Handle<Component> Object::attachComponent(Ptr<Component> component) {
+    component->m_object = this;
+    component->setEngine(m_engine);
+    auto h = Handle<Component>(component);
+    if (!m_iteratingComponents) {
+        m_components.push_back(std::move(component));
+        updateComponentIndices();
+        for (auto& other : m_components)
+            other->onComponentAdded(h);
+    }
+    else {
+        m_componentsAdd.push_back(std::move(component));
+    }
+    return h;
 }
 
 
@@ -473,6 +324,8 @@ void Object::setEngine(Engine* engine) {
     m_engine = engine;
     for (const auto& child : m_children)
         child->setEngine(m_engine);
+    for (const auto& comp : m_components)
+        comp->setEngine(m_engine);
 }
 
 void Object::updateChildIndices() {
@@ -489,22 +342,28 @@ void Object::updateChildren() {
 
 void Object::processAdditions() {
     // process children
-    if (m_additions.size() > 0) {
-        for (std::size_t i = 0; i < m_additions.size(); ++i)
-            attachChild(std::move(m_additions[i]));
-        m_additions.clear();
+    while (!m_childrenAdd.empty()) {
+        attachChild(std::move(m_childrenAdd.back()));
+        m_childrenAdd.pop_back();
     }
     // process Components
+    while (!m_componentsAdd.empty()) {
+        attachComponent(std::move(m_componentsAdd.back()));
+        m_componentsAdd.pop_back();
+    }
 }
 
 void Object::processDeletions() {
     // process children
-    if (m_deletions.size() > 0) {
-        for (std::size_t i = 0; i < m_deletions.size(); ++i)
-            detachChild(m_deletions[i]->getIndex());
-        m_deletions.clear();
+    while (!m_childrenDel.empty()) {
+        detachChild(m_childrenDel.back()->getIndex());
+        m_childrenDel.pop_back();
     }
     // process Components
+    while (!m_componentsDel.empty()) {
+        removeComponent(m_componentsDel.back()->getIndex());
+        m_componentsDel.pop_back();
+    }
 }
 
 void Object::updateAll() {
@@ -514,6 +373,7 @@ void Object::updateAll() {
             start();
             m_startCalled = true;
         }
+        updateComponents();
         update();
         if (hasCoroutines())
             resumeCoroutines();
@@ -525,7 +385,7 @@ void Object::updateAll() {
 void Object::queRender(RenderQue& renderQue, RenderStates states) const {
     if (m_enabled) {
         // set states
-        states.transform *= getTransform();
+        states.transform *= transform.getLocalMatrix();
         // que this Object
         renderQue[m_layer].emplace_back(this, states);
         // que children
@@ -539,7 +399,6 @@ void Object::queRender(RenderQue& renderQue, RenderStates states) const {
 //=============================================================================
 // Coroutines
 //=============================================================================
-
 
 Handle<Coroutine> Object::startCoroutine(Enumerator&& e) {
     auto h = e.getCoroutine();
@@ -557,7 +416,7 @@ void Object::stopAllCoroutines() {
 }
 
 bool Object::hasCoroutines() const {
-    return m_coroutines.size() > 0;
+    return !m_coroutines.empty();
 }
 
 std::size_t Object::getCoroutineCount() const {
@@ -572,6 +431,5 @@ void Object::resumeCoroutines() {
             m_coroutines.push_back(std::move(coro));
     }
 }
-
 
 } // namespace sfvg

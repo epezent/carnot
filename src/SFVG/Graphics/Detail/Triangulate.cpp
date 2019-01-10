@@ -146,17 +146,17 @@ bool snip(const std::vector<sf::Vector2f>& vertices,
 
 bool triangulate(const std::vector<sf::Vector2f>& vertices,
                  std::vector<std::size_t>& indices_out) {
-    std::size_t vertices_size = vertices.size();
+    int vertices_size = (int)vertices.size();
 
     if (vertices_size < 3)
         return false;
 
     std::vector<int> V(vertices_size, 0);
     if (polygonArea(vertices) > 0) {
-        for (std::size_t v = 0; v < vertices_size; v++)
+        for (int v = 0; v < vertices_size; v++)
             V[v] = v;
     } else {
-        for (std::size_t v = 0; v < vertices_size; v++)
+        for (int v = 0; v < vertices_size; v++)
             V[v] = (vertices_size - 1) - v;
     }
 

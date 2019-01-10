@@ -31,19 +31,6 @@ public:
     void showInfo(bool show);
 
     //=========================================================================
-    // WINDOW
-    //=========================================================================
-
-    /// Return window size in pixels
-    void setWindowTitle(const std::string& name);
-    /// Sets the window size of the Engine
-    void setWindowSize(unsigned int width, unsigned int height);
-    /// Return window size in pixels
-    Vector2u getWindowSize() const;
-    /// Get the underlying RenderWindow of the Engine
-    RenderWindow& getWindow();
-
-    //=========================================================================
     // RENDERING
     //=========================================================================
 
@@ -86,12 +73,12 @@ private:
 
 public:
 
+    RenderWindow window;
     ResourceManager<Texture, std::string> textures;
     ResourceManager<Font,    std::string> fonts;
 
 private:
     Ptr<Object> m_root;
-    RenderWindow m_window;
     std::vector<View> m_views;
     RenderQue m_renderQue;
 

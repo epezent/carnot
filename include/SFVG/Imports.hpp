@@ -26,7 +26,6 @@ namespace sfvg {
 using sf::Event;
 using sf::Drawable;
 using sf::Transformable;
-using sf::Transform;
 using sf::NonCopyable;
 using sf::Vector2f;
 using sf::Vector2i;
@@ -53,8 +52,9 @@ using sf::Sprite;
 using sf::Texture;
 using sf::Image;
 
-using Key            = sf::Keyboard::Key;
-using MouseButton    = sf::Mouse::Button;
+using Key         = sf::Keyboard::Key;
+using MouseButton = sf::Mouse::Button;
+using Matrix3x3   = sf::Transform;
 
 using sf::seconds;
 using sf::milliseconds;

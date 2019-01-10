@@ -1,12 +1,13 @@
 #pragma once
 
-#include <vector>
-#include <SFVG/Imports.hpp>
+#include <SFVG/Engine/Components/Transform.hpp>
+#include <SFVG/Engine/Coroutine.hpp>
 #include <SFVG/Engine/Handle.hpp>
 #include <SFVG/Engine/Id.hpp>
+#include <SFVG/Imports.hpp>
 #include <SFVG/Print.hpp>
 #include <SFVG/Random.hpp>
-#include <SFVG/Engine/Coroutine.hpp>
+#include <vector>
 
 namespace sfvg {
 
@@ -79,72 +80,6 @@ public:
     void sendToFront();
 
     //==========================================================================
-    // Local Transformation Functions
-    //==========================================================================
-
-    /// Sets the local position of the Object
-    void setPosition(float x, float y);
-    /// Sets the local position of the Object
-    void setPosition(const Vector2f& position);
-    /// Sets the local rotation of the Object
-    void setRotation(float angle);
-    /// Sets the local scale of the Object
-    void setScale(float factorX, float factorY);
-    /// Sets the local scale of the Object
-    void setScale(const Vector2f& factors);
-    /// Sets the local origin of the Object
-    void setOrigin(float x, float y);
-    /// Sets the local origin of the Object
-    void setOrigin(const Vector2f& origin);
-    /// Gets the local position of the Object
-    const Vector2f& getPosition() const;
-    /// Gets the local rotation of the Object
-    float getRotation() const;
-    /// Gets the local scale of the Object
-    const Vector2f& getScale() const;
-    /// Gets the local origin of the Object
-    const Vector2f& getOrigin() const;
-    /// Moves the Object by an offset amount
-    void move(float offsetX, float offsetY);
-    /// Moves the Object by an offset ammount
-    void move(const Vector2f& offset);
-    /// Rotates the Object by an offset ammout
-    void rotate(float angle);
-    /// Scales the Object by factors X,Y
-    void scale(float factorX, float factorY);
-    /// Scales the Object by a factor
-    void scale(const Vector2f& factor);
-    /// Gets the local Transform of the Object
-    const Transform& getTransform() const;
-    /// Gets the inverse local Transform of the Object
-    const Transform& getInverseTransform() const;
-
-    //==========================================================================
-    // Global Transformatioins Functions
-    //==========================================================================
-
-    /// Gets the global Transform of the Object
-    Transform getGlobalTransform() const;
-    /// Gets the inverse global Transform of the Object
-    Transform getInverseGlobalTransform() const;
-    /// Sets the global position of the Object
-    void setGlobalPosition(const sf::Vector2f& position);
-    /// Sets the global position of the Object
-    void setGlobalPosition(float x, float y);
-    /// Gets the global position of the Object
-    sf::Vector2f getGlobalPosition() const;
-    /// Sets the global rotation of the Object
-    void setGlobalRotation(float angle);
-    /// Gets the global rotation of the Object
-    float getGlobalRotation() const;
-    /// Sets the global scale of the Object
-    void setGlobalScale(float factorX, float factorY);
-    /// Sets the global scale of the Object
-    void setGlobalScale(const Vector2f& factors);
-    /// Gets the global scale of the Object
-    const Vector2f getGlobalScale() const;
-
-    //==========================================================================
     // Child Functions
     //==========================================================================
 
@@ -195,6 +130,19 @@ public:
     std::size_t getIndex() const;
     /// Returns true if this Object is a child of the passed Object
     bool isChildOf(Handle<Object> object);
+
+    //==========================================================================
+    // Component Functions
+    //==========================================================================
+
+    /// Adds a Component of a specific type and returns a handle to it
+    template <typename T, typename ...Args> Handle<T> addComponent(Args... args);
+    /// Gets the number of Components attached to this Object
+    std::size_t getComponentCount() const;
+    /// Gets the first Component of a specific type
+    template <typename T> Handle<T> getComponent();
+    /// Removes the first Component of a specific type
+    void removeComponent(std::size_t index);
 
     //==========================================================================
     // Coroutine Functions
@@ -251,14 +199,23 @@ private:
     //==========================================================================
 
     friend class Engine;
+    friend class Transform;
 
+    /// Attaches a Component to this Object
+    Handle<Component> attachComponent(Ptr<Component> component);
     /// Sets the Engine pointer of the Object. Called by owning Engine.
     void setEngine(Engine* engine);
-
     /// Updates the m_index member variable of all children
     void updateChildIndices();
+    /// Updates the m_index member variable of all components
+    void updateComponentIndices();
+    /// Updates child Objects
     void updateChildren();
+    /// Updates Components
+    void updateComponents();
+    /// Process added Objects/Components
     void processAdditions();
+    /// Processs deleted Objects/Components
     void processDeletions();
 
     /// Updates the Object and then recursively updates all of its children
@@ -279,34 +236,27 @@ private:
     bool m_enabled;                       ///< whether or not the Object is enabled
     std::size_t m_layer;                  ///< the render layer of the Object
 
-    std::vector<Ptr<Object>> m_children;  ///< list of current child Objects
-    std::vector<Ptr<Object>> m_additions; ///< list of child Objects to be added
-    std::vector<Object*> m_deletions;     ///< list of child Objects to be destroyed
-    mutable bool m_iteratingChildren;     ///< true if children currently being iterated
-    mutable bool m_startCalled;           ///< Has start() been called?
+    std::vector<Ptr<Object>> m_children;    ///< list of current child Objects
+    std::vector<Ptr<Object>> m_childrenAdd; ///< list of child Objects to be added
+    std::vector<Object*>     m_childrenDel; ///< list of child Objects to be destroyed
+    mutable bool m_iteratingChildren;       ///< true if children currently being iterated
+    mutable bool m_startCalled;             ///< Has start() been called?
+
+    std::vector<Ptr<Component>> m_components;
+    std::vector<Ptr<Component>> m_componentsAdd;
+    std::vector<Component*>     m_componentsDel;
+    mutable bool m_iteratingComponents;
 
     Object* m_parent;                     ///< pointer to parent Object
     std::size_t m_index;                  ///< sibling index within parent Object
     Engine* m_engine;                     ///< pointer to Engine Object is managed by
     bool m_isRoot;                        ///< whether ot not the Object is the root Engine Object
 
-    Vector2f          m_origin;                     ///< Origin of translation/rotation/scaling of the object
-    Vector2f          m_position;                   ///< Position of the object in the 2D world
-    float             m_rotation;                   ///< Orientation of the Object, in degrees
-    Vector2f          m_scale;                      ///< Scale of the object
-
-    mutable Transform m_transform;                  ///< Combined transformation of the object
-    mutable Transform m_globalTransform;            ///< Global tansform of the Object
-    mutable Transform m_inverseTransform;           ///< Inverse combined transformation of the object
-    mutable Transform m_inverseGlobalTransform;     ///< Inverse global transform of the Object
-
-    mutable bool      m_transformNeedUpdate;        ///< Does the transform need to be recomputed?
-    mutable bool      m_globalTransformNeedUpdate;  ///< Does the transform need to be recomputed?
-    mutable bool      m_inverseTransformNeedUpdate; ///< Does the transform need to be recomputed?
-    mutable bool      m_invGlobTransformNeedUpdate; ///< Does the transform need to be recomputed?
-
     std::vector<Enumerator> m_coroutines;           ///< Coroutines
 
+public:
+
+    Transform& transform;
 };
 
 //==============================================================================
@@ -344,6 +294,22 @@ Handle<T> Object::findChild() {
 template <typename T, typename ...Args>
 Ptr<T> Object::make(Args... args) {
     return std::make_shared<T>(args...);
+}
+
+template <typename T, typename ...Args>
+Handle<T> Object::addComponent(Args... args) {
+    auto component = std::make_shared<T>(args...);
+    return attachComponent(component).as<T>();
+}
+
+template <typename T>
+Handle<T> Object::getComponent() {
+    for (auto& comp : m_components) {
+        auto cast = std::dynamic_pointer_cast<T>(comp);
+        if (cast)
+            return Handle<T>(cast);
+    }
+    return Handle<T>();
 }
 
 } // namespace sfvg

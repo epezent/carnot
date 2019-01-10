@@ -104,6 +104,7 @@ public:
 private:
 
     friend class Object;
+    friend class Component;
     friend struct PromiseType;
 
     /// Constructor
