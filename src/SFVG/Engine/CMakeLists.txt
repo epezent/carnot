@@ -1,0 +1,12 @@
+target_sources(sfvg
+	PRIVATE
+		Clock.cpp
+		Engine.cpp
+		Id.cpp
+		Input.cpp
+		Object.cpp
+		Random.cpp
+		RobotoBold.cpp
+		RobotoMonoBold.cpp
+		System.cpp
+)
