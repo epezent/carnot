@@ -1,12 +1,13 @@
 target_sources(sfvg
 	PRIVATE
-		Clock.cpp
+		Coroutine.cpp
 		Engine.cpp
 		Id.cpp
 		Input.cpp
 		Object.cpp
-		Random.cpp
 		RobotoBold.cpp
 		RobotoMonoBold.cpp
+		RobotoMonoBold.hpp
 		System.cpp
+		XboxController.cpp
 )
