@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.7)
+cmake_minimum_required(VERSION 3.13.0)
 
 # create project
 project(SFVG VERSION 1.0.0 LANGUAGES CXX)
@@ -6,18 +6,37 @@ project(SFVG VERSION 1.0.0 LANGUAGES CXX)
 # enable C++11
 set(CMAKE_CXX_STANDARD 14)
 
-# declare dependencies
+# create target and add an alias
+add_library(sfvg "")
+add_library(SFVG::sfvg ALIAS sfvg)
+
+# add source files to target
+add_subdirectory(src/SFVG)
+
+# add dependencies
 set(SFML_STATIC_LIBRARIES TRUE)
 find_package(SFML 2.5 REQUIRED COMPONENTS audio graphics window system network)
-
-# create target and add an alias
-file(GLOB_RECURSE SFVG_INCLUDE "${CMAKE_SOURCE_DIR}/include/SFVG/*.hpp")
-file(GLOB_RECURSE SFVG_SRC "${CMAKE_SOURCE_DIR}/src/SFVG/*.cpp" "${CMAKE_SOURCE_DIR}/src/SFVG/*.hpp")
-add_library(sfvg
-	${SFVG_INCLUDE}
-	${SFVG_SRC}
+target_link_libraries(sfvg
+	PUBLIC
+		ws2_32
+		winmm
+		Pdh
+		Psapi
+		XInput
+		sfml-audio sfml-graphics sfml-window sfml-system sfml-network
+	PRIVATE
 )
-add_library(SFVG::sfvg ALIAS sfvg)
+
+target_compile_definitions(sfvg
+	PUBLIC
+		-D_CRT_SECURE_NO_WARNINGS
+		-DNOMINMAX
+		-D_WINSOCK_DEPRECATED_NO_WARNINGS
+)
+
+target_compile_features(sfvg 
+	PRIVATE cxx_std_11
+)
 
 # set target properties
 target_include_directories(sfvg
@@ -28,27 +47,33 @@ target_include_directories(sfvg
 		${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
-target_compile_features(sfvg 
-	PRIVATE cxx_std_11)
-target_compile_options(sfvg
-	PRIVATE $<$<CXX_COMPILER_ID:GNU>:"-Wall">
-		$<$<CXX_COMPILER_ID:MSVC>:"/W4">
-		$<$<CXX_COMPILER_ID:MSVC>:"/MP">
-)
 
-target_link_libraries(sfvg
-	PUBLIC
-		ws2_32 winmm Pdh Psapi XInput sfml-audio sfml-graphics sfml-window sfml-system sfml-network
-	PRIVATE
-)
+# don't know why this doesn't work for setting compile options 
+# target_compile_options(sfvg
+# 	PRIVATE $<$<CXX_COMPILER_ID:GNU>:"-Wall">
+# 		$<$<CXX_COMPILER_ID:MSVC>:"/W4">
+# 		$<$<CXX_COMPILER_ID:MSVC>:"/MP">
+# )
 
-# set binary output location (optional, but recommended)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib)
 
-# add definitons
-add_definitions(-D_CRT_SECURE_NO_WARNINGS -DNOMINMAX -D_WINSOCK_DEPRECATED_NO_WARNINGS)
+if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+    set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wall -O3") # ALL WARNINGS
+elseif(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+    set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} /MP")    # MULTICORE BUILDS
+    set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} /await") # COROUTINES
+elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -fcoroutines-ts -stdlib=libc++") # COROUTINES
+endif()
+
+# set binary output location for executables
+# set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
+
+# set binary output location for static libraries
+# set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib)
+
+# set binary output location for shared libraries
+# set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib)
+
 
 # install the library
 include(GNUInstallDirs)
@@ -64,14 +89,13 @@ set_target_properties(sfvg PROPERTIES EXPORT_NAME SFVG)
 install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 # export the targets to a script
-install(EXPORT sfvg-targets
-	DESTINATION
-		${INSTALL_CONFIGDIR}
+install(EXPORT sfvg-targets	
 	FILE
 		SFVGTargets.cmake
 	NAMESPACE
 		SFVG::
-	
+	DESTINATION
+		${INSTALL_CONFIGDIR}
 )
 
 # include helper functions for creating config files that can be included by other projects to find and use a package
