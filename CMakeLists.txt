@@ -3,6 +3,8 @@ cmake_minimum_required(VERSION 3.13.0)
 # create project
 project(SFVG VERSION 1.0.0 LANGUAGES CXX)
 
+list(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_SOURCE_DIR}/cmake)
+
 # enable C++11
 set(CMAKE_CXX_STANDARD 17)
 
@@ -26,6 +28,7 @@ target_link_libraries(sfvg
 		sfml-audio sfml-graphics sfml-window sfml-system sfml-network
 	PRIVATE
 )
+find_package(Chipmunk REQUIRED)
 
 target_compile_definitions(sfvg
 	PUBLIC

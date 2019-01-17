@@ -1,5 +1,6 @@
 target_sources(sfvg
 	PRIVATE
+		Component.cpp
 		Coroutine.cpp
 		Engine.cpp
 		Id.cpp
@@ -11,3 +12,5 @@ target_sources(sfvg
 		System.cpp
 		XboxController.cpp
 )
+
+add_subdirectory(Components)
