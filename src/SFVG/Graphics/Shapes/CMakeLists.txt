@@ -1,0 +1,9 @@
+target_sources(sfvg
+	PRIVATE
+		CircleShape.cpp
+		CrossShape.cpp
+		PolygonShape.cpp
+		RectangleShape.cpp
+		SquareShape.cpp
+		StarShape.cpp
+)

@@ -83,7 +83,7 @@ float XboxController::Impl::getAxis(Axis axis) {
     float norm, value;
     switch (axis) {
         case Axis::LX:
-            norm = max(-1.0, (float)state_.Gamepad.sThumbLX / 32767.0);
+            norm = std::max(-1.0, (float)state_.Gamepad.sThumbLX / 32767.0);
             value =
                 (std::abs(norm) < deadzones_[LX]
                      ? 0
@@ -92,7 +92,7 @@ float XboxController::Impl::getAxis(Axis axis) {
                 value /= 1 - deadzones_[LX];
             return value;
         case Axis::LY:
-            norm = max(-1.0, (float)state_.Gamepad.sThumbLY / 32767.0);
+            norm = std::max(-1.0, (float)state_.Gamepad.sThumbLY / 32767.0);
             value =
                 (std::abs(norm) < deadzones_[LY]
                      ? 0
@@ -103,7 +103,7 @@ float XboxController::Impl::getAxis(Axis axis) {
         case Axis::LT:
             return (float)state_.Gamepad.bLeftTrigger / 255.0;
         case Axis::RX:
-            norm = max(-1.0, (float)state_.Gamepad.sThumbRX / 32767.0);
+            norm = std::max(-1.0, (float)state_.Gamepad.sThumbRX / 32767.0);
             value =
                 (std::abs(norm) < deadzones_[RX]
                      ? 0
@@ -112,7 +112,7 @@ float XboxController::Impl::getAxis(Axis axis) {
                 value /= 1 - deadzones_[RX];
             return value;
         case Axis::RY:
-            norm = max(-1.0, (float)state_.Gamepad.sThumbRY / 32767.0);
+            norm = std::max(-1.0, (float)state_.Gamepad.sThumbRY / 32767.0);
             value =
                 (std::abs(norm) < deadzones_[RY]
                      ? 0

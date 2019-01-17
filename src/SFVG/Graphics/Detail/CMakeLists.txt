@@ -1,0 +1,10 @@
+target_sources(sfvg
+	PRIVATE
+		clipper.cpp
+		clipper.hpp
+		earcut.hpp
+		ExternalLibs.cpp
+		ExternalLibs.hpp
+		Triangulate.cpp
+		Triangulate.hpp
+)
