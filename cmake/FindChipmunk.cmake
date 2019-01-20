@@ -1,8 +1,8 @@
 # Locate Chipmunk physics library
 # This module defines
-# CHIPMUNK_FOUND, if false, do not try to link to Lua 
+# CHIPMUNK_FOUND, if false, do not try to link to Lua
 # CHIPMUNK_LIBRARIES
-# CHIPMUNK_INCLUDE_DIRS, where to find chipmunk.h 
+# CHIPMUNK_INCLUDE_DIRS, where to find chipmunk.h
 #
 # Note that the expected include convention is
 #  #include <chipmunk.h>
@@ -28,7 +28,7 @@ find_path(CHIPMUNK_INCLUDE_DIR chipmunk.h
   /opt
 )
 
-find_library(CHIPMUNK_LIBRARY 
+find_library(CHIPMUNK_LIBRARY
   NAMES chipmunk
   HINTS
   $ENV{CHIPMUNK_DIR}

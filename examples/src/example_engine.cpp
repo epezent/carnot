@@ -1,6 +1,6 @@
 #include <SFVG/Engine.hpp>
 #include <SFVG/Graphics.hpp>
-#include <chipmunk/chipmunk.h>
+#include <chipmunk.h>
 
 using namespace sfvg;
 

@@ -15,9 +15,14 @@ add_library(SFVG::sfvg ALIAS sfvg)
 # add source files to target
 add_subdirectory(src/SFVG)
 
-# add dependencies
+# find SFML
 set(SFML_STATIC_LIBRARIES TRUE)
 find_package(SFML 2.5 REQUIRED COMPONENTS audio graphics window system network)
+
+# find Chipmunk
+find_package(Chipmunk REQUIRED)
+
+# add dependcies
 target_link_libraries(sfvg
 	PUBLIC
 		ws2_32
@@ -26,9 +31,9 @@ target_link_libraries(sfvg
 		Psapi
 		XInput
 		sfml-audio sfml-graphics sfml-window sfml-system sfml-network
+		${CHIPMUNK_LIBRARIES}
 	PRIVATE
 )
-find_package(Chipmunk REQUIRED)
 
 target_compile_definitions(sfvg
 	PUBLIC
@@ -37,21 +42,24 @@ target_compile_definitions(sfvg
 		-D_WINSOCK_DEPRECATED_NO_WARNINGS
 )
 
-target_compile_features(sfvg 
-	PRIVATE cxx_std_11
-)
+# target_compile_features(sfvg
+# 	PRIVATE cxx_std_11
+# )
 
 # set target properties
 target_include_directories(sfvg
 	PUBLIC
 		$<INSTALL_INTERFACE:include>
 		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+		${CHIPMUNK_INCLUDE_DIRS}
 	PRIVATE
 		${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
+message(${CHIPMUNK_INCLUDE_DIRS})
 
-# don't know why this doesn't work for setting compile options 
+
+# don't know why this doesn't work for setting compile options
 # target_compile_options(sfvg
 # 	PRIVATE $<$<CXX_COMPILER_ID:GNU>:"-Wall">
 # 		$<$<CXX_COMPILER_ID:MSVC>:"/W4">
@@ -90,7 +98,7 @@ set_target_properties(sfvg PROPERTIES EXPORT_NAME SFVG)
 install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 # export the targets to a script
-install(EXPORT sfvg-targets	
+install(EXPORT sfvg-targets
 	FILE
 		SFVGTargets.cmake
 	NAMESPACE
@@ -113,7 +121,7 @@ write_basic_package_version_file(
 	COMPATIBILITY AnyNewerVersion
 )
 
-# install the config and configversion modules 
+# install the config and configversion modules
 install(FILES
 	${CMAKE_CURRENT_BINARY_DIR}/SFVGConfig.cmake
 	${CMAKE_CURRENT_BINARY_DIR}/SFVGConfigVersion.cmake
@@ -122,7 +130,7 @@ install(FILES
 
 # export from the build tree
 export(EXPORT sfvg-targets
-	NAMESPACE SFVG:: 
+	NAMESPACE SFVG::
 	FILE ${CMAKE_CURRENT_BINARY_DIR}/SFVGTargets.cmake)
 
 # register package in user's package registry
