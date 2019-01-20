@@ -1,29 +1,15 @@
-add_executable(test1 src/test1.cpp)
-target_link_libraries(test1 SFVG::sfvg)
+macro(sfvg_test SFVG_TEST_NAME)
+    add_executable(${SFVG_TEST_NAME} src/test_${SFVG_TEST_NAME}.cpp)
+    target_link_libraries(${SFVG_TEST_NAME} PRIVATE SFVG::sfvg)
+    set_target_properties(${SFVG_TEST_NAME} PROPERTIES FOLDER "Tests")
+endmacro()
 
-add_executable(test2 src/test2.cpp)
-target_link_libraries(test2 SFVG::sfvg)
-
-add_executable(test3 src/test3.cpp)
-target_link_libraries(test3 SFVG::sfvg)
-
-add_executable(test4 src/test4.cpp)
-target_link_libraries(test4 SFVG::sfvg)
-
-add_executable(test5 src/test5.cpp)
-target_link_libraries(test5 SFVG::sfvg)
-
-add_executable(test6 src/test6.cpp)
-target_link_libraries(test6 SFVG::sfvg)
-
-add_executable(test7 src/test7.cpp)
-target_link_libraries(test7 SFVG::sfvg)
-
-add_executable(test8 src/test8.cpp)
-target_link_libraries(test8 SFVG::sfvg)
-
-add_executable(test9 src/test9.cpp)
-target_link_libraries(test9 SFVG::sfvg)
-
-add_executable(benchmark src/benchmark.cpp)
-target_link_libraries(benchmark SFVG::sfvg)
+sfvg_test(anim)
+sfvg_test(benchmark)
+sfvg_test(bezier)
+sfvg_test(inside)
+sfvg_test(lines)
+sfvg_test(miter)
+sfvg_test(points)
+sfvg_test(poly)
+sfvg_test(xsection)

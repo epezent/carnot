@@ -1,9 +1,5 @@
-
 macro(sfvg_example SFVG_EXAMPLE_NAME)
-    # project(${SFVG_EXAMPLE_NAME})
-    # add_executable(${SFVG_EXAMPLE_NAME} "example_${SFVG_EXAMPLE_NAME}.cpp")
-    # target_link_libraries(${SFVG_EXAMPLE_NAME} chipmunk ws2_32 winmm Pdh Psapi XInput sfvg sfml-audio sfml-graphics sfml-window sfml-system sfml-network)
-
+    project(${SFVG_EXAMPLE_NAME})
     add_executable(${SFVG_EXAMPLE_NAME} src/example_${SFVG_EXAMPLE_NAME}.cpp)
     target_link_libraries(${SFVG_EXAMPLE_NAME} PRIVATE SFVG::sfvg)
     set_target_properties(${SFVG_EXAMPLE_NAME} PROPERTIES FOLDER "Examples")

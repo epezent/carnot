@@ -13,7 +13,23 @@ add_library(sfvg "")
 add_library(SFVG::sfvg ALIAS sfvg)
 
 # add source files to target
-add_subdirectory(src/SFVG)
+# add_subdirectory(src/SFVG)
+
+file(GLOB_RECURSE SFVG_INCLUDE "${CMAKE_SOURCE_DIR}/include/SFVG/*.hpp")
+file(GLOB_RECURSE SFVG_SRC     "${CMAKE_SOURCE_DIR}/src/SFVG/*.cpp" "${CMAKE_SOURCE_DIR}/src/SFVG/*.hpp")
+
+# file(GLOB SFVG_BASE "${CMAKE_SOURCE_DIR}/include/SFVG/*.hpp" "${CMAKE_SOURCE_DIR}/src/SFVG/*.cpp")
+# file(GLOB_RECURSE SFVG_ANIMATION "${CMAKE_SOURCE_DIR}/include/SFVG/Animation/*.hpp" "${CMAKE_SOURCE_DIR}/src/SFVG/Animation/*.cpp")
+
+# source_group("\\" FILES ${SFVG_BASE})
+# source_group("Animation" FILES ${SFVG_ANIMATION})
+
+
+target_sources(sfvg
+	PRIVATE
+		${SFVG_INCLUDE}
+		${SFVG_SRC}
+)
 
 # find SFML
 set(SFML_STATIC_LIBRARIES TRUE)
@@ -56,9 +72,6 @@ target_include_directories(sfvg
 		${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
-message(${CHIPMUNK_INCLUDE_DIRS})
-
-
 # don't know why this doesn't work for setting compile options
 # target_compile_options(sfvg
 # 	PRIVATE $<$<CXX_COMPILER_ID:GNU>:"-Wall">
@@ -76,10 +89,8 @@ endif()
 
 # set binary output location for executables
 # set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
-
 # set binary output location for static libraries
 # set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib)
-
 # set binary output location for shared libraries
 # set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib)
 
@@ -94,6 +105,8 @@ install(TARGETS sfvg
 )
 
 set_target_properties(sfvg PROPERTIES EXPORT_NAME SFVG)
+set_target_properties(sfvg PROPERTIES FOLDER "SFVG")
+
 
 install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
@@ -130,8 +143,8 @@ install(FILES
 
 # export from the build tree
 export(EXPORT sfvg-targets
-	NAMESPACE SFVG::
-	FILE ${CMAKE_CURRENT_BINARY_DIR}/SFVGTargets.cmake)
+	   NAMESPACE SFVG::
+	   FILE ${CMAKE_CURRENT_BINARY_DIR}/SFVGTargets.cmake)
 
 # register package in user's package registry
 export(PACKAGE SFVG)

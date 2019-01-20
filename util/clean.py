@@ -8,24 +8,7 @@
 import os
 import shutil
 
-keep = ['bin/sfml-audio-2.dll',
-        'bin/sfml-graphics-2.dll',
-        'bin/sfml-network-2.dll',
-        'bin/sfml-system-2.dll',
-        'bin/sfml-window-2.dll',
-        'bin/Release',
-        'bin/Debug',
-        'bin/Release/sfml-audio-2.dll',
-        'bin/Release/sfml-graphics-2.dll',
-        'bin/Release/sfml-network-2.dll',
-        'bin/Release/sfml-system-2.dll',
-        'bin/Release/sfml-window-2.dll',
-        'bin/Debug/sfml-audio-d-2.dll',
-        'bin/Debug/sfml-graphics-d-2.dll',
-        'bin/Debug/sfml-network-d-2.dll',
-        'bin/Debug/sfml-system-d-2.dll',
-        'bin/Debug/sfml-window-d-2.dll'
-        ]
+keep    = []
 folders = ['build',
            'lib',
            'bin']
