@@ -198,7 +198,7 @@ public:
 int main() {
     Engine engine(500,500);
     engine.setBackgroundColor(Color::Black);
-    engine.setWindowTitle("Engine Testing");
+    engine.window.setTitle("Coroutine Testing");
     auto root = engine.makeRoot<MyObject>();
     root->setName("root");
     engine.run();

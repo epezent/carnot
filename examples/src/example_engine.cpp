@@ -4,163 +4,97 @@
 
 using namespace sfvg;
 
-class RigidBody;
-
-class Collider;
-
-cpSpace *g_space;
-float g_dt = 1.0f / 60.0f;
-
-class RigidBody : public Component {
+class TestComp : public Component {
 public:
-
-    enum BodyType {
-        Dynamic,
-        Kinematic,
-        Static
-    };
-
-    RigidBody() {
-        auto moment = cpMomentForBox(1.0f, 100, 100);
-        m_body = cpSpaceAddBody(g_space, cpBodyNew(1.0f, moment));
+    TestComp(GameObject& go) : Component(go) { }
+    void update() override {
+        if (clock.getElapsedTime() > seconds(0.5f))
+        {
+            print("Ping");
+            clock.restart();
+        }
     }
+    Clock clock;
+};
 
-    ~RigidBody() {
-        cpBodyFree(m_body);
-    }
-
-    void start() override {
-        print("RigidBody added");
+class CircleObject : public GameObject {
+public:
+    CircleObject(Engine& engine, Color color) :  GameObject(engine)
+    {
+        cir.setCircleRadius(50);
+        cir.setColor(color);
+        transform.setPosition(250, 250);
+        text.setFont(engine.fonts.get("Roboto"));
+        text.setFillColor(Whites::White);
+        text.setString(getName());
+        text.setCharacterSize(15);
+        alignCenter(text);
     }
 
     void update() override {
-        auto position = cpBodyGetPosition(m_body);
-        auto angle = cpBodyGetAngle(m_body);
-        object()->transform.setPosition((float) position.x, (float) position.y);
-        object()->transform.setRotation((float) angle * RAD2DEG);
+        if (input.getKeyDown(Key::E) && isEnabled())
+            print("Enabled!");
+        if (input.getKeyDown(Key::A) && isEnabled())
+            print("Active!");
+        if (input.getDoubleClick(MouseButton::Left))
+            cir.setColor(randomColor());
+        if (input.getKeyDown(Key::S))
+            startCoroutine(coro());
+
     }
 
-    void onComponentAdded(Handle<Component> component) override {
-        auto candidate = component.as<Collider>();
-        if (candidate) {
-            print("RigidBody connected with Collider");
-            m_collider = candidate;
+    Enumerator coro() {
+        float elapseTime = 0.0f;
+        transform.setPosition(100, 100);
+        while (elapseTime < 2.0f) {
+            auto newPosition = Tween::Smoothstep(Vector2f(100,100), Vector2f(400,400), elapseTime / 2.0f);
+            transform.setPosition(newPosition);
+            elapseTime += engine.deltaTime();
+            co_yield nullptr;
         }
+        transform.setPosition(400, 400);
     }
 
-    void applyForceToCenter(float forceX, float forceY) {
-        auto pos = cpBodyGetPosition(m_body);
-        cpBodyApplyForceAtWorldPoint(m_body, cpv(forceX, forceY), cpv(pos.x, pos.y));
-    }
-
-    void applyTorqueToCenter(float torque) {
-        torque += (float) cpBodyGetTorque(m_body);
-        cpBodySetTorque(m_body, (double) torque);
+    void draw(RenderTarget& target, RenderStates states) const override {
+        target.draw(cir, states);
+        target.draw(text, states);
     }
 
 private:
-    Handle<Collider> m_collider;
-    cpBody *m_body;
+
+    CircleShape cir;
+    Text text;
 };
 
-class Collider : public Component {
+class SquareObject : public GameObject {
 public:
 
-    void start() override {
-        //print("Collider added");
-    }
-
-    void onComponentAdded(Handle<Component> component) override {
-        auto candidate = component.as<RigidBody>();
-        if (candidate) {
-            print("Collider connected with RigidBody");
-            m_rigidbody = candidate;
-        }
-    }
-
-private:
-    Handle<RigidBody> m_rigidbody;
-};
-
-class BoxCollider : public Collider {
-public:
-
-};
-
-class Renderer : public Component {
-public:
-
-    void start() override {
-        print("Renderer added");
-    }
-
-};
-
-class MyObject : public Object {
-public:
-
-    MyObject(Color color) {
-        sqr.setColor(color);
+    SquareObject(Engine& engine, Color color) :
+        GameObject(engine)
+    {
         sqr.setSideLength(100);
-    }
-
-    void start() override {
-        rb = addComponent<RigidBody>();
+        sqr.setColor(color);
+        transform.setPosition(250,250);
     }
 
     void update() override {
-        if (Input::getKey(Key::C))
-            addComponent<Collider>();
-        if (Input::getKeyDown(Key::D))
-            addComponent<Renderer>();
-        if (Input::getKeyDown(Key::B))
-            addComponent<BoxCollider>();
-
-        if (Input::getKey(Key::Up))
-            rb->applyForceToCenter(0, -3000);
-        if (Input::getKey(Key::Right))
-            rb->applyTorqueToCenter(1000);
 
     }
 
-    void draw(RenderTarget &target, RenderStates states) const override {
+    void draw(RenderTarget& target, RenderStates states) const override {
         target.draw(sqr, states);
     }
 
 private:
+
     SquareShape sqr;
-    Handle<RigidBody> rb;
-};
-
-class World : public Object {
-public:
-
-    World() {
-        g_space = cpSpaceNew();
-        cpSpaceSetIterations(g_space, 10);
-        cpSpaceSetSleepTimeThreshold(g_space, 0.5f);
-        cpSpaceSetCollisionSlop(g_space, 0.5f);
-        cpSpaceSetGravity(g_space, cpv(0, 1000));
-    }
-
-    void update() override {
-        cpSpaceStep(g_space, g_dt);
-    }
-
-private:
 
 };
 
 int main(int argc, char const *argv[]) {
-    Engine engine(500, 1000);
-    engine.textures.load("paper", "../textures/paper.png");
-    engine.textures.get("paper").setSmooth(true);
+    Engine engine(500, 500);
     engine.window.setKeyRepeatEnabled(false);
-    Sprite sprite;
-    sprite.setTexture(engine.textures.get("paper"));
-    auto world = engine.makeRoot<World>();
-    world->makeChild<MyObject>(Greens::Chartreuse);
-    engine.getView(0).setCenter(0, 500);
+    engine.makeRoot<CircleObject>(Reds::FireBrick);
     engine.window.setTitle("Evan's Engine");
     engine.run();
     return 0;

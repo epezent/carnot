@@ -1,5 +1,5 @@
 #include <SFVG/Engine/Components/Transform.hpp>
-#include <SFVG/Engine/Object.hpp>
+#include <SFVG/Engine/GameObject.hpp>
 #include <SFVG/Math.hpp>
 
 namespace sfvg {
@@ -8,7 +8,8 @@ namespace sfvg {
 // Constructor
 //==============================================================================
 
-Transform::Transform() :
+Transform::Transform(GameObject& gameObject) :
+    Component(gameObject),
     m_origin(0, 0),
     m_position(0, 0),
     m_rotation(0),
@@ -158,7 +159,7 @@ const Matrix3x3& Transform::getInverseLocalMatrix() const
 
 Matrix3x3 Transform::getGlobalMatrix() const {
     Matrix3x3 matrix = Matrix3x3::Identity;
-    for (const Object* node = object().get(); node != nullptr; node = node->m_parent)
+    for (const GameObject* node = &gameObject; node != nullptr; node = node->m_parent)
         matrix = node->transform.getLocalMatrix() * matrix;
     return matrix;
 }

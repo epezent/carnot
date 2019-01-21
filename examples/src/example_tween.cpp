@@ -18,7 +18,7 @@ int main() {
     window.setVerticalSyncEnabled(true);
 
     sf::Font font;
-    font.loadFromFile("RobotoMono-Bold.ttf");
+    font.loadFromFile("../../fonts/RobotoMono-Bold.ttf");
 
     sf::Text text;
     text.setFont(font);

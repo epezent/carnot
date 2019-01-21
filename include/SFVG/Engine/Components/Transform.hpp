@@ -8,7 +8,7 @@ class Transform : public Component {
 public:
 
     /// Constructor
-    Transform();
+    Transform(GameObject& gameObject);
 
     //==========================================================================
     // Local Transformation Functions

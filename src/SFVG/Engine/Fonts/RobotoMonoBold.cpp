@@ -1,4 +1,6 @@
-#include "RobotoMonoBold.hpp"
+#include "EngineFonts.hpp"
+
+namespace sfvg {
 
 unsigned char RobotoMono_Bold_ttf[] = {
   0x00, 0x01, 0x00, 0x00, 0x00, 0x10, 0x01, 0x00, 0x00, 0x04, 0x00, 0x00,
@@ -9566,3 +9568,5 @@ unsigned char RobotoMono_Bold_ttf[] = {
   0x00, 0x44, 0xb1, 0x05, 0x64, 0x44, 0x00, 0x00
 };
 unsigned int RobotoMono_Bold_ttf_len = 114752;
+
+} // namespace sfvg

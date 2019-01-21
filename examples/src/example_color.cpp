@@ -4,10 +4,10 @@
 
 using namespace sfvg;
 
-class ColorDemo : public Object {
+class ColorDemo : public GameObject {
 public:
 
-    ColorDemo() {
+    ColorDemo(Engine& engine) : GameObject(engine) {
         m_sqr.setSideLength(500.0f);
         m_sqr.setColor(Color::Black);
         m_sqr.setPosition(250,250);
@@ -31,35 +31,35 @@ public:
 
     void update() override {
         int dir = 0;
-        if (Input::getKeyDown(Key::Up))
+        if (input.getKeyDown(Key::Up))
             dir = 1;
-        else if (Input::getKeyDown(Key::Down))
+        else if (input.getKeyDown(Key::Down))
             dir = -1;
 
         if (dir != 0) {
-            if (Input::getKey(Key::R))
+            if (input.getKey(Key::R))
                 m_color.r += dir;
-            if (Input::getKey(Key::G))
+            if (input.getKey(Key::G))
                 m_color.g += dir;
-            if (Input::getKey(Key::B))
+            if (input.getKey(Key::B))
                 m_color.b += dir;
-            if (Input::getKey(Key::A))
+            if (input.getKey(Key::A))
                 m_color.a += dir;
 
-            if (Input::getKey(Key::H))
+            if (input.getKey(Key::H))
                 m_color.setH(m_color.getH() + dir * 1.0f);
-            if (Input::getKey(Key::S))
+            if (input.getKey(Key::S))
                 m_color.setS(m_color.getS() + dir * 1.0f / 255.0f);
-            if (Input::getKey(Key::V))
+            if (input.getKey(Key::V))
                 m_color.setV(m_color.getV() + dir * 1.0f / 255.0f);
 
-            if (Input::getKey(Key::C))
+            if (input.getKey(Key::C))
                 m_color.setC(m_color.getC() + dir * 1.0f / 255.0f);
-            if (Input::getKey(Key::M))
+            if (input.getKey(Key::M))
                 m_color.setM(m_color.getM() + dir * 1.0f / 255.0f);
-            if (Input::getKey(Key::Y))
+            if (input.getKey(Key::Y))
                 m_color.setY(m_color.getY() + dir * 1.0f / 255.0f);
-            if (Input::getKey(Key::K))
+            if (input.getKey(Key::K))
                 m_color.setK(m_color.getK() + dir * 1.0f / 255.0f);
         }
 
@@ -103,7 +103,7 @@ int main(int argc, char const *argv[])
 {
     Engine engine(500,500);
     engine.setBackgroundColor(Color::White);
-    engine.setWindowTitle("Engine Testing");
+    engine.window.setTitle("Engine Testing");
     auto root = engine.makeRoot<ColorDemo>();
     root->setName("root");
     engine.run();

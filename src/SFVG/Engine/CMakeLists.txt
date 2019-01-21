@@ -4,13 +4,13 @@ target_sources(sfvg
 		Coroutine.cpp
 		Engine.cpp
 		Id.cpp
-		Input.cpp
 		Object.cpp
-		RobotoBold.cpp
-		RobotoMonoBold.cpp
-		RobotoMonoBold.hpp
-		System.cpp
+        GameObject.cpp
+		ProcessInfo.cpp
+        System.cpp
 		XboxController.cpp
 )
 
 add_subdirectory(Components)
+add_subdirectory(Fonts)
+add_subdirectory(Systems)

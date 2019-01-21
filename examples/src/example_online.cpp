@@ -13,8 +13,6 @@ const unsigned short SERVER_TCP = 55001; // port 55001 (server TCP port) must be
 const unsigned short SERVER_UDP = 55002; // port-forwarded on the server machine
 const unsigned short CLIENT_UDP = 55003; // to enable internet-based chat
 
-Font g_font;
-
 //=============================================================================
 // AVATAR
 //=============================================================================
@@ -26,12 +24,16 @@ public:
         m_sqr(50)
     {
         m_sqr.setColor(color);
-        m_text.setFont(g_font);
+        m_text.setFont(engine().fonts.get("RobotoMonoBold"));
         m_text.setCharacterSize(20);
         m_text.setFillColor(Color::White);
         m_text.setString(m_username);
-        setPosition(random(100.0f, 900.0f), random(100.0f, 900.0f));
+        transform.setPosition(random(100.0f, 900.0f), random(100.0f, 900.0f));
         m_text.setPosition(-25, -55);
+    }
+
+    void start() override {
+
     }
 
     void draw(sf::RenderTarget& target, sf::RenderStates states) const override {
@@ -53,13 +55,13 @@ public:
     Player(const string& username) : Avatar(username, randomColor()) {}
     void update() override {
         if (Input::getKey(Key::Up))
-            move(0, -100 * Engine::deltaTime());
+            transform.move(0, -100 * Engine::deltaTime());
         if (Input::getKey(Key::Down))
-            move(0, 100 * Engine::deltaTime());
+            transform.move(0, 100 * Engine::deltaTime());
         if (Input::getKey(Key::Left))
-            move(-100 * Engine::deltaTime(), 0);
+            transform.move(-100 * Engine::deltaTime(), 0);
         if (Input::getKey(Key::Right))
-            move(100 * Engine::deltaTime(), 0);
+            transform.move(100 * Engine::deltaTime(), 0);
     }
 };
 
@@ -75,7 +77,7 @@ public:
         m_localAddress = IpAddress::getLocalAddress().toString();
         m_publicAddress = IpAddress::getPublicAddress().toString();
         m_status = "Disconnected";
-        m_text.setFont(g_font);
+        m_text.setFont(engine().fonts.get("RobotoMonoBold"));
         m_text.setCharacterSize(20);
         m_text.setFillColor(Color::White);
         m_text.setPosition(5, 5);
@@ -113,7 +115,7 @@ public:
         int color;
         addPacket >> username >> color >> x >> y;
         m_others[username] = makeChild<Avatar>(username, Color(color));
-        m_others[username]->setPosition(x, y);
+        m_others[username]->transform.setPosition(x, y);
         notify("Connected " + username);
     }
 
@@ -129,7 +131,7 @@ public:
             float x, y;
             updatePacket >> username >> x >> y;
             if (m_others.count(username))
-                m_others[username]->setPosition(x, y);
+                m_others[username]->transform.setPosition(x, y);
         }
     }
 
@@ -160,7 +162,7 @@ public:
             startCoroutine(connect());
         Packet packet;
         if (m_connected) {
-            auto position = m_player->getPosition();
+            auto position = m_player->transform.getPosition();
             packet << m_player->m_username << position.x << position.y;
             m_tcp.send(packet);
             if (m_tcp.receive(packet) == Socket::Disconnected) {
@@ -190,7 +192,7 @@ public:
         while (m_tcp.connect(serverAddress, SERVER_TCP, milliseconds(1)) != Socket::Status::Done) {
             co_yield nullptr;
         }
-        auto position = m_player->getPosition();
+        auto position = m_player->transform.getPosition();
         Packet packet;
         packet << m_player->m_username
                << m_player->m_sqr.getColor().toInteger()
@@ -373,9 +375,9 @@ int main2(int argc, char *argv[])
     auto input = options.parse(argc, argv);
 
     if (input.count("user")) {
-        g_font.loadFromFile("RobotoMono-Bold.ttf");
+        // g_font.loadFromFile("RobotoMono-Bold.ttf");
         Engine engine(1000,1000);
-        engine.setWindowTitle("Online Example");
+        engine.window.setTitle("Online Example");
         if (input.count("server")) {
             engine.makeRoot<Server>(input["u"].as<string>());
         }
@@ -515,10 +517,9 @@ int main(int argc, char *argv[])
         ("i,ip",     "Remote IP  ", value<string>());
     auto input = options.parse(argc, argv);
 
-    g_fonts.load("roboto","RobotoMono-Bold.ttf");
     Engine engine(250,250);
-    engine.setWindowTitle("Online Example");
-    engine.makeRoot<UdpClient>(input["l"].as<int>(),input["r"].as<int>(),input["i"].as<string>())->setPosition(125, 125);
+    engine.window.setTitle("Online Example");
+    engine.makeRoot<UdpClient>(input["l"].as<int>(),input["r"].as<int>(),input["i"].as<string>())->transform.setPosition(125, 125);
     engine.run();
     return 0;
 }

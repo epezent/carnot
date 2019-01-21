@@ -16,12 +16,4 @@ SFVG is an extension to SFML providing functionality to draw and animate vector 
 - Over 35 tweening functions
 - Various graphics related math functions and utilities
 
-## Shapes and Graphics
-
-SFVG's shape class is a drop-in replacement for SFML's. It offers all of the original functionality plus several new features. This includes the ability to draw concave shapes, add radii to corners, add holes, offset and clip shapes, and fill shapes with gradients.
-
-
-## Animation
-
-<img src="https://github.com/epezent/SFVG/blob/master/screenshots/animation.gif" width="100">
 

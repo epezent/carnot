@@ -5,11 +5,11 @@
 #include <SFVG/Print.hpp>
 #include <SFVG/Random.hpp>
 #include <SFVG/Engine/ResourceManager.hpp>
-#include <SFVG/Engine/Input.hpp>
+#include <SFVG/Engine/Systems/InputSystem.hpp>
 #include <SFVG/Engine/Handle.hpp>
 #include <SFVG/Engine/Id.hpp>
-#include <SFVG/Engine/System.hpp>
-#include <SFVG/Engine/Object.hpp>
+#include <SFVG/Engine/GameObject.hpp>
+#include <SFVG/Engine/Component.hpp>
 
 namespace sfvg {
 
@@ -29,6 +29,11 @@ public:
     void run();
     /// Shows basic engine info
     void showInfo(bool show);
+
+    /// Returns the current Engine time
+    float time();
+    /// Returns the elapsed time since the last frame update
+    float deltaTime();
 
     //=========================================================================
     // RENDERING
@@ -54,16 +59,10 @@ public:
     /// Makes a root Object of a specifc type and returns a handle to it
     template <typename T, typename ...Args> Handle<T> makeRoot(Args... args);
     /// Sets the root Object of the Engine
-    void setRoot(Ptr<Object> root);
+    void setRoot(Ptr<GameObject> root);
     /// Gets a Handle to the root Object of the Engine
-    Handle<Object> getRoot() const;
+    Handle<GameObject> getRoot() const;
 
-public:
-
-    /// Returns the current Engine time
-    static float time();
-    /// Returns the elapsed time since the last frame update
-    static float deltaTime();
 
 private:
     void processEvents();
@@ -76,17 +75,21 @@ public:
     RenderWindow window;
     ResourceManager<Texture, std::string> textures;
     ResourceManager<Font,    std::string> fonts;
+    InputSystem input;
 
 private:
-    Ptr<Object> m_root;
+    Ptr<GameObject> m_root;
     std::vector<View> m_views;
     RenderQue m_renderQue;
 
-    Font m_font;
-    bool m_showTitleBar;
     Text m_infoText;
     bool m_showInfo;
     Color m_backgroundColor;
+
+    Clock m_timeClock;
+    Clock m_deltaTimeClock;
+    float m_timeValue;
+    float m_deltaTimeValue;
 };
 
 //==============================================================================
@@ -95,7 +98,7 @@ private:
 
 template <typename T, typename ...Args>
 Handle<T> Engine::makeRoot(Args... args) {
-    auto root = Object::make<T>(args...);
+    auto root = Object::make<T>(*this, args...);
     setRoot(root);
     return getRoot().as<T>();
 }

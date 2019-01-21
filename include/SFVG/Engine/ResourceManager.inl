@@ -26,6 +26,18 @@ void ResourceManager<Resource, Identifier>::load(Identifier id, const std::strin
 }
 
 template <typename Resource, typename Identifier>
+void ResourceManager<Resource, Identifier>::load(Identifier id, const void* data, std::size_t size)
+{
+    // Create and load resource
+    std::unique_ptr<Resource> resource(new Resource());
+    if (!resource->loadFromMemory(data, size))
+        throw std::runtime_error("ResourceManager::load - Failed to load");
+
+    // If loading successful, insert resource to map
+    insertResource(id, std::move(resource));
+}
+
+template <typename Resource, typename Identifier>
 Resource& ResourceManager<Resource, Identifier>::get(Identifier id)
 {
     auto found = mResourceMap.find(id);

@@ -13,17 +13,7 @@ add_library(sfvg "")
 add_library(SFVG::sfvg ALIAS sfvg)
 
 # add source files to target
-# add_subdirectory(src/SFVG)
-
-file(GLOB_RECURSE SFVG_INCLUDE "${CMAKE_SOURCE_DIR}/include/SFVG/*.hpp")
-file(GLOB_RECURSE SFVG_SRC     "${CMAKE_SOURCE_DIR}/src/SFVG/*.cpp" "${CMAKE_SOURCE_DIR}/src/SFVG/*.hpp")
-
-# file(GLOB SFVG_BASE "${CMAKE_SOURCE_DIR}/include/SFVG/*.hpp" "${CMAKE_SOURCE_DIR}/src/SFVG/*.cpp")
-# file(GLOB_RECURSE SFVG_ANIMATION "${CMAKE_SOURCE_DIR}/include/SFVG/Animation/*.hpp" "${CMAKE_SOURCE_DIR}/src/SFVG/Animation/*.cpp")
-
-# source_group("\\" FILES ${SFVG_BASE})
-# source_group("Animation" FILES ${SFVG_ANIMATION})
-
+add_subdirectory(src/SFVG)
 
 target_sources(sfvg
 	PRIVATE
@@ -88,11 +78,11 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 # set binary output location for executables
-# set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 # set binary output location for static libraries
-# set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib)
 # set binary output location for shared libraries
-# set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib)
 
 
 # install the library

@@ -1,0 +1,9 @@
+target_sources(sfvg
+    PRIVATE
+        RobotoRegular.cpp
+        RobotoBold.cpp
+        RobotoItalic.cpp
+        RobotoMonoRegular.cpp
+        RobotoMonoBold.cpp
+        RobotoMonoItalic.cpp
+)

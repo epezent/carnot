@@ -6,7 +6,7 @@ macro(sfvg_example SFVG_EXAMPLE_NAME)
 endmacro()
 
 
-# sfvg_example(color)
+sfvg_example(color)
 # sfvg_example(coroutine)
 sfvg_example(engine)
 # sfvg_example(online)
@@ -14,3 +14,4 @@ sfvg_example(engine)
 # sfvg_example(pong)
 # sfvg_example(shapes)
 # sfvg_example(tween)
+# sfvg_example(turbulent)
