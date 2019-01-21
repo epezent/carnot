@@ -4,97 +4,57 @@
 
 using namespace sfvg;
 
-class TestComp : public Component {
-public:
-    TestComp(GameObject& go) : Component(go) { }
-    void update() override {
-        if (clock.getElapsedTime() > seconds(0.5f))
-        {
-            print("Ping");
-            clock.restart();
-        }
-    }
-    Clock clock;
-};
-
 class CircleObject : public GameObject {
 public:
-    CircleObject(Engine& engine, Color color) :  GameObject(engine)
-    {
-        cir.setCircleRadius(50);
-        cir.setColor(color);
-        transform.setPosition(250, 250);
-        text.setFont(engine.fonts.get("Roboto"));
-        text.setFillColor(Whites::White);
-        text.setString(getName());
-        text.setCharacterSize(15);
-        alignCenter(text);
+
+    CircleObject(Engine& engine) : GameObject(engine) {
+        auto sr = addComponent<ShapeRenderer>();
+        sr->drawable = CircleShape(50);
+        sr->drawable.setColor(randomColor());
     }
 
-    void update() override {
-        if (input.getKeyDown(Key::E) && isEnabled())
-            print("Enabled!");
-        if (input.getKeyDown(Key::A) && isEnabled())
-            print("Active!");
-        if (input.getDoubleClick(MouseButton::Left))
-            cir.setColor(randomColor());
-        if (input.getKeyDown(Key::S))
-            startCoroutine(coro());
-
-    }
-
-    Enumerator coro() {
-        float elapseTime = 0.0f;
-        transform.setPosition(100, 100);
-        while (elapseTime < 2.0f) {
-            auto newPosition = Tween::Smoothstep(Vector2f(100,100), Vector2f(400,400), elapseTime / 2.0f);
-            transform.setPosition(newPosition);
-            elapseTime += engine.deltaTime();
-            co_yield nullptr;
-        }
-        transform.setPosition(400, 400);
-    }
-
-    void draw(RenderTarget& target, RenderStates states) const override {
-        target.draw(cir, states);
-        target.draw(text, states);
-    }
-
-private:
-
-    CircleShape cir;
-    Text text;
 };
 
 class SquareObject : public GameObject {
 public:
 
-    SquareObject(Engine& engine, Color color) :
+    SquareObject(Engine& engine) :
         GameObject(engine)
     {
-        sqr.setSideLength(100);
-        sqr.setColor(color);
-        transform.setPosition(250,250);
+
+        sr1 = addComponent<ShapeRenderer>();
+        sr1->drawable = SquareShape(50);
+        sr1->drawable.setColor(randomColor());
+
+        sr2 = addComponent<ShapeRenderer>();
+        sr2->drawable = SquareShape(25);
+        sr2->drawable.setColor(randomColor());
+
+        makeChild<CircleObject>()->transform.setPosition(250, 250);
     }
 
     void update() override {
 
-    }
+        transform.move(input.dragDelta(MouseButton::Left));
+        transform.rotate(input.dragDelta(MouseButton::Right).x);
 
-    void draw(RenderTarget& target, RenderStates states) const override {
-        target.draw(sqr, states);
+        if (input.getKeyDown(Key::S))
+            sr1->decrementLayer();
+        if (input.getKeyDown(Key::W))
+            sr1->incrementLayer();
     }
 
 private:
 
-    SquareShape sqr;
+    Handle<ShapeRenderer> sr1, sr2;
 
 };
 
 int main(int argc, char const *argv[]) {
     Engine engine(500, 500);
+    engine.setLayerCount(2);
     engine.window.setKeyRepeatEnabled(false);
-    engine.makeRoot<CircleObject>(Reds::FireBrick);
+    engine.makeRoot<SquareObject>();
     engine.window.setTitle("Evan's Engine");
     engine.run();
     return 0;

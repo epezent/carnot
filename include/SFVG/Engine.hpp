@@ -16,3 +16,5 @@
 #include <SFVG/Engine/ResourceManager.hpp>
 #include <SFVG/Engine/ProcessInfo.hpp>
 #include <SFVG/Engine/XboxController.hpp>
+#include <SFVG/Engine/Components/Transform.hpp>
+#include <SFVG/Engine/Components/Renderer.hpp>

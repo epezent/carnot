@@ -9,6 +9,7 @@
 #include <vector>
 #include <utility>
 
+
 namespace sfvg {
 
 //==============================================================================
@@ -18,8 +19,9 @@ namespace sfvg {
 class Engine;
 class Object;
 class InputSystem;
+class RendererBase;
 
-typedef std::vector<std::vector<std::pair<const Object*, RenderStates>>> RenderQue;
+typedef std::vector<std::vector<const RendererBase*>> RenderQue;
 
 //==============================================================================
 // CLASS: Object
@@ -102,10 +104,10 @@ protected:
     virtual void update();
     /// Called once per frame
     virtual void lateUpdate();
-    /// Called once per frame when the Object is drawn
-    virtual void draw(sf::RenderTarget& target, RenderStates states) const;
     /// Called when the Object is renamed
     virtual void onRenamed(const Name& newName);
+    /// Called when the on Rendering
+    virtual void onRender(RenderQue& que);
 
     //==========================================================================
     // Protected Functions

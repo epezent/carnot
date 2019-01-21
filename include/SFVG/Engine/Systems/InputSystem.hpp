@@ -75,8 +75,8 @@ private:
     std::array<bool, MouseButton::ButtonCount>         m_dragStartedTable;
     std::array<bool, MouseButton::ButtonCount>         m_dragEndedTable;
     std::array<bool, MouseButton::ButtonCount>         m_draggingTable;
-    std::array<sf::Vector2f, MouseButton::ButtonCount> m_dragStartTable;
 
+    std::array<Vector2f, MouseButton::ButtonCount>    m_dragStartTable;
     std::array<Vector2f, MouseButton::ButtonCount>     m_dragLastTable;
     std::array<Vector2f, MouseButton::ButtonCount>     m_dragDeltaTable;
     std::array<Vector2f, MouseButton::ButtonCount>     m_dragTotalTable;

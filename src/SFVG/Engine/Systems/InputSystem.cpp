@@ -13,8 +13,22 @@ InputSystem::InputSystem(Engine& engine, const Name& name) :
     m_anyMouseDownBool(false),
     m_anyMouseUpBool(false),
     m_anyInputBool(false),
-    m_textEntered("")
+    m_textEntered(""),
+    m_keyDownTable({false})
 {
+    m_keyDownTable.fill(false);
+    m_keyUpTable.fill(false);
+    m_mouseDownTable.fill(false);
+    m_mouseUpTable.fill(false);
+    m_dblClkTable.fill(false);
+    m_dblClkTimes.fill(0.0f);
+    m_dragStartedTable.fill(false);
+    m_dragEndedTable.fill(false);
+    m_draggingTable.fill(false);
+    m_dragStartTable.fill(Vector2f());
+    m_dragLastTable.fill(Vector2f());
+    m_dragDeltaTable.fill(Vector2f());
+    m_dragTotalTable.fill(Vector2f());
 }
 
 void InputSystem::processEvent(const Event& event) {
@@ -87,6 +101,7 @@ void InputSystem::clearState() {
         m_dblClkTable[i] = false;
         m_dragStartedTable[i] = false;
         m_dragEndedTable[i] = false;
+        m_dragDeltaTable[i] = Vector2f();
     }
     m_mouseScrollDetla = 0;
     m_textEntered = "";

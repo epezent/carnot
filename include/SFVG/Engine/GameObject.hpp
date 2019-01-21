@@ -32,23 +32,6 @@ public:
     Handle<GameObject> getHandle() const;
 
     //==========================================================================
-    // Layer Functions
-    //==========================================================================
-
-    /// Set the render layer of the GameObject
-    void setLayer(std::size_t layer);
-    /// Get the render layer of the GameObject
-    std::size_t getLayer() const;
-    /// Increments render layer until Engine layer count reached
-    void incrementLayer();
-    /// Decrements render layer until Engine layer 0 reached
-    void decrementLayer();
-    /// Sets the render layer to the bottom layer
-    void sendToBack();
-    /// Sets the render layer to the top layer
-    void sendToFront();
-
-    //==========================================================================
     // Child Functions
     //==========================================================================
 
@@ -138,12 +121,10 @@ private:
     /// Updates the GameObject and then recursively updates all of its children
     void updateAll();
     /// Ques the GameObject for rendering and the recursively ques all of its children
-    void queRender(RenderQue& renderQue, RenderStates states) const;
+    void onRender(RenderQue& que) override;
 
 
 private:
-
-    std::size_t m_layer;                  ///< the render layer of the GameObject
 
     std::vector<Ptr<GameObject>> m_children;    ///< list of current child GameObjects
     std::vector<Ptr<GameObject>> m_childrenAdd; ///< list of child GameObjects to be added
@@ -163,7 +144,6 @@ private:
  public:
 
     Transform& transform;  ///< reference to Transform Component
-
 
 };
 

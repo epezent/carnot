@@ -8,6 +8,7 @@
 #include <iostream>
 #include <sstream>
 #include "Fonts/EngineFonts.hpp"
+#include <SFVG/Engine/Components/Renderer.hpp>
 
 namespace sfvg {
 
@@ -171,10 +172,10 @@ void Engine::render() {
     // clear each layer in the RenderQue and reserve capacity for max number of Objects
     for (auto& layer : m_renderQue) {
         layer.clear();
-        layer.reserve(Object::getObjectCount());
+        layer.reserve(RendererBase::getRendererCount());
     }
     // que Objects for rendering
-    m_root->queRender(m_renderQue, sf::RenderStates::Default);
+    m_root->onRender(m_renderQue);
     // clear window
     window.clear(m_backgroundColor);
     // iterate over views
@@ -183,8 +184,8 @@ void Engine::render() {
         window.setView(view);
         // iterate over layers and draw
         for (auto& layer : m_renderQue) {
-            for (auto& pair : layer) {
-                pair.first->draw(window, pair.second);
+            for (auto& renderer : layer) {
+                renderer->render(window);
             }
         }
     }
@@ -232,16 +233,14 @@ void Engine::updateStats() {
     ss.str(std::string());
     ss << "CLK:  " << (int)m_timeValue << " s\n";
     ss << "FPS:  " << framesDisplay << "\n";
-    ss << "CPU:  " << std::setprecision(3) << cpuDisplay << "%%\n";
+    ss << "CPU:  " << std::setprecision(3) << cpuDisplay << "%\n";
     ss << "RAM:  " << ramDisplay << " MB\n";
     ss << "PIX:  " << input.getRawMousePosition().x << "," << input.getRawMousePosition().y << " px\n";
     ss << "X,Y:  " << std::fixed << input.getMousePosition().x << "," << input.getMousePosition().y << "\n";
     ss << "OBJ:  " << Object::getObjectCount() << "\n";
-    ss << "CMP:  " << Component::getComponentCount() << "\n";
+    ss << "RND:  " << RendererBase::getRendererCount() << "\n";
     m_infoText.setString(ss.str()) ;
 }
-
-
 
 // How does Unity's GetComponent() work?
 // https://stackoverflow.com/questions/44105058/how-does-unitys-getcomponent-work

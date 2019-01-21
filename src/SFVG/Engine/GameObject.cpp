@@ -12,8 +12,6 @@ namespace sfvg {
 
 GameObject::GameObject(Engine& _engine, const Name& name) :
     Object(_engine, name),
-    //temp(addComponent<Component>()),
-    m_layer(0),
     m_iteratingChildren(false),
     m_startCalled(false),
     m_iteratingComponents(false),
@@ -27,7 +25,6 @@ GameObject::GameObject(Engine& _engine, const Name& name) :
 
 GameObject::GameObject(Engine& _engine) :
     Object(_engine),
-    m_layer(0),
     m_iteratingChildren(false),
     m_startCalled(false),
     m_iteratingComponents(false),
@@ -64,36 +61,7 @@ bool GameObject::isRoot() const {
     return m_isRoot;
 }
 
-//==============================================================================
-// Layer Functions
-//==============================================================================
 
-void GameObject::setLayer(std::size_t layer) {
-    assert(layer < engine.getLayerCount());
-    m_layer = layer;
-}
-
-std::size_t GameObject::getLayer() const {
-    return m_layer;
-}
-
-void GameObject::incrementLayer() {
-    if (m_layer < (engine.getLayerCount() - 1))
-        m_layer++;
-}
-
-void GameObject::decrementLayer() {
-    if (m_layer > 0)
-        m_layer--;
-}
-
-void GameObject::sendToBack() {
-    m_layer = 0;
-}
-
-void GameObject::sendToFront() {
-    m_layer = engine.getLayerCount() - 1;
-}
 
 
 //==============================================================================
@@ -249,6 +217,11 @@ Handle<Component> GameObject::attachComponent(Ptr<Component> component) {
     return h;
 }
 
+// void GameObject::draw(RenderTarget& target, RenderStates states) const {
+//     // do nothing by default
+// }
+
+
 //==============================================================================
 // Private Functions
 //==============================================================================
@@ -307,16 +280,17 @@ void GameObject::updateAll() {
     processDeletions();
 }
 
-void GameObject::queRender(RenderQue& renderQue, RenderStates states) const {
+void GameObject::onRender(RenderQue& que) {
     if (isEnabled()) {
-        // set states
-        states.transform *= transform.getLocalMatrix();
-        // que this Object
-        renderQue[m_layer].emplace_back(this, states);
+        // que components
+        m_iteratingComponents = true;
+        for (const auto& comp : m_components)
+            comp->onRender(que);
+        m_iteratingComponents = false;
         // que children
         m_iteratingChildren = true;
         for (const auto& child : m_children)
-            child->queRender(renderQue, states);
+            child->onRender(que);
         m_iteratingChildren = false;
     }
 }

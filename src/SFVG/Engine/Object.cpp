@@ -89,11 +89,11 @@ void Object::lateUpdate() {
     // do nothing by default
 }
 
-void Object::draw(RenderTarget& target, RenderStates states) const {
+void Object::onRenamed(const Name& newName) {
     // do nothing by default
 }
 
-void Object::onRenamed(const Name& newName) {
+void Object::onRender(RenderQue& que) {
     // do nothing by default
 }
 
