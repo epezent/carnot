@@ -295,5 +295,21 @@ void GameObject::onRender(RenderQue& que) {
     }
 }
 
+void GameObject::onPhysics() {
+    if (isEnabled()) {
+        // que components
+        m_iteratingComponents = true;
+        for (const auto& comp : m_components)
+            comp->onPhysics();
+        m_iteratingComponents = false;
+        // que children
+        m_iteratingChildren = true;
+        for (const auto& child : m_children)
+            child->onPhysics();
+        m_iteratingChildren = false;
+    }
+}
+
+
 
 } // namespace sfvg

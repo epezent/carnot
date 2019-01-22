@@ -9,6 +9,7 @@
 #include <sstream>
 #include "Fonts/EngineFonts.hpp"
 #include <SFVG/Engine/Components/Renderer.hpp>
+#include <SFVG/Engine/Components/RigidBody.hpp>
 
 namespace sfvg {
 
@@ -27,6 +28,7 @@ bool g_engineLoaded = false;
 Engine::Engine(unsigned int width, unsigned int height, unsigned int style) :
     window(),
     input(*this,"__input__"),
+    physics(*this, "__physics__"),
     m_views(1),
     m_renderQue(1),
     m_infoText(),
@@ -76,8 +78,13 @@ void Engine::run() {
     while (window.isOpen()) {
         m_deltaTimeValue = m_deltaTimeClock.restart().asSeconds();
         m_timeValue      = m_timeClock.getElapsedTime().asSeconds();
+        // physics update
+        physics.update();
+        m_root->onPhysics();
+        // input update
         input.update();
         processEvents();
+        // update
         update();
         updateStats();
         render();
@@ -172,7 +179,7 @@ void Engine::render() {
     // clear each layer in the RenderQue and reserve capacity for max number of Objects
     for (auto& layer : m_renderQue) {
         layer.clear();
-        layer.reserve(RendererBase::getRendererCount());
+        layer.reserve(Renderer::getRendererCount());
     }
     // que Objects for rendering
     m_root->onRender(m_renderQue);
@@ -238,7 +245,8 @@ void Engine::updateStats() {
     ss << "PIX:  " << input.getRawMousePosition().x << "," << input.getRawMousePosition().y << " px\n";
     ss << "X,Y:  " << std::fixed << input.getMousePosition().x << "," << input.getMousePosition().y << "\n";
     ss << "OBJ:  " << Object::getObjectCount() << "\n";
-    ss << "RND:  " << RendererBase::getRendererCount() << "\n";
+    ss << "RND:  " << Renderer::getRendererCount() << "\n";
+    ss << "BDY:  " << RigidBody::getRigidBodyCount() << "\n";
     m_infoText.setString(ss.str()) ;
 }
 

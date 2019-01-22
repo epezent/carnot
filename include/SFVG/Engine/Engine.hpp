@@ -6,6 +6,7 @@
 #include <SFVG/Random.hpp>
 #include <SFVG/Engine/ResourceManager.hpp>
 #include <SFVG/Engine/Systems/InputSystem.hpp>
+#include <SFVG/Engine/Systems/PhysicsSystem.hpp>
 #include <SFVG/Engine/Handle.hpp>
 #include <SFVG/Engine/Id.hpp>
 #include <SFVG/Engine/GameObject.hpp>
@@ -76,6 +77,7 @@ public:
     ResourceManager<Texture, std::string> textures;
     ResourceManager<Font,    std::string> fonts;
     InputSystem input;
+    PhysicsSystem physics;
 
 private:
     Ptr<GameObject> m_root;

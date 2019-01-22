@@ -8,49 +8,50 @@ namespace {
 std::size_t g_rendererCount = 0;
 } // namespace
 
-RendererBase::RendererBase(GameObject& gameObject) :
-    Component(gameObject),
+Renderer::Renderer(GameObject& _gameObject) :
+    Component(_gameObject),
+    m_states(RenderStates::Default),
     m_layer(0)
 {
     g_rendererCount++;
 }
 
-RendererBase::~RendererBase() {
+Renderer::~Renderer() {
     g_rendererCount--;
 }
 
-void RendererBase::setLayer(std::size_t layer) {
+void Renderer::setLayer(std::size_t layer) {
     assert(layer < engine.getLayerCount());
     m_layer = layer;
 }
 
-std::size_t RendererBase::getLayer() const {
+std::size_t Renderer::getLayer() const {
     return m_layer;
 }
 
-void RendererBase::incrementLayer() {
+void Renderer::incrementLayer() {
     if (m_layer < (engine.getLayerCount() - 1))
         m_layer++;
 }
 
-void RendererBase::decrementLayer() {
+void Renderer::decrementLayer() {
     if (m_layer > 0)
         m_layer--;
 }
 
-void RendererBase::sendToBack() {
+void Renderer::sendToBack() {
     m_layer = 0;
 }
 
-void RendererBase::sendToFront() {
+void Renderer::sendToFront() {
     m_layer = engine.getLayerCount() - 1;
 }
 
-std::size_t RendererBase::getRendererCount() {
+std::size_t Renderer::getRendererCount() {
     return g_rendererCount;
 }
 
-void RendererBase::onRender(RenderQue& que) {
+void Renderer::onRender(RenderQue& que) {
     que[m_layer].emplace_back(this);
 }
 

@@ -93,9 +93,15 @@ void Object::onRenamed(const Name& newName) {
     // do nothing by default
 }
 
+void Object::onPhysics() {
+
+}
+
 void Object::onRender(RenderQue& que) {
     // do nothing by default
 }
+
+
 
 //=============================================================================
 // Coroutines

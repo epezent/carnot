@@ -18,3 +18,7 @@
 #include <SFVG/Engine/XboxController.hpp>
 #include <SFVG/Engine/Components/Transform.hpp>
 #include <SFVG/Engine/Components/Renderer.hpp>
+#include <SFVG/Engine/Components/ShapeRenderer.hpp>
+#include <SFVG/Engine/Components/SpriteRenderer.hpp>
+#include <SFVG/Engine/Components/TextRenderer.hpp>
+#include <SFVG/Engine/Components/RigidBody.hpp>

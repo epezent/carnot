@@ -122,7 +122,8 @@ private:
     void updateAll();
     /// Ques the GameObject for rendering and the recursively ques all of its children
     void onRender(RenderQue& que) override;
-
+    /// Updates all Physics children and compoents
+    void onPhysics() override;
 
 private:
 

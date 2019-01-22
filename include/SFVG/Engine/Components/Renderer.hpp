@@ -6,13 +6,13 @@
 
 namespace sfvg {
 
-class RendererBase : public Component {
+class Renderer : public Component {
 public:
 
     /// Constructor
-    RendererBase(GameObject& gameObject);
+    Renderer(GameObject& gameObject);
     /// Destructor
-    ~RendererBase();
+    ~Renderer();
 
     /// Set the render layer of the GameObject
     void setLayer(std::size_t layer);
@@ -29,6 +29,7 @@ public:
 
 public:
 
+    /// Gets the number of Renderers alive
     static std::size_t getRendererCount();
 
 protected:
@@ -37,41 +38,17 @@ protected:
 
     /// Ques this Renderer
     void onRender(RenderQue& que) override;
-
     /// Must be overriden to draw the Renderer
     virtual void render(RenderTarget& target) const = 0;
 
-private:
-
-    std::size_t m_layer;   ///< the render layer of the GameObject
-
-};
-
-template <class TDrawable>
-class Renderer : public RendererBase {
-public:
-
-    Renderer(GameObject& gameObject) :
-        RendererBase(gameObject),
-        m_states(RenderStates::Default)
-    { }
-
-    TDrawable drawable;
-
 protected:
 
-    virtual void render(RenderTarget& target) const override {
-        m_states.transform = gameObject.transform.getGlobalMatrix();
-        target.draw(drawable, m_states);
-    }
+    mutable RenderStates m_states;  ///< RenderStates
 
 private:
 
-    mutable RenderStates m_states;
-};
+    std::size_t m_layer;   ///< the render layer
 
-typedef Renderer<Sprite> SpriteRenderer;
-typedef Renderer<Shape>  ShapeRenderer;
-typedef Renderer<Text>   TextRenderer;
+};
 
 } // namespace sfvg

@@ -19,9 +19,9 @@ namespace sfvg {
 class Engine;
 class Object;
 class InputSystem;
-class RendererBase;
+class Renderer;
 
-typedef std::vector<std::vector<const RendererBase*>> RenderQue;
+typedef std::vector<std::vector<const Renderer*>> RenderQue;
 
 //==============================================================================
 // CLASS: Object
@@ -106,7 +106,9 @@ protected:
     virtual void lateUpdate();
     /// Called when the Object is renamed
     virtual void onRenamed(const Name& newName);
-    /// Called when the on Rendering
+    /// Called when the Engine updates physics
+    virtual void onPhysics();
+    /// Called when the Engine renders
     virtual void onRender(RenderQue& que);
 
     //==========================================================================

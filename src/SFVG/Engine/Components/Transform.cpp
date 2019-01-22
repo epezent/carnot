@@ -8,8 +8,8 @@ namespace sfvg {
 // Constructor
 //==============================================================================
 
-Transform::Transform(GameObject& gameObject) :
-    Component(gameObject),
+Transform::Transform(GameObject& _gameObject) :
+    Component(_gameObject),
     m_origin(0, 0),
     m_position(0, 0),
     m_rotation(0),

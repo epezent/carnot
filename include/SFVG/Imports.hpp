@@ -1,5 +1,6 @@
 #pragma once
 
+// SFML
 #include <SFML/Window/Keyboard.hpp>
 #include <SFML/Window/Mouse.hpp>
 #include <SFML/Window/Event.hpp>
@@ -16,6 +17,9 @@
 #include <SFML/Graphics/RenderStates.hpp>
 #include <SFML/Graphics/RenderStates.hpp>
 #include <SFML/Network.hpp>
+
+// Chipmunk
+
 
 namespace sfvg {
 
