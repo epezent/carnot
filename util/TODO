@@ -18,3 +18,4 @@
  ☐ add function which takes a shape with more points, and returns a version of the less point shape with equal number of points that are optimally place to blend into the other shape
 
 % move over to global transforms
+% add pause/stepping feature

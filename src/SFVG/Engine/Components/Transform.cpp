@@ -141,11 +141,9 @@ const Matrix3x3& Transform::getLocalMatrix() const
     return m_transform;
 }
 
-const Matrix3x3& Transform::getInverseLocalMatrix() const
-{
+const Matrix3x3& Transform::getInverseLocalMatrix() const {
     // Recompute the inverse transform if needed
-    if (m_inverseTransformNeedUpdate)
-    {
+    if (m_inverseTransformNeedUpdate) {
         m_inverseTransform = getLocalMatrix().getInverse();
         m_inverseTransformNeedUpdate = false;
     }
@@ -169,7 +167,8 @@ Matrix3x3 Transform::getInverseGlobalMatrix() const {
 }
 
 void Transform::setGlobalPosition(const Vector2f& position) {
-    setPosition(getInverseGlobalMatrix().transformPoint(position));
+    auto parentMatrix = getInverseGlobalMatrix() * getLocalMatrix();
+    setPosition(parentMatrix.transformPoint(position));
 }
 void Transform::setGlobalPosition(float x, float y) {
     setGlobalPosition(Vector2f(x, y));

@@ -34,7 +34,8 @@ Engine::Engine(unsigned int width, unsigned int height, unsigned int style) :
     m_infoText(),
     m_showInfo(false),
     m_timeValue(0.0f),
-    m_deltaTimeValue(0.0f)
+    m_deltaTimeValue(0.0f),
+    m_paused(false)
 {
     assert(!g_engineLoaded);
 
@@ -50,8 +51,12 @@ Engine::Engine(unsigned int width, unsigned int height, unsigned int style) :
 
     m_infoText.setFont(fonts.get("RobotoMonoBold"));
     m_infoText.setPosition(5, 5);
-    m_infoText.setCharacterSize(10);
+    m_infoText.setCharacterSize(20);
     m_infoText.setFillColor(Color::Magenta);
+    m_infoText.scale(0.5f, 0.5f);
+    m_pauseText = m_infoText;
+    m_pauseText.setString("PAUSED");
+    alignTopCenter(m_pauseText);
 
     // create Window and set settings
     sf::ContextSettings settings;
@@ -73,21 +78,41 @@ Engine::~Engine() {
 
 void Engine::run() {
     assert(m_root != nullptr);
-    m_timeClock.restart();
-    m_deltaTimeClock.restart();
+    m_clock.restart();
     while (window.isOpen()) {
-        m_deltaTimeValue = m_deltaTimeClock.restart().asSeconds();
-        m_timeValue      = m_timeClock.getElapsedTime().asSeconds();
-        // physics update
-        physics.update();
-        m_root->onPhysics();
         // input update
         input.update();
         processEvents();
-        // update
-        update();
+        // internal input checks
+        if (input.getKeyDown(Key::Escape))
+            window.close();
+        if (input.getKeyDown(Key::F1))
+            m_showInfo = !m_showInfo;
+        if (input.getKeyDown(Key::F2))
+            m_paused = !m_paused;
+        if (input.getKeyDown(Key::F3))
+            m_advance = true;
+        // update delta time
+        m_deltaTimeValue = m_clock.restart().asSeconds();
+        // update stats
         updateStats();
+        if (!m_paused || m_advance) {
+            // reset advance flag
+            m_advance = false;
+            // update continous time
+            m_timeValue += m_deltaTimeValue;
+            // physics update
+            physics.update();
+            m_root->onPhysics();
+            // update all objects
+            m_root->updateAll();
+        }
+        // clear window
+        window.clear(m_backgroundColor);
+        // render
         render();
+        // display window
+        window.display();
     }
 }
 
@@ -167,14 +192,6 @@ void Engine::processEvents() {
     }
 }
 
-void Engine::update() {
-    if (input.getKeyDown(Key::Escape))
-        window.close();
-    if (input.getKeyDown(Key::Tilde) && input.getKey(Key::LControl))
-        m_showInfo = !m_showInfo;
-    m_root->updateAll();
-}
-
 void Engine::render() {
     // clear each layer in the RenderQue and reserve capacity for max number of Objects
     for (auto& layer : m_renderQue) {
@@ -183,8 +200,6 @@ void Engine::render() {
     }
     // que Objects for rendering
     m_root->onRender(m_renderQue);
-    // clear window
-    window.clear(m_backgroundColor);
     // iterate over views
     for (auto& view : m_views) {
         // set view
@@ -201,8 +216,12 @@ void Engine::render() {
         window.setView(window.getDefaultView());
         window.draw(m_infoText);
     }
-    // display window
-    window.display();
+    if (m_paused) {
+        window.setView(window.getDefaultView());
+        float width = (float)window.getSize().x;
+        m_pauseText.setPosition(width*0.5f, 5);
+        window.draw(m_pauseText);
+    }
 }
 
 void Engine::updateStats() {

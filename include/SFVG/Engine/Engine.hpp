@@ -67,7 +67,6 @@ public:
 
 private:
     void processEvents();
-    void update();
     void render();
     void updateStats();
 
@@ -85,13 +84,17 @@ private:
     RenderQue m_renderQue;
 
     Text m_infoText;
+    Text m_pauseText;
+
     bool m_showInfo;
     Color m_backgroundColor;
 
-    Clock m_timeClock;
-    Clock m_deltaTimeClock;
+    Clock m_clock;
     float m_timeValue;
     float m_deltaTimeValue;
+
+    bool m_paused;
+    bool m_advance;
 };
 
 //==============================================================================
