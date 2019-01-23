@@ -17,9 +17,7 @@
 #include <SFML/Graphics/RenderStates.hpp>
 #include <SFML/Graphics/RenderStates.hpp>
 #include <SFML/Network.hpp>
-
-// Chipmunk
-
+#include <SFML/Audio.hpp>
 
 namespace sfvg {
 
@@ -55,6 +53,9 @@ using sf::IpAddress;
 using sf::Sprite;
 using sf::Texture;
 using sf::Image;
+using sf::SoundBuffer;
+using sf::Sound;
+using sf::Music;
 
 using Key         = sf::Keyboard::Key;
 using MouseButton = sf::Mouse::Button;

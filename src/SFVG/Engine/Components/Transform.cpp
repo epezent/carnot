@@ -147,7 +147,6 @@ const Matrix3x3& Transform::getInverseLocalMatrix() const {
         m_inverseTransform = getLocalMatrix().getInverse();
         m_inverseTransformNeedUpdate = false;
     }
-
     return m_inverseTransform;
 }
 
@@ -170,6 +169,7 @@ void Transform::setGlobalPosition(const Vector2f& position) {
     auto parentMatrix = getInverseGlobalMatrix() * getLocalMatrix();
     setPosition(parentMatrix.transformPoint(position));
 }
+
 void Transform::setGlobalPosition(float x, float y) {
     setGlobalPosition(Vector2f(x, y));
 }

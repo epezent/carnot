@@ -20,7 +20,7 @@ public:
     }
 
     void start() override {
-        engine.physics.setGravity(Vector2f());
+        // engine.physics.setGravity(Vector2f());
     }
 
     void update() override {
@@ -31,9 +31,9 @@ public:
             if (input.getKeyDown(Key::D))
                 removeComponent(rb->getIndex());
             if (input.getKey(Key::F)) {
-                // rb->applyForceToCenter(Vector2f(0,-1000));
+                rb->applyForceToCenter(Vector2f(0,-2000));
                 // rb->applyTorqueToCenter(10.0f);
-                rb->setVelocity(Vector2f(50.0f,50.0f));
+                // rb->setVelocity(Vector2f(50.0f,50.0f));
             }
         }
 

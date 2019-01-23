@@ -64,19 +64,26 @@ public:
     /// Gets a Handle to the root Object of the Engine
     Handle<GameObject> getRoot() const;
 
+public:
+
+    //==============================================================================
+    // Resources
+    //==============================================================================
+
+    ResourceManager<Texture, std::string> textures;
+    ResourceManager<Font, std::string> fonts;
+    ResourceManager<SoundBuffer, std::string> sounds;
+
+    RenderWindow window;
+    InputSystem input;
+    PhysicsSystem physics;
 
 private:
     void processEvents();
     void render();
     void updateStats();
 
-public:
 
-    RenderWindow window;
-    ResourceManager<Texture, std::string> textures;
-    ResourceManager<Font,    std::string> fonts;
-    InputSystem input;
-    PhysicsSystem physics;
 
 private:
     Ptr<GameObject> m_root;
