@@ -13,11 +13,13 @@ namespace sfvg {
 struct DebugInfo {
     float       elapsedTime = 0.0f;
     std::size_t frames = 0;
+    std::size_t fpsDisplay = 0;
     std::size_t framesDisplay = 0;
     double cpuSum = 0.0;
     double cpuDisplay = 0.0;
     std::size_t ramSum = 0;
     std::size_t ramDisplay = 0;
+
 };
 
 DebugSystem::DebugSystem(Engine& engine, const Name& name) :
@@ -45,7 +47,7 @@ void DebugSystem::drawLine(const Vector2f& start,
     m_drawables.push_back(ptr);
 }
 
-void DebugSystem::drawLabel(const std::string& text,
+void DebugSystem::drawText(const std::string& text,
                const Vector2f& position,
                const Color& color)
 {
@@ -128,9 +130,10 @@ void DebugSystem::updateInfo() {
     // update every second
     if (m_info->elapsedTime >= 1.0) {
         // calculate averages
-        m_info->framesDisplay = m_info->frames;
+        m_info->fpsDisplay = m_info->frames;
         m_info->cpuDisplay = m_info->cpuSum / m_info->frames;
         m_info->ramDisplay = m_info->ramSum / m_info->frames;
+        m_info->framesDisplay = engine.frame();
         // reset
         m_info->frames = 0;
         m_info->cpuSum = 0.0;
@@ -141,8 +144,8 @@ void DebugSystem::updateInfo() {
     // form string
     m_ss.str(std::string());
     m_ss << "CLK:  " << (int)engine.time() << " s\n";
-    m_ss << "FPS:  " << m_info->framesDisplay << "\n";
-    m_ss << "FRM:  " << engine.frame() << "\n";
+    m_ss << "FPS:  " << m_info->fpsDisplay << "\n";
+    m_ss << "FRM:  " << m_info->framesDisplay << "\n";
     m_ss << "CPU:  " << std::setprecision(3) << m_info->cpuDisplay << "%\n";
     m_ss << "RAM:  " << m_info->ramDisplay << " MB\n";
     m_ss << "PIX:  " << input.getRawMousePosition().x << "," << input.getRawMousePosition().y << " px\n";

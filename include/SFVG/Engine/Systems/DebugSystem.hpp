@@ -23,9 +23,9 @@ public:
                   const Color& color = Color::Magenta);
 
     /// Draws a debug text label in global coordinates
-    void drawLabel(const std::string& text,
-                   const Vector2f& position,
-                   const Color& color = Color::Magenta);
+    void drawText(const std::string& text,
+                  const Vector2f& position,
+                  const Color& color = Color::Magenta);
 
 private:
 

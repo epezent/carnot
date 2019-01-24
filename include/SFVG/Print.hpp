@@ -5,6 +5,7 @@
 #include <utility>
 #include <SFVG/Graphics/Color.hpp>
 #include <SFVG/Imports.hpp>
+#include <sstream>
 
 namespace sfvg {
 
@@ -40,6 +41,22 @@ std::ostream & operator << (std::ostream &out, const sf::Rect<T>& value) {
 //=============================================================================
 // Print
 //=============================================================================
+
+template <typename T>
+std::string str(const T& value) {
+    std::stringstream ss;
+    ss << value;
+    return ss.str();
+}
+
+template <typename Arg, typename... Args>
+std::string str(Arg&& arg, Args&&... args) {
+    std::stringstream ss;
+    ss << std::forward<Arg>(arg);
+    using expander = int[];
+    (void)expander{0, (void(ss << ' ' << std::forward<Args>(args)), 0)...};
+    return ss.str();
+}
 
 /// Prints a value to std::cout and then starts a new line
 template <typename T>

@@ -8,25 +8,23 @@ class PhysicsObject : public GameObject {
 public:
     PhysicsObject(Engine& engine) : GameObject(engine) {
         sr = addComponent<ShapeRenderer>();
-        sr->shape = StarShape(5);
+        sr->shape = SquareShape(100);
         sr->shape.setColor(randomColor());
     }
 
     void start() override {
         engine.physics.setGravity(Vector2f());
         rb = addComponent<RigidBody>();
+        // engine.window.setMouseCursorVisible(bool visible)
     }
 
     void update() override {
         if (input.getDoubleClick(MouseButton::Left))
-            sr->shape.setColor(randomColor());
+            sr->shape.setGradient(Gradient(randomColor(),randomColor(),random(0.f,360.f)));
         auto v = input.getMousePosition() - transform.getGlobalPosition();
-        rb->applyForceToCenter(200.0f * v - 30.0f * rb->getVelocity());
-        std::stringstream ss;
-        ss << "Local  " << transform.getPosition() << std::endl;
-        ss << "Global " << transform.getGlobalPosition();
-        engine.debug.drawLabel(ss.str(), transform.getGlobalPosition());
-        engine.debug.drawLine(transform.getGlobalPosition(), input.getMousePosition(), Greens::Chartreuse);
+        rb->applyForceToCenter(500.0f * v - 40.0f * rb->getVelocity());
+        engine.debug.drawText(str("Position",transform.getPosition()), transform.getGlobalPosition());
+        engine.debug.drawLine(transform.getPosition(), input.getMousePosition());
     }
 
     Handle<ShapeRenderer> sr;
