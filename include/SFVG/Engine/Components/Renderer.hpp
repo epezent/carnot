@@ -13,7 +13,6 @@ public:
     Renderer(GameObject& gameObject);
     /// Destructor
     ~Renderer();
-
     /// Set the render layer of the GameObject
     void setLayer(std::size_t layer);
     /// Get the render layer of the GameObject

@@ -50,6 +50,7 @@ using sf::UdpSocket;
 using sf::TcpSocket;
 using sf::TcpListener;
 using sf::IpAddress;
+using sf::VertexArray;
 using sf::Sprite;
 using sf::Texture;
 using sf::Image;

@@ -7,6 +7,7 @@
 #include <SFVG/Engine/ResourceManager.hpp>
 #include <SFVG/Engine/Systems/InputSystem.hpp>
 #include <SFVG/Engine/Systems/PhysicsSystem.hpp>
+#include <SFVG/Engine/Systems/DebugSystem.hpp>
 #include <SFVG/Engine/Handle.hpp>
 #include <SFVG/Engine/Id.hpp>
 #include <SFVG/Engine/GameObject.hpp>
@@ -28,13 +29,14 @@ public:
 
     /// Starts running the Engine
     void run();
-    /// Shows basic engine info
-    void showInfo(bool show);
-
+    /// Stops running the Engine
+    void stop();
     /// Returns the current Engine time
-    float time();
+    float time() const;
     /// Returns the elapsed time since the last frame update
-    float deltaTime();
+    float deltaTime() const;
+    /// Returns the current frame number
+    std::size_t frame() const;
 
     //=========================================================================
     // RENDERING
@@ -77,31 +79,23 @@ public:
     RenderWindow window;
     InputSystem input;
     PhysicsSystem physics;
+    DebugSystem debug;
 
 private:
     void processEvents();
     void render();
-    void updateStats();
-
-
 
 private:
+
+    bool m_running;
     Ptr<GameObject> m_root;
     std::vector<View> m_views;
     RenderQue m_renderQue;
-
-    Text m_infoText;
-    Text m_pauseText;
-
-    bool m_showInfo;
     Color m_backgroundColor;
-
     Clock m_clock;
     float m_timeValue;
     float m_deltaTimeValue;
-
-    bool m_paused;
-    bool m_advance;
+    std::size_t m_frame;
 };
 
 //==============================================================================

@@ -8,7 +8,7 @@ namespace sfvg {
 
 class RigidBody;
 
-class PhysicsSystem : public System {
+class PhysicsSystem : private System {
 public:
 
     /// Constructor
