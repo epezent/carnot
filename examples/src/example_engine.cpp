@@ -10,6 +10,11 @@ public:
         sr->shape = CircleShape(50);
         sr->shape.setColor(randomColor());
     }
+
+    void update() {
+
+        engine.debug.drawText(str(transform.worldToLocal(input.getMousePosition())), transform.getPosition());
+    }
 };
 
 class SquareObject : public GameObject {
@@ -27,7 +32,7 @@ public:
         sr2->shape = SquareShape(25);
         sr2->shape.setColor(randomColor());
 
-        makeChild<CircleObject>()->transform.setPosition(250, 250);
+        makeChild<CircleObject>()->transform.setLocalPosition(250, 250);
     }
 
     void update() override {

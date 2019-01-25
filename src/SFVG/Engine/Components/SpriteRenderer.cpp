@@ -10,7 +10,7 @@ SpriteRenderer::SpriteRenderer(GameObject& _gameObject) :
 }
 
 void SpriteRenderer::render(RenderTarget& target) const {
-    m_states.transform = gameObject.transform.getGlobalMatrix();
+    m_states.transform = gameObject.transform.getWorldMatrix();
     target.draw(sprite, m_states);
 }
 

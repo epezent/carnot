@@ -10,7 +10,7 @@ ShapeRenderer::ShapeRenderer(GameObject& _gameObject) :
 }
 
 void ShapeRenderer::render(RenderTarget& target) const {
-    m_states.transform = gameObject.transform.getGlobalMatrix();
+    m_states.transform = gameObject.transform.getWorldMatrix();
     target.draw(shape, m_states);
 }
 

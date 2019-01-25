@@ -14,14 +14,14 @@ Transform::Transform(GameObject& _gameObject) :
     m_position(0, 0),
     m_rotation(0),
     m_scale(1, 1),
-    m_transform(),
-    m_globalTransform(),
-    m_inverseTransform(),
-    m_inverseGlobalTransform(),
-    m_transformNeedUpdate(true),
-    m_globalTransformNeedUpdate(true),
-    m_inverseTransformNeedUpdate(true),
-    m_invGlobTransformNeedUpdate(true)
+    m_localTransform(),
+    m_worldTransform(),
+    m_invLocalTransform(),
+    m_invWorldTransform(),
+    m_localTransformDirty(true),
+    m_worldTransformDirty(true),
+    m_invLocalTransformDirty(true),
+    m_invWorldTransformDirty(true)
 {
 
 }
@@ -30,97 +30,97 @@ Transform::Transform(GameObject& _gameObject) :
 // Local Transformatioins
 //==============================================================================
 
-void Transform::setPosition(float x, float y) {
+void Transform::setLocalPosition(float x, float y) {
     m_position.x = x;
     m_position.y = y;
-    m_transformNeedUpdate = true;
-    m_inverseTransformNeedUpdate = true;
-    m_globalTransformNeedUpdate = true;
-    m_invGlobTransformNeedUpdate = true;
+    m_localTransformDirty = true;
+    m_invLocalTransformDirty = true;
+    m_worldTransformDirty = true;
+    m_invWorldTransformDirty = true;
 }
 
-void Transform::setPosition(const Vector2f& position) {
-    setPosition(position.x, position.y);
+void Transform::setLocalPosition(const Vector2f& position) {
+    setLocalPosition(position.x, position.y);
 }
 
-void Transform::setRotation(float angle) {
+void Transform::setLocalRotation(float angle) {
     m_rotation = static_cast<float>(fmod(angle, 360));
     if (m_rotation < 0)
         m_rotation += 360.f;
 
-    m_transformNeedUpdate = true;
-    m_inverseTransformNeedUpdate = true;
-    m_globalTransformNeedUpdate = true;
-    m_invGlobTransformNeedUpdate = true;
+    m_localTransformDirty = true;
+    m_invLocalTransformDirty = true;
+    m_worldTransformDirty = true;
+    m_invWorldTransformDirty = true;
 }
 
-void Transform::setScale(float factorX, float factorY) {
+void Transform::setLocalScale(float factorX, float factorY) {
     m_scale.x = factorX;
     m_scale.y = factorY;
-    m_transformNeedUpdate = true;
-    m_inverseTransformNeedUpdate = true;
-    m_globalTransformNeedUpdate = true;
-    m_invGlobTransformNeedUpdate = true;
+    m_localTransformDirty = true;
+    m_invLocalTransformDirty = true;
+    m_worldTransformDirty = true;
+    m_invWorldTransformDirty = true;
 }
 
-void Transform::setScale(const Vector2f& factors) {
-    setScale(factors.x, factors.y);
+void Transform::setLocalScale(const Vector2f& factors) {
+    setLocalScale(factors.x, factors.y);
 }
 
-void Transform::setOrigin(float x, float y) {
+void Transform::setLocalOrigin(float x, float y) {
     m_origin.x = x;
     m_origin.y = y;
-    m_transformNeedUpdate = true;
-    m_inverseTransformNeedUpdate = true;
-    m_globalTransformNeedUpdate = true;
-    m_invGlobTransformNeedUpdate = true;
+    m_localTransformDirty = true;
+    m_invLocalTransformDirty = true;
+    m_worldTransformDirty = true;
+    m_invWorldTransformDirty = true;
 }
 
-void Transform::setOrigin(const Vector2f& origin) {
-    setOrigin(origin.x, origin.y);
+void Transform::setLocalOrigin(const Vector2f& origin) {
+    setLocalOrigin(origin.x, origin.y);
 }
 
-const Vector2f& Transform::getPosition() const {
+const Vector2f& Transform::getLocalPosition() const {
     return m_position;
 }
 
-float Transform::getRotation() const {
+float Transform::getLocalRotation() const {
     return m_rotation;
 }
 
-const Vector2f& Transform::getScale() const {
+const Vector2f& Transform::getLocalScale() const {
     return m_scale;
 }
 
-const Vector2f& Transform::getOrigin() const {
+const Vector2f& Transform::getLocalOrigin() const {
     return m_origin;
 }
 
 void Transform::move(float offsetX, float offsetY) {
-    setPosition(m_position.x + offsetX, m_position.y + offsetY);
+    setLocalPosition(m_position.x + offsetX, m_position.y + offsetY);
 }
 
 
 void Transform::move(const Vector2f& offset) {
-    setPosition(m_position.x + offset.x, m_position.y + offset.y);
+    setLocalPosition(m_position.x + offset.x, m_position.y + offset.y);
 }
 
 void Transform::rotate(float angle) {
-    setRotation(m_rotation + angle);}
+    setLocalRotation(m_rotation + angle);}
 
 
 void Transform::scale(float factorX, float factorY) {
-    setScale(m_scale.x * factorX, m_scale.y * factorY);
+    setLocalScale(m_scale.x * factorX, m_scale.y * factorY);
 }
 
 void Transform::scale(const Vector2f& factor) {
-    setScale(m_scale.x * factor.x, m_scale.y * factor.y);
+    setLocalScale(m_scale.x * factor.x, m_scale.y * factor.y);
 }
 
 const Matrix3x3& Transform::getLocalMatrix() const
 {
     // Recompute the combined transform if needed
-    if (m_transformNeedUpdate)
+    if (m_localTransformDirty)
     {
         float angle = -m_rotation * 3.141592654f / 180.f;
         float cosine = static_cast<float>(std::cos(angle));
@@ -132,58 +132,58 @@ const Matrix3x3& Transform::getLocalMatrix() const
         float tx = -m_origin.x * sxc - m_origin.y * sys + m_position.x;
         float ty = m_origin.x * sxs - m_origin.y * syc + m_position.y;
 
-        m_transform = Matrix3x3(sxc, sys, tx,
+        m_localTransform = Matrix3x3(sxc, sys, tx,
                                -sxs, syc, ty,
                                 0.f, 0.f, 1.f);
-        m_transformNeedUpdate = false;
+        m_localTransformDirty = false;
     }
 
-    return m_transform;
+    return m_localTransform;
 }
 
 const Matrix3x3& Transform::getInverseLocalMatrix() const {
     // Recompute the inverse transform if needed
-    if (m_inverseTransformNeedUpdate) {
-        m_inverseTransform = getLocalMatrix().getInverse();
-        m_inverseTransformNeedUpdate = false;
+    if (m_invLocalTransformDirty) {
+        m_invLocalTransform = getLocalMatrix().getInverse();
+        m_invLocalTransformDirty = false;
     }
-    return m_inverseTransform;
+    return m_invLocalTransform;
 }
 
 //==============================================================================
 // Global Transformatioins
 //==============================================================================
 
-Matrix3x3 Transform::getGlobalMatrix() const {
+Matrix3x3 Transform::getWorldMatrix() const {
     Matrix3x3 matrix = Matrix3x3::Identity;
     for (const GameObject* node = &gameObject; node != nullptr; node = node->m_parent)
         matrix = node->transform.getLocalMatrix() * matrix;
     return matrix;
 }
 
-Matrix3x3 Transform::getInverseGlobalMatrix() const {
-    return getGlobalMatrix().getInverse();
+Matrix3x3 Transform::getInverseWorldMatrix() const {
+    return getWorldMatrix().getInverse();
 }
 
-void Transform::setGlobalPosition(const Vector2f& position) {
-    auto parentMatrix = getInverseGlobalMatrix() * getLocalMatrix();
-    setPosition(parentMatrix.transformPoint(position));
+void Transform::setPosition(const Vector2f& position) {
+    auto parentMatrix = getInverseWorldMatrix() * getLocalMatrix();
+    setLocalPosition(parentMatrix.transformPoint(position));
 }
 
-void Transform::setGlobalPosition(float x, float y) {
-    setGlobalPosition(Vector2f(x, y));
+void Transform::setPosition(float x, float y) {
+    setPosition(Vector2f(x, y));
 }
 
-Vector2f Transform::getGlobalPosition() const {
-    return getGlobalMatrix() * Vector2f();
+Vector2f Transform::getPosition() const {
+    return getWorldMatrix() * Vector2f();
 }
 
-void Transform::setGlobalRotation(float angle) {
-    rotate(angle - getGlobalRotation());
+void Transform::setRotation(float angle) {
+    rotate(angle - getRotation());
 }
 
-float Transform::getGlobalRotation() const {
-    auto m = getGlobalMatrix().getMatrix();
+float Transform::getRotation() const {
+    auto m = getWorldMatrix().getMatrix();
     float angle = std::atan2(m[1] , m[5]) * sfvg::RAD2DEG;
     angle = static_cast<float>(fmod(angle, 360));
     if (angle < 0)
@@ -191,25 +191,38 @@ float Transform::getGlobalRotation() const {
     return angle;
 }
 
-void Transform::setGlobalScale(float factorX, float factorY) {
-    setGlobalScale(Vector2f(factorX, factorY));
+void Transform::setScale(float factorX, float factorY) {
+    setScale(Vector2f(factorX, factorY));
 }
 
 
-void Transform::setGlobalScale(const Vector2f& factors) {
-    auto scaleBy = getGlobalScale();
+void Transform::setScale(const Vector2f& factors) {
+    auto scaleBy = getScale();
     scaleBy.x = factors.x / scaleBy.x;
     scaleBy.y = factors.y / scaleBy.y;
     scale(scaleBy);
 }
 
-const Vector2f Transform::getGlobalScale() const {
-    auto m = getGlobalMatrix().getMatrix();
+const Vector2f Transform::getScale() const {
+    auto m = getWorldMatrix().getMatrix();
     Vector2f scale;
     scale.x = std::sqrt(m[0] * m[0] + m[1] * m[1]);
     scale.y = std::sqrt(m[4] * m[4] + m[5] * m[5]);
     return scale;
 }
+
+//==========================================================================
+// Utility Functions
+//==========================================================================
+
+Vector2f Transform::localToWorld(const Vector2f point) {
+    return getWorldMatrix().transformPoint(point);
+}
+
+Vector2f Transform::worldToLocal(const Vector2f point) {
+    return getInverseWorldMatrix().transformPoint(point);
+}
+
 
 
 } // namespace sfvg

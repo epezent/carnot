@@ -51,8 +51,8 @@ RigidBody::RigidBody(GameObject& _gameObject, BodyType type, float mass, float m
 
 
     // set initial position
-    auto position = gameObject.transform.getGlobalPosition();
-    auto rotation = gameObject.transform.getGlobalRotation();
+    auto position = gameObject.transform.getPosition();
+    auto rotation = gameObject.transform.getRotation();
     cpBodySetPosition(m_body, sf2cp(position));
     cpBodySetAngle(m_body, (cpFloat)rotation);
     cpSpaceAddBody(gameObject.engine.physics.m_space, m_body);
@@ -137,8 +137,8 @@ std::size_t RigidBody::getRigidBodyCount() {
 void RigidBody::onPhysics() {
     auto position = cpBodyGetPosition(m_body);
     auto angle = cpBodyGetAngle(m_body);
-    gameObject.transform.setGlobalPosition((float) position.x, (float) position.y);
-    gameObject.transform.setGlobalRotation((float) angle * RAD2DEG);
+    gameObject.transform.setPosition((float) position.x, (float) position.y);
+    gameObject.transform.setRotation((float) angle * RAD2DEG);
 }
 
 } // namespace sfvg

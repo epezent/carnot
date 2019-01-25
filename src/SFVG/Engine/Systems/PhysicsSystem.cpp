@@ -23,7 +23,7 @@ inline Vector2f cp2sf(const cpVect& in) {
 
 PhysicsSystem::PhysicsSystem(Engine& engine, const Name& name) :
     System(engine, name),
-    m_dt(1.0/120.0)
+    m_dt(1.0/60.0)
 {
     m_space = cpSpaceNew();
     cpSpaceSetIterations(m_space, 10);

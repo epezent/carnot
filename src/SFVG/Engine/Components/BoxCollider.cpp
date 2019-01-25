@@ -27,8 +27,8 @@ BoxCollider::BoxCollider(GameObject& _gameObject, float width, float height, flo
     if ((body = getBodyPointer())) {
         m_shape = cpBoxShapeNew(body, (cpFloat)width, (cpFloat)height, (cpFloat)radius);
         addShape(m_shape);
-        cpShapeSetElasticity(m_shape, 0.1f);
-        cpShapeSetFriction(m_shape, 0.1f);
+        // cpShapeSetElasticity(m_shape, 0.1f);
+        cpShapeSetFriction(m_shape, 0.5f);
         cpShapeSetMass(m_shape, cpBodyGetMass(body));
     }
     else {
