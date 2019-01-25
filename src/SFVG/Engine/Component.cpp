@@ -45,6 +45,10 @@ void Component::onComponentAdded(Handle<Component> component) {
     // do nothing by default
 }
 
+void Component::onComponentRemoved(Handle<Component> component) {
+    // do nothing by default
+}
+
 void Component::updateAll() {
     if (isEnabled()) {
         if (!m_startCalled) {

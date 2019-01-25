@@ -34,32 +34,94 @@ void DebugSystem::show(bool _show) {
     m_show = _show;
 }
 
-void DebugSystem::drawLine(const Vector2f& start,
-              const Vector2f& end,
-              const Color& color)
-{
-    auto ptr = std::make_shared<VertexArray>(sf::Lines);
-    ptr->resize(2);
-    ptr->operator[](0).position = start;
-    ptr->operator[](0).color = color;
-    ptr->operator[](1).position = end;
-    ptr->operator[](1).color = color;
-    m_drawables.push_back(ptr);
+void DebugSystem::drawPoint(const Point& position, const Color& color) {
+    // auto sqr = std::make_shared<SquareShape>(3);
+    // sqr->setPosition(position);
+    // sqr->setColor(color);
+    // m_drawables.push_back(sqr);
+
+    auto rect = std::make_shared<VertexArray>(sf::TriangleStrip);
+    rect->resize(4);
+    (*rect)[0].position = position + Point( 2.0f, -2.0f);
+    (*rect)[1].position = position + Point(-2.0f, -2.0f);
+    (*rect)[2].position = position + Point( 2.0f,  2.0f);
+    (*rect)[3].position = position + Point(-2.0f,  2.0f);
+    (*rect)[0].color = color;
+    (*rect)[1].color = color;
+    (*rect)[2].color = color;
+    (*rect)[3].color = color;
+    m_drawables.push_back(rect);
 }
 
-void DebugSystem::drawText(const std::string& text,
-               const Vector2f& position,
+void DebugSystem::drawLine(const Point& start,
+              const Point& end,
+              const Color& color)
+{
+    auto line = std::make_shared<VertexArray>(sf::Lines);
+    line->resize(2);
+    (*line)[0].position = start;
+    (*line)[0].color = color;
+    (*line)[1].position = end;
+    (*line)[1].color = color;
+    m_drawables.push_back(line);
+}
+
+void DebugSystem::drawTriangle(const Point& a, const Point& b, const Point& c, const Color& color) {
+    auto tri = std::make_shared<VertexArray>(sf::LineStrip);
+    tri->resize(4);
+    (*tri)[0].position = a;
+    (*tri)[0].color = color;
+    (*tri)[1].position = b;
+    (*tri)[1].color = color;
+    (*tri)[2].position = c;
+    (*tri)[2].color = color;
+    (*tri)[3].position = a;
+    (*tri)[3].color = color;
+    m_drawables.push_back(tri);
+}
+
+void DebugSystem::drawRectangle(const Point& position, float width, float height,  const Color& color) {
+    auto rect = std::make_shared<VertexArray>(sf::LineStrip);
+    rect->resize(5);
+    (*rect)[0].position = position + Point(-width, -height) * 0.5f;
+    (*rect)[1].position = position + Point( width, -height) * 0.5f;
+    (*rect)[2].position = position + Point( width,  height) * 0.5f;
+    (*rect)[3].position = position + Point(-width,  height) * 0.5f;
+    (*rect)[4].position = position + Point(-width, -height) * 0.5f;
+    (*rect)[0].color = color;
+    (*rect)[1].color = color;
+    (*rect)[2].color = color;
+    (*rect)[3].color = color;
+    (*rect)[4].color = color;
+    m_drawables.push_back(rect);
+}
+
+void DebugSystem::drawCircle(const Point &position, float radius, const Color& color) {
+    std::size_t smoothness = 100;
+    auto circle = std::make_shared<VertexArray>(sf::LineStrip);
+    circle->resize(smoothness + 1);
+    float angleIncrement = 2.0f * PI / smoothness;
+    for (std::size_t i = 0; i < smoothness + 1; i++) {
+        float angle = i * angleIncrement - 0.5f * PI;
+        (*circle)[i].position = position + Point(std::cos(angle) * radius, std::sin(angle) * radius);
+        (*circle)[i].color = color;
+    }
+    m_drawables.push_back(circle);
+}
+
+void DebugSystem::drawText(const std::string& _text,
+               const Point& position,
                const Color& color)
 {
-    auto ptr = std::make_shared<Text>();
-    ptr->setFont(engine.fonts.get("RobotoMonoBold"));
-    ptr->setPosition(position);
-    ptr->setCharacterSize(20);
-    ptr->setScale(0.5f, 0.5f);
-    ptr->setFillColor(color);
-    ptr->setString(text);
-    alignCenter(*ptr.get());
-    m_drawables.push_back(ptr);
+    auto text = std::make_shared<Text>();
+    text->setFont(engine.fonts.get("RobotoMonoBold"));
+    text->setPosition(position);
+    text->setCharacterSize(20);
+    text->setScale(0.5f, 0.5f);
+    text->setFillColor(color);
+    text->setString(_text);
+    alignCenter(*text.get());
+    m_drawables.push_back(text);
 }
 
 
@@ -67,7 +129,7 @@ void DebugSystem::start() {
     m_infoText.setFont(engine.fonts.get("RobotoMonoBold"));
     m_infoText.setPosition(5, 5);
     m_infoText.setCharacterSize(20);
-    m_infoText.setFillColor(Color::Magenta);
+    m_infoText.setFillColor(DEBUG_COLOR);
     m_infoText.scale(0.5f, 0.5f);
     m_pauseText = m_infoText;
     m_pauseText.setString("PAUSED");

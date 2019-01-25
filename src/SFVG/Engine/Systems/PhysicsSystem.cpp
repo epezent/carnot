@@ -27,9 +27,10 @@ PhysicsSystem::PhysicsSystem(Engine& engine, const Name& name) :
 {
     m_space = cpSpaceNew();
     cpSpaceSetIterations(m_space, 10);
-    cpSpaceSetSleepTimeThreshold(m_space, 0.5f);
-    cpSpaceSetCollisionSlop(m_space, 0.5f);
+    // cpSpaceSetSleepTimeThreshold(m_space, 0.5f);
+    // cpSpaceSetCollisionSlop(m_space, 0.5f);
     setGravity(Vector2f(0,1000));
+    setDamping(0.9f);
 }
 
 PhysicsSystem::~PhysicsSystem() {
@@ -42,6 +43,14 @@ void PhysicsSystem::setDeltaTime(float dt) {
 
 void PhysicsSystem::setGravity(const Vector2f &g) {
     cpSpaceSetGravity(m_space, sf2cp(g));
+}
+
+void PhysicsSystem::setDamping(float damping) {
+    cpSpaceSetDamping(m_space, (cpFloat)damping);
+}
+
+float PhysicsSystem::getDamping() const {
+    return (float)cpSpaceGetDamping(m_space);
 }
 
 Vector2f PhysicsSystem::getGravity() const {

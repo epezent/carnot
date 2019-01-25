@@ -22,7 +22,9 @@ public:
     // GENERAL
     //=========================================================================
 
-    /// Constructor
+    /// Construct (Fullscreen)
+    Engine();
+    /// Constructor (Windowed Mode)
     Engine(unsigned int windowWidth, unsigned int windowHeight, unsigned int style = WindowStyle::Close);
     /// Destructor
     ~Engine();

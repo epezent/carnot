@@ -7,6 +7,7 @@ struct cpSpace;
 namespace sfvg {
 
 class RigidBody;
+class Collider;
 
 class PhysicsSystem : private System {
 public:
@@ -24,10 +25,16 @@ public:
     /// Gets the global gravity vector
     Vector2f getGravity() const;
 
+    /// Set global damping for 0 to 1 (default = 1)
+    void setDamping(float daping);
+    /// Get global damping
+    float getDamping() const;
+
 private:
 
     friend class Engine;
     friend class RigidBody;
+    friend class Collider;
 
     /// Steps the PhysicsSystem
     void update() override;

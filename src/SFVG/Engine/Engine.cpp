@@ -20,6 +20,14 @@ bool g_engineLoaded = false;
 // GENERAL
 //==============================================================================
 
+Engine::Engine() :
+    Engine(sf::VideoMode::getDesktopMode().width,
+           sf::VideoMode::getDesktopMode().height,
+           WindowStyle::Fullscreen)
+{
+
+}
+
 Engine::Engine(unsigned int width, unsigned int height, unsigned int style) :
     window(),
     input(*this,"__input__"),

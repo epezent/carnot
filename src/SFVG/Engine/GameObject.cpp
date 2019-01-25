@@ -193,9 +193,14 @@ std::size_t GameObject::getComponentCount() const {
 }
 
 void GameObject::removeComponent(std::size_t index) {
-    assert (index < m_componentsDel.size());
+    assert (index < m_components.size());
     if (!m_iteratingComponents) {
-        m_components.erase(m_components.begin() + index);
+        auto component = m_components.begin() + index;
+        auto h = Handle<Component>(*component);
+        for (auto& other : m_components) {
+            other->onComponentRemoved(h);
+        }
+        m_components.erase(component);
         updateComponentIndices();
     }
     else {

@@ -12,16 +12,16 @@ public:
     InputSystem(Engine& engine, const Name& name);
 
     bool getKey(Key key);
-    bool getKeyDown();
     bool getKeyDown(Key key);
-    bool getKeyUp();
     bool getKeyUp(Key key);
+    bool anyKeyDown();
+    bool anyKeyUp();
 
     bool getMouse(MouseButton button);
-    bool getMouseDown();
     bool getMouseDown(MouseButton button);
-    bool getMouseUp();
     bool getMouseUp(MouseButton button);
+    bool anyMouseDown();
+    bool anyMouseUp();
 
     bool getDoubleClick(MouseButton button);
     float getScroll();

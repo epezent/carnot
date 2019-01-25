@@ -46,6 +46,8 @@ protected:
 
     /// Called when a new Component is added to the Object
     virtual void onComponentAdded(Handle<Component> component);
+    /// Called when a Component was about to be removed
+    virtual void onComponentRemoved(Handle<Component> component);
 
 private:
 

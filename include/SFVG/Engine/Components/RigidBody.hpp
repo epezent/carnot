@@ -6,6 +6,8 @@ struct cpBody;
 
 namespace sfvg {
 
+class Collider;
+
 class RigidBody : public Component {
 public:
 
@@ -74,6 +76,8 @@ protected:
     void onPhysics() override;
 
 private:
+
+    friend class Collider;
 
     cpBody* m_body;  ///< Chipmunk body
 };

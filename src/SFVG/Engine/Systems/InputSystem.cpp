@@ -142,11 +142,11 @@ bool InputSystem::getKeyUp(Key key) {
     return m_keyUpTable[key];
 }
 
-bool InputSystem::getKeyDown() {
+bool InputSystem::anyKeyDown() {
     return m_anyKeyDownBool;
 }
 
-bool InputSystem::getKeyUp() {
+bool InputSystem::anyKeyUp() {
     return m_anyKeyUpBool;
 }
 
@@ -162,11 +162,11 @@ bool InputSystem::getMouseUp(MouseButton button) {
     return m_mouseUpTable[button];
 }
 
-bool InputSystem::getMouseDown() {
+bool InputSystem::anyMouseDown() {
     return m_anyMouseDownBool;
 }
 
-bool InputSystem::getMouseUp() {
+bool InputSystem::anyMouseUp() {
     return m_anyMouseUpBool;
 }
 

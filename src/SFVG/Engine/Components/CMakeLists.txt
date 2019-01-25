@@ -1,5 +1,7 @@
 target_sources(sfvg
 	PRIVATE
+        BoxCollider.cpp
+        Collider.cpp
         Renderer.cpp
         RigidBody.cpp
         ShapeRenderer.cpp

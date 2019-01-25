@@ -2,9 +2,12 @@
 
 #include <SFVG/Engine/System.hpp>
 #include <SFVG/Imports.hpp>
+#include <SFVG/Graphics.hpp>
 #include <sstream>
 
 namespace sfvg {
+
+#define DEBUG_COLOR Greens::Chartreuse
 
 struct DebugInfo;
 
@@ -17,15 +20,30 @@ public:
     /// Shows/hides general debug info in top right corner
     void show(bool show);
 
+    /// Draws a debug point in global coordinates
+    void drawPoint(const Point& position,
+                   const Color& color = DEBUG_COLOR);
+
     /// Draws a debug line in global coordinates
-    void drawLine(const Vector2f& start,
-                  const Vector2f& end,
-                  const Color& color = Color::Magenta);
+    void drawLine(const Point& start, const Point& end,
+                  const Color& color = DEBUG_COLOR);
+
+    /// Draws a debug triangle in global coordinates
+    void drawTriangle(const Point& a, const Point& b, const Point& c,
+                      const Color& color = DEBUG_COLOR);
+
+    /// Draws a debug centered rectangle in global coordinates
+    void drawRectangle(const Point& position, float width, float height,
+                       const Color& color = DEBUG_COLOR);
+
+    void drawCircle(const Point& position, float radius,
+                    const Color& color = DEBUG_COLOR);
+
 
     /// Draws a debug text label in global coordinates
     void drawText(const std::string& text,
-                  const Vector2f& position,
-                  const Color& color = Color::Magenta);
+                  const Point& position,
+                  const Color& color = DEBUG_COLOR);
 
 private:
 

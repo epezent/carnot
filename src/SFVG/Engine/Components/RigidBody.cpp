@@ -31,13 +31,31 @@ RigidBody::RigidBody(GameObject& _gameObject, BodyType type, float mass, float m
     m_body(nullptr)
 {
     m_body = cpBodyNew((cpFloat)mass, (cpFloat)moment);
-    setBodyType(type);
-    cpSpaceAddBody(gameObject.engine.physics.m_space, m_body);
+
+
+    switch(type) {
+        case BodyType::Kinematic: {
+            m_body = cpBodyNewKinematic();
+            break;
+        }
+        case BodyType::Static: {
+            m_body = cpBodyNewStatic();
+            break;
+        }
+        case BodyType::Dynamic:
+        default: {
+            m_body = cpBodyNew(mass, moment);
+            break;
+        }
+    }
+
+
     // set initial position
     auto position = gameObject.transform.getGlobalPosition();
     auto rotation = gameObject.transform.getGlobalRotation();
     cpBodySetPosition(m_body, sf2cp(position));
     cpBodySetAngle(m_body, (cpFloat)rotation);
+    cpSpaceAddBody(gameObject.engine.physics.m_space, m_body);
     g_rigidBodyCount++;
 }
 
@@ -55,6 +73,7 @@ void RigidBody::setBodyType(BodyType type) {
         }
         case BodyType::Static: {
             cpBodySetType(m_body, CP_BODY_TYPE_STATIC);
+            break;
         }
         case BodyType::Dynamic:
         default: {
