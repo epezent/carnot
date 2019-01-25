@@ -55,7 +55,7 @@ Engine::Engine(unsigned int width, unsigned int height, unsigned int style) :
     sf::ContextSettings settings;
     settings.antialiasingLevel = 8;
     window.create(sf::VideoMode(width, height), "", style, settings);
-    window.setFramerateLimit(60);
+    window.setFramerateLimit(120);
     window.requestFocus();
     // set Window view
     m_views[0] = window.getDefaultView();

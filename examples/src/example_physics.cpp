@@ -8,11 +8,12 @@ class PhysicsObject : public GameObject {
 public:
     PhysicsObject(Engine& engine) : GameObject(engine) {
         sr = addComponent<ShapeRenderer>();
-        sr->shape = SquareShape(100);
+        sr->shape = RectangleShape(200,100);
         sr->shape.setGradient(Gradient(randomColor(),randomColor(),random(0.f,360.f)));
         setName("physicsGO");
         rb = addComponent<RigidBody>();
-        col = addComponent<BoxCollider>(100,100);
+        rb->setMass(100);
+        col = addComponent<BoxCollider>(200,100);
     }
 
     void start() override {
