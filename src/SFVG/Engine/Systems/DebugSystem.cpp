@@ -34,6 +34,10 @@ void DebugSystem::show(bool _show) {
     m_show = _show;
 }
 
+bool DebugSystem::isShown() const {
+    return m_show;
+}
+
 void DebugSystem::drawPoint(const Point& position, const Color& color) {
     // auto sqr = std::make_shared<SquareShape>(3);
     // sqr->setPosition(position);

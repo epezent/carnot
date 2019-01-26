@@ -101,7 +101,9 @@ void Object::onRender(RenderQue& que) {
     // do nothing by default
 }
 
-
+void Object::onDebugRender() {
+    // do nothing by default
+}
 
 //=============================================================================
 // Coroutines

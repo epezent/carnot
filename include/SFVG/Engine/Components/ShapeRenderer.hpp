@@ -19,6 +19,12 @@ protected:
 
     /// Renders the Shape to RenderTarget
     virtual void render(RenderTarget& target) const override;
+    /// Renders shape bounding box and wireframe
+    virtual void onDebugRender() override;
+
+private:
+
+
 };
 
 } // namespace sfvg

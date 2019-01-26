@@ -14,11 +14,11 @@ struct DebugInfo;
 class DebugSystem : public System {
 public:
 
-    /// Constructor
-    DebugSystem(Engine& engine, const Name& name);
-
     /// Shows/hides general debug info in top right corner
     void show(bool show);
+
+    /// Returns true if the debug info is show
+    bool isShown() const;
 
     /// Draws a debug point in global coordinates
     void drawPoint(const Point& position,
@@ -48,6 +48,9 @@ public:
 private:
 
     friend class Engine;
+
+    /// Constructor
+    DebugSystem(Engine& engine, const Name& name);
 
     /// Starts the DebugSystem
     void start() override;

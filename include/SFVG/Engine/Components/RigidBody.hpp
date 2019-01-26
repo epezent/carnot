@@ -3,10 +3,12 @@
 #include <SFVG/Engine/Component.hpp>
 
 struct cpBody;
+struct cpShape;
 
 namespace sfvg {
 
-class Collider;
+class Shape;
+class CircleShape;
 
 class RigidBody : public Component {
 public:
@@ -48,6 +50,38 @@ public:
     float getMoment() const;
 
     //==============================================================================
+    // SHAPES
+    //==============================================================================
+
+    /// Adds a centered box shape to the RigidBody
+    void addBoxShape(float width, float height, float radius = 0.0f);
+    /// Adds a cenetered circle shape to the RigidBody
+    void addCircleShape(float radius);
+    /// Add a generic shape
+    void addShape(const Shape& shape);
+    /// Adds a CircleShape
+    void addShape(const CircleShape& shape);
+
+    /// Gets the number of shapes attached to RigidBody
+    std::size_t getShapeCount() const;
+
+    /// Set a shape's mass
+    void setShapeMass(std::size_t index, float mass);
+    /// Set a shape's friction
+    void setShapeFriction(std::size_t index, float friction);
+    /// Set a shape's elasticity
+    void setShapeElasticity(std::size_t index, float elasticity);
+
+    /// Get a shape's mass
+    float getShapeMass(std::size_t index) const;
+    /// Get a shape's moment
+    float getShapeMoment(std::size_t index) const;
+    /// Get a shape's friction
+    float getShapeFriction(std::size_t index) const;
+    /// Get a shape's elasticity
+    float getShapeElasticity(std::size_t index) const;
+
+    //==============================================================================
     // KINEMATIC
     //==============================================================================
 
@@ -74,12 +108,16 @@ protected:
 
     /// Updates GameObject transform
     void onPhysics() override;
+    /// Draws Shapes and RigidBody info
+    void onDebugRender() override;
 
 private:
 
     friend class Collider;
 
-    cpBody* m_body;  ///< Chipmunk body
+    cpBody* m_body;                 ///< Chipmunk body
+    std::vector<cpShape*> m_shapes; ///< Chipmunk shapes
+    std::vector<char>     m_mask;   ///< Shape type mask
 };
 
 

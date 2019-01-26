@@ -1,5 +1,5 @@
 #include <SFVG/Engine/Systems/PhysicsSystem.hpp>
-#include <chipmunk.h>
+#include <chipmunk/chipmunk.h>
 
 namespace sfvg {
 

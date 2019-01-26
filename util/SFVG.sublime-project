@@ -53,12 +53,22 @@
 		},
 		{
 			"file_regex": "^(..[^:]*)(?::|\\()([0-9]+)(?::|\\))(?:([0-9]+):)?\\s*(.*)",
-			"name": "MSVC",
+			"name": "MSVC (Release)",
 			"selector":
 			[
 				"source.c++.11"
 			],
 			"shell_cmd": "cmake --build . --config Release",
+			"working_dir": "$project_path/../build"
+		},
+		{
+			"file_regex": "^(..[^:]*)(?::|\\()([0-9]+)(?::|\\))(?:([0-9]+):)?\\s*(.*)",
+			"name": "MSVC (Debug)",
+			"selector":
+			[
+				"source.c++.11"
+			],
+			"shell_cmd": "cmake --build . --config Debug",
 			"working_dir": "$project_path/../build"
 		},
 		{

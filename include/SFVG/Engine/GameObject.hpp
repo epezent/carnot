@@ -121,9 +121,11 @@ private:
     /// Updates the GameObject and then recursively updates all of its children
     void updateAll();
     /// Ques the GameObject for rendering and the recursively ques all of its children
-    void onRender(RenderQue& que) override;
+    void onRender(RenderQue& que) final;
+    /// Calls onDebugRender for all cildren and components
+    void onDebugRender() final;
     /// Updates all Physics children and compoents
-    void onPhysics() override;
+    void onPhysics() final;
 
 private:
 

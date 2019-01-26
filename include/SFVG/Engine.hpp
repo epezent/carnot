@@ -22,5 +22,4 @@
 #include <SFVG/Engine/Components/SpriteRenderer.hpp>
 #include <SFVG/Engine/Components/TextRenderer.hpp>
 #include <SFVG/Engine/Components/RigidBody.hpp>
-#include <SFVG/Engine/Components/Collider.hpp>
-#include <SFVG/Engine/Components/BoxCollider.hpp>
+

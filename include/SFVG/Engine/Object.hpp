@@ -110,6 +110,8 @@ protected:
     virtual void onPhysics();
     /// Called when the Engine renders
     virtual void onRender(RenderQue& que);
+    /// Called if and when the Engine renders debug info
+    virtual void onDebugRender();
 
     //==========================================================================
     // Protected Functions

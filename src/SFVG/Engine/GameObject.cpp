@@ -300,6 +300,21 @@ void GameObject::onRender(RenderQue& que) {
     }
 }
 
+void GameObject::onDebugRender() {
+    if (isEnabled()) {
+        // que components
+        m_iteratingComponents = true;
+        for (const auto& comp : m_components)
+            comp->onDebugRender();
+        m_iteratingComponents = false;
+        // que children
+        m_iteratingChildren = true;
+        for (const auto& child : m_children)
+            child->onDebugRender();
+        m_iteratingChildren = false;
+    }
+}
+
 void GameObject::onPhysics() {
     if (isEnabled()) {
         // que components

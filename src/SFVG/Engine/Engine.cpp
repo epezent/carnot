@@ -98,6 +98,8 @@ void Engine::run() {
         // render
         render();
         // update debug
+        if (debug.isShown())
+            m_root->onDebugRender();
         debug.update();
         // display window
         window.display();

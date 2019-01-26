@@ -7,7 +7,6 @@ struct cpSpace;
 namespace sfvg {
 
 class RigidBody;
-class Collider;
 
 class PhysicsSystem : private System {
 public:
@@ -34,7 +33,6 @@ private:
 
     friend class Engine;
     friend class RigidBody;
-    friend class Collider;
 
     /// Steps the PhysicsSystem
     void update() override;
