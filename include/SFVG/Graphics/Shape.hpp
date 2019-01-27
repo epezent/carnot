@@ -5,12 +5,16 @@
 #include <SFML/Graphics/Vertex.hpp>
 #include <SFVG/Graphics/Points.hpp>
 #include <SFVG/Graphics/Gradient.hpp>
+#include <SFVG/Imports.hpp>
 #include <vector>
 
 namespace sfvg {
 
+class ShapeRenderer;
+class RigidBody;
+
 /// Encapsulates an advanced vector graphics object
-class Shape : public sf::Drawable, public sf::Transformable {
+class Shape : public Transformable {
 
 public:
 
@@ -92,41 +96,11 @@ public:
     /// Adds a new hole and increments to hole count
     void addHole(const Shape& hole);
 
-    /// Sets the fill of a shape to a solid Color
-    void setColor(const sf::Color& color);
-
-    /// Gets the fill Color of a shape
-    const sf::Color& getColor() const;
-
-    /// Sets the fill Gradient of the Shape
-    void setGradient(const Gradient& gradient);
-
-    /// Gets the fill Gradient of the Shape
-    Gradient getGradient() const;
-
-    /// Sets the texture of the Shape
-    void setTexture(const sf::Texture* texture, bool resetRect = false);
-
-    /// Gets the texture of the Shape
-    const sf::Texture* getTexture() const;
-
-    /// Sets the Texture Rect of the Shape
-    void setTextureRect(const sf::IntRect& rect);
-
-    /// Gets the Texture Rect of the Shape
-    const sf::IntRect& getTextureRect() const;
-
     /// Gets the local bounding rectangle of the Shape
-    sf::FloatRect getLocalBounds() const;
+    FloatRect getLocalBounds() const;
 
     /// Gets the global bounding rectangle of the Shape
-    sf::FloatRect getGlobalBounds() const;
-
-    /// Sets whether or not the Shape's wireframe is drawn
-    void showWireFrame(bool show);
-
-    /// Sets whether or not the Shape's bounding box is drawn
-    void showBoundsBox(bool show);
+    FloatRect getGlobalBounds() const;
 
 public:
 
@@ -148,15 +122,18 @@ public:
     static Shape offsetShape(const Shape& shape, float offset, OffsetType type = Round);
     static std::vector<Shape> clipShapes(const Shape& subject, const Shape& clip, ClipType type);
 
+protected:
+
+    friend class ShapeRenderer;
+    friend class RigidBody;
+
+    float m_circleRadius;
+
 private:
 
     void updateVertices() const;
-    void updateVertexArray() const;
     void updateBounds() const;
-    void updateTexCoords() const;
-    void updateFillColors() const;
     void update() const;
-    void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 
 private:
     Points m_points;
@@ -164,15 +141,7 @@ private:
     std::vector<std::size_t> m_smoothness;
     std::vector<Shape> m_holes;
     mutable Points m_vertices;
-    mutable std::vector<sf::Vertex> m_vertexArray;
-    const sf::Texture* m_texture;
-    sf::IntRect m_textureRect;
-    sf::Color m_color;
-    Gradient m_gradient;
-    bool m_hasSolidFill;
-    mutable sf::FloatRect m_bounds;
-    bool m_showWireFrame;
-    bool m_showBoundsBox;
+    mutable FloatRect m_bounds;
     mutable bool m_needsUpdate;
 };
 

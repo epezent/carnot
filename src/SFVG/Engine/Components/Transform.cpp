@@ -215,14 +215,29 @@ const Vector2f Transform::getScale() const {
 // Utility Functions
 //==========================================================================
 
-Vector2f Transform::localToWorld(const Vector2f point) {
+Vector2f Transform::localToWorld(const Vector2f& point) {
     return getWorldMatrix().transformPoint(point);
 }
 
-Vector2f Transform::worldToLocal(const Vector2f point) {
+FloatRect Transform::localToWorld(const FloatRect& rect) {
+    return getWorldMatrix().transformRect(rect);
+}
+
+Vector2f Transform::worldToLocal(const Vector2f& point) {
     return getInverseWorldMatrix().transformPoint(point);
 }
 
+FloatRect Transform::worldToLocal(const FloatRect& rect) {
+    return getInverseWorldMatrix().transformRect(rect);
 
+    m_localTransform.getMatrix();
+}
+
+// SFML Transform.getMatrix()
+//     m_localTransform.getMatrix();
+//     [m0  m4  m8  m12]    []
+//     [m1  m5  m9  m13]
+//     [m2  m6  m10 m14]
+//     [m3  m4  m11 m15]
 
 } // namespace sfvg

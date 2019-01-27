@@ -103,12 +103,16 @@ float RigidBody::getMoment() const {
     return (float)cpBodyGetMoment(m_body);
 }
 
+Vector2f RigidBody::getCOG() const {
+    return cp2sf(cpBodyLocalToWorld(m_body,cpBodyGetCenterOfGravity(m_body)));
+}
+
 //==============================================================================
 // SHAPES
 //==============================================================================
 
-void RigidBody::addBoxShape(float width, float height, float radius) {
-    cpShape* shape = cpBoxShapeNew(m_body, (cpFloat)width, (cpFloat)height, (cpFloat)radius);
+void RigidBody::addBoxShape(float width, float height, const Vector2f& offset, float skin) {
+    cpShape* shape = cpBoxShapeNew(m_body, (cpFloat)width, (cpFloat)height, (cpFloat)skin);
     cpSpaceAddShape(engine.physics.m_space, shape);
     cpShapeSetFriction(shape, 0.5f);
     cpShapeSetMass(shape, getMass());
@@ -116,7 +120,7 @@ void RigidBody::addBoxShape(float width, float height, float radius) {
     m_mask.push_back(RBShapeTypePolygon);
 }
 
-void RigidBody::addCircleShape(float radius) {
+void RigidBody::addCircleShape(float radius, const Vector2f& offset) {
     cpShape* shape = cpCircleShapeNew(m_body, (cpFloat)radius, cpv(0,0));
     cpSpaceAddShape(engine.physics.m_space, shape);
     cpShapeSetFriction(shape, 0.5f);
@@ -125,24 +129,24 @@ void RigidBody::addCircleShape(float radius) {
     m_mask.push_back(RBShapeTypeCircle);
 }
 
-void RigidBody::addShape(const Shape &_shape) {
+void RigidBody::addShape(const Shape& _shape, float skin) {
+    // special case circle
+    if (_shape.m_circleRadius > 0.0f && _shape.getScale() == Vector2f(1.0f,1.0f)) {
+        return addCircleShape(_shape.m_circleRadius, _shape.getPosition());
+    }
+    // else it's a polygon
     auto verts = _shape.getVertices();
     int N = (int)verts.size();
     std::vector<cpVect> cpVerts;
     cpVerts.reserve(N);
     for (std::size_t i = 0; i < N; ++i)
-        cpVerts.push_back(sf2cp(verts[i]));
-    cpShape* shape = cpPolyShapeNewRaw(m_body, N, &cpVerts[0], 0.0f);
+        cpVerts.push_back(sf2cp(_shape.getTransform().transformPoint(verts[i])));
+    cpShape* shape = cpPolyShapeNewRaw(m_body, N, &cpVerts[0], (cpFloat)skin);
     cpSpaceAddShape(engine.physics.m_space, shape);
     cpShapeSetFriction(shape, 0.5f);
     cpShapeSetMass(shape, getMass());
     m_shapes.push_back(shape);
     m_mask.push_back(RBShapeTypePolygon);
-}
-
-void RigidBody::addShape(const CircleShape& shape) {
-    print(shape.getCircleRadius());
-    addCircleShape(shape.getCircleRadius());
 }
 
 std::size_t RigidBody::getShapeCount() const {
@@ -152,6 +156,11 @@ std::size_t RigidBody::getShapeCount() const {
 void RigidBody::setShapeMass(std::size_t index, float mass) {
     assert(index < m_shapes.size());
     cpShapeSetMass(m_shapes[index], (cpFloat)mass);
+}
+
+void RigidBody::setShapeDensity(std::size_t index, float density) {
+    assert(index < m_shapes.size());
+    cpShapeSetDensity(m_shapes[index], (cpFloat)density);
 }
 
 void RigidBody::setShapeFriction(std::size_t index, float friction) {
@@ -172,6 +181,11 @@ float RigidBody::getShapeMoment(std::size_t index) const {
 float RigidBody::getShapeMass(std::size_t index) const {
     assert(index < m_shapes.size());
     return (float)cpShapeGetMass(m_shapes[index]);
+}
+
+float RigidBody::getShapeDensity(std::size_t index) const {
+    assert(index < m_shapes.size());
+    return (float)cpShapeGetDensity(m_shapes[index]);
 }
 
 float RigidBody::getShapeFriction(std::size_t index) const {
@@ -227,24 +241,34 @@ void RigidBody::onPhysics() {
 }
 
 void RigidBody::onDebugRender() {
-    for (std::size_t i = 0; i < getShapeCount(); ++i) {
-        cpBody* body = cpShapeGetBody(m_shapes[i]);
-        if (m_mask[i] == RBShapeTypePolygon) {
-            int n = cpPolyShapeGetCount(m_shapes[i]);
-            for (int j = 0; j < n; ++j) {
-                Point a = cp2sf(cpBodyLocalToWorld(body,cpPolyShapeGetVert(m_shapes[i], j)));
-                Point b = cp2sf(cpBodyLocalToWorld(body,cpPolyShapeGetVert(m_shapes[i], ((j+1)%n))));
-                engine.debug.drawLine(a, b, Purples::Magenta);
+    // draw shapes
+    if (engine.debug.widgets[DebugSystem::PhysicsShapes]) {
+        for (std::size_t i = 0; i < getShapeCount(); ++i) {
+            cpBody* body = cpShapeGetBody(m_shapes[i]);
+            if (m_mask[i] == RBShapeTypePolygon) {
+                int n = cpPolyShapeGetCount(m_shapes[i]);
+                for (int j = 0; j < n; ++j) {
+                    Point a = cp2sf(cpBodyLocalToWorld(body,cpPolyShapeGetVert(m_shapes[i], j)));
+                    Point b = cp2sf(cpBodyLocalToWorld(body,cpPolyShapeGetVert(m_shapes[i], ((j+1)%n))));
+                    engine.debug.drawLine(a, b, DEBUG_PHYSICS_SHAPE_COLOR);
+                }
+            }
+            else if (m_mask[i] == RBShapeTypeCircle) {
+                float r = (float)cpCircleShapeGetRadius(m_shapes[i]);
+                Point pos = cp2sf(cpBodyLocalToWorld(body,cpCircleShapeGetOffset(m_shapes[i])));
+                engine.debug.drawCircle(pos, r, DEBUG_PHYSICS_SHAPE_COLOR);
+            }
+            else if (m_mask[i] == RBShapeTypeSegment) {
+
             }
         }
-        else if (m_mask[i] == RBShapeTypeCircle) {
-            float r = (float)cpCircleShapeGetRadius(m_shapes[i]);
-            Point pos = cp2sf(cpBodyLocalToWorld(body,cpCircleShapeGetOffset(m_shapes[i])));
-            engine.debug.drawCircle(pos, r, Purples::Magenta);
-        }
-        else if (m_mask[i] == RBShapeTypeSegment) {
-
-        }
+    }
+    // draw center of gravity
+    if (engine.debug.widgets[DebugSystem::PhysicsCOG]) {
+        Vector2f cog = getCOG();
+        engine.debug.drawCircle(cog, 5, DEBUG_PHYSICS_COG_COLOR);
+        engine.debug.drawPoint(cog + Vector2f(2,2), DEBUG_PHYSICS_COG_COLOR);
+        engine.debug.drawPoint(cog - Vector2f(2,2), DEBUG_PHYSICS_COG_COLOR);
 
     }
 }

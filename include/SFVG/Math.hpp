@@ -88,6 +88,9 @@ inline bool inBounds(const sf::Vector2f& position, const sf::Vector2f& size);
 // VECTOR ALGEBRA
 //==============================================================================
 
+/// Returns absolute value of vector
+inline sf::Vector2f absVec(const sf::Vector2f v);
+
 /// Computes the squared length of a vector
 inline float squaredLength(const sf::Vector2f v);
 

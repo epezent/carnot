@@ -166,6 +166,10 @@ inline bool inBounds(const sf::Vector2f& position, const sf::Vector2f& size) {
 // VECTOR ALGEBRA
 //==============================================================================
 
+inline sf::Vector2f absVec(const sf::Vector2f v) {
+    return sf::Vector2f(std::abs(v.x), std::abs(v.y));
+}
+
 inline float squaredLength(const sf::Vector2f v) {
     return v.x * v.x + v.y * v.y;
 }

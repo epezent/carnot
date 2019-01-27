@@ -9,59 +9,59 @@ public:
         transform.setLocalPosition(x,y);
         auto sr = addComponent<ShapeRenderer>();
         sr->shape = RectangleShape(width,height);
-        sr->shape.setColor(Color::Black);
+        sr->setColor(Color::Black);
         auto rb = addComponent<RigidBody>(RigidBody::Static);
         rb->addBoxShape(width,height);
     }
 };
 
-class FreeBody : public GameObject {
+class RectObject : public GameObject {
 public:
-    FreeBody(Engine& engine, Vector2f pos) : GameObject(engine) {
-        transform.setPosition(pos);
-        transform.setRotation(random(0.0f,360.0f));
+    RectObject(Engine& engine) : GameObject(engine) {
         sr = addComponent<ShapeRenderer>();
-        rb = addComponent<RigidBody>(RigidBody::Dynamic);
-        auto shape = SquareShape(20);
-        sr->shape = shape;
-        sr->shape.setColor(color = randomColor());
-        rb->addShape(shape);
-        shape.setPosition(20, 0);
-        shape.applyTransform();
-        rb->addShape(shape);
+        sr->setColor(color = randomColor());
+        start = input.getMousePosition();
     }
 
     void update() {
-        auto localPos = transform.worldToLocal(input.getMousePosition());
-
-        if (inBounds(localPos, sr->shape.getLocalBounds()) && input.getMouseDown(MouseButton::Left))
-            active = true;
-        if (input.getMouseUp(MouseButton::Left))
-            active = false;
-
-        if (active || inBounds(localPos, sr->shape.getLocalBounds())) {
-            sr->shape.setColor(Color::Black);
-            if (input.getMouse(MouseButton::Left)) {
-                auto v = input.getMousePosition() - transform.getPosition();
-                rb->applyForceToCenter(200.0f * v - 15.0f * rb->getVelocity());
-            }
-            if (input.getKey(Key::D))
+        if (!confirmed && input.getMouseUp(MouseButton::Right)) {
+            if (absVec(start - end) == Vector2f(0,0)) {
                 destroy();
+            }
+            else {
+                confirmed = true;
+                rb = addComponent<RigidBody>(RigidBody::Dynamic);
+                rb->addShape(sr->shape);
+                rb->setShapeDensity(0, 1.0f);
+                rb->setShapeFriction(0, 0.7f);
+                rb->setShapeElasticity(0, 0.0f);
+            }
         }
-        else
-            sr->shape.setColor(color);
+        if (!confirmed && input.getMouse(MouseButton::Right)) {
+            end = input.getMousePosition();
+            auto size = absVec(start - end);
+            sr->shape = RectangleShape(size.x, size.y);
+            transform.setPosition(start + 0.5f * (end - start));
+        }
+        if (rb) {
+            engine.debug.drawText(str("mass = ",rb->getMass()), transform.getPosition());
+            auto localPos = transform.worldToLocal(input.getMousePosition());
+            if (inBounds(localPos, sr->shape.getLocalBounds()) && input.getKeyDown(Key::D))
+                destroy();
+
+        }
     }
 
     Color color;
-    bool active = false;
     Handle<ShapeRenderer> sr;
     Handle<RigidBody> rb;
-    Handle<Collider> co;
+    Vector2f start, end;
+    bool confirmed = false;
 };
 
-class Root : public GameObject {
+class Player : public GameObject {
 public:
-    Root(Engine& engine) : GameObject(engine) {
+    Player(Engine& engine) : GameObject(engine) {
         makeChild<Wall>(750,50,0,375);
         makeChild<Wall>(750,50,0,-375);
         makeChild<Wall>(50,750,-375,0);
@@ -72,8 +72,11 @@ public:
         if (input.getKeyDown(Key::G))
             engine.physics.setGravity(Vector2f(0,1000) - engine.physics.getGravity());
         if (input.getMouseDown(MouseButton::Right))
-            makeChild<FreeBody>(input.getMousePosition());
+            makeChild<RectObject>();
     }
+
+
+
 };
 
 int main(int argc, char const *argv[]) {
@@ -81,9 +84,9 @@ int main(int argc, char const *argv[]) {
     engine.getView(0).setCenter(0, 0);
     engine.setLayerCount(2);
     engine.debug.show(true);
-    engine.setBackgroundColor(Grays::Gray50);
+    engine.setBackgroundColor(Grays::Gray10);
     engine.window.setKeyRepeatEnabled(false);
-    auto root = engine.makeRoot<Root>();
+    auto root = engine.makeRoot<Player>();
     engine.window.setTitle("Evan's Engine");
     engine.run();
     return 0;

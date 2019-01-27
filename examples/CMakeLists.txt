@@ -8,7 +8,7 @@ endmacro()
 
 # sfvg_example(color)
 # sfvg_example(coroutine)
-# sfvg_example(engine)
+sfvg_example(engine)
 # sfvg_example(online)
 sfvg_example(physics)
 # sfvg_example(pong)

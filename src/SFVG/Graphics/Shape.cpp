@@ -14,18 +14,11 @@ namespace sfvg {
 //==============================================================================
 
 Shape::Shape(std::size_t pointCount) :
+    m_circleRadius(0.0f),
     m_holes(0),
-    m_texture(NULL),
-    m_textureRect(),
-    m_gradient(),
-    m_hasSolidFill(true),
-    m_showWireFrame(false),
-    m_showBoundsBox(false),
     m_needsUpdate(true)
 {
     setPointCount(pointCount);
-    setTextureRect(sf::IntRect(0, 0, 1, 1));
-
 }
 
 Shape::~Shape() {}
@@ -164,65 +157,12 @@ void Shape::addHole(const Shape &hole) {
     m_needsUpdate = true;
 }
 
-void Shape::setGradient(const Gradient &gradient) {
-    m_gradient = gradient;
-    m_hasSolidFill = false;
-}
-
-Gradient Shape::getGradient() const {
-    return m_gradient;
-}
-
-void Shape::setColor(const sf::Color& color)
-{
-    m_color = color;
-    m_hasSolidFill = true;
-    updateFillColors();
-}
-
-const sf::Color& Shape::getColor() const
-{
-    return m_color;
-}
-
-void Shape::setTexture(const sf::Texture* texture, bool resetRect) {
-    if (texture) {
-        // Recompute the texture area if requested, or if there was no texture
-        if (resetRect || !m_texture) {
-            setTextureRect(sf::IntRect(0, 0, texture->getSize().x, texture->getSize().y));
-        }
-    }
-    // Assign the new texture
-    m_texture = texture;
-}
-
-const sf::Texture* Shape::getTexture() const {
-    return m_texture;
-}
-
-void Shape::setTextureRect(const sf::IntRect& rect) {
-    m_textureRect = rect;
-    updateTexCoords();
-}
-
-const sf::IntRect& Shape::getTextureRect() const {
-    return m_textureRect;
-}
-
-sf::FloatRect Shape::getLocalBounds() const {
+FloatRect Shape::getLocalBounds() const {
     return m_bounds;
 }
 
-sf::FloatRect Shape::getGlobalBounds() const {
+FloatRect Shape::getGlobalBounds() const {
     return getTransform().transformRect(m_bounds);
-}
-
-void Shape::showWireFrame(bool show) {
-    m_showWireFrame = show;
-}
-
-void Shape::showBoundsBox(bool show) {
-    m_showBoundsBox = show;
 }
 
 //==============================================================================
@@ -313,119 +253,16 @@ void Shape::updateVertices() const {
     }
 }
 
-void Shape::updateVertexArray() const {
-    // make earcut polygon
-    std::vector<Points> polygon(1 + m_holes.size());
-    polygon[0] = m_vertices;
-    std::size_t n_vertices = polygon[0].size();
-    if (n_vertices < 3)
-        return;
-    // generate vertices for holes
-    for (std::size_t i = 0; i < m_holes.size(); ++i) {
-        if (m_holes[i].m_needsUpdate)
-            m_holes[i].update();
-        polygon[i+1] = m_holes[i].m_vertices;
-        n_vertices += polygon[i+1].size();
-    }
-    // generate indices
-    std::vector<std::size_t> indices = mapbox::earcut<std::size_t>(polygon);
-    // resize vertex array
-    m_vertexArray.resize(indices.size());
-    // make cummulative sum of vertices in polygon
-    std::vector<std::size_t> sums(polygon.size() + 1);
-    sums[0] = 0;
-    for (std::size_t i = 1; i < polygon.size() + 1; ++i)
-        sums[i] = sums[i-1] + polygon[i-1].size();
-    // set vertex array positions
-    std::size_t index = 0, subIndex = 0;
-    for (std::size_t i = 0; i < indices.size(); ++i) {
-        for (index = 0; sums.size(); ++index) {
-            if (indices[i] < sums[index + 1])
-                break;
-        }
-        subIndex = indices[i] - sums[index];
-        m_vertexArray[i].position = polygon[index][subIndex];
-    }
-}
-
 void Shape::updateBounds() const {
     m_bounds = m_vertices.getBounds();
-}
-
-void Shape::updateTexCoords() const {
-    float invWidth = 1.0f / m_bounds.width;
-    float invHeight = 1.0f / m_bounds.height;
-    for (std::size_t i = 0; i < m_vertexArray.size(); ++i) {
-        float xratio =
-            m_bounds.width > 0
-                ? (m_vertexArray[i].position.x - m_bounds.left) * invWidth
-                : 0;
-        float yratio =
-            m_bounds.height > 0
-                ? (m_vertexArray[i].position.y - m_bounds.top) * invHeight
-                : 0;
-        m_vertexArray[i].texCoords.x =
-            m_textureRect.left + m_textureRect.width * xratio;
-        m_vertexArray[i].texCoords.y =
-            m_textureRect.top + m_textureRect.height * yratio;
-    }
-}
-
-void Shape::updateFillColors() const
-{
-    for (std::size_t i = 0; i < m_vertexArray.size(); ++i)
-        m_vertexArray[i].color = m_color;
 }
 
 void Shape::update() const {
     // update outer vertices
     updateVertices();
-    // update vertex array
-    updateVertexArray();
     // update bounds
     updateBounds();
-    // Texture coordinates
-    updateTexCoords();
-    // Fill color (solid)
-    if (m_hasSolidFill)
-        updateFillColors();
-    // reset update flag
     m_needsUpdate = false;
-}
-
-void Shape::draw(sf::RenderTarget& target, sf::RenderStates states) const {
-    if (m_needsUpdate)
-        update();
-    states.transform *= getTransform();
-    if (m_texture)
-        states.texture = m_texture;
-    else
-        states.texture = SFVG_WHITE_TEXTURE;
-    if (!m_hasSolidFill)
-        states.shader = m_gradient.getShader();
-    target.draw(&m_vertexArray[0], m_vertexArray.size(), sf::Triangles, states);
-
-    if (m_showBoundsBox) {
-        sf::VertexArray bounds(sf::LineStrip, 5);
-        bounds[0].position = sf::Vector2f(m_bounds.left, m_bounds.top);
-        bounds[1].position = sf::Vector2f(m_bounds.left + m_bounds.width, m_bounds.top);
-        bounds[2].position = sf::Vector2f(m_bounds.left + m_bounds.width, m_bounds.top + m_bounds.height);
-        bounds[3].position = sf::Vector2f(m_bounds.left, m_bounds.top + m_bounds.height);
-        bounds[4].position = bounds[0].position;
-        target.draw(bounds, states);
-    }
-
-    if (m_showWireFrame) {
-        sf::VertexArray wireframe(sf::Lines, 4 * (m_vertexArray.size() - 1) / 3);
-        std::size_t k = 0;
-        for (std::size_t i = 0; i < (m_vertexArray.size() - 1) / 3; ++i) {
-            wireframe[k++].position = m_vertexArray[3 * i].position;
-            wireframe[k++].position = m_vertexArray[3 * i + 1].position;
-            wireframe[k++].position = m_vertexArray[3 * i + 2].position;
-            wireframe[k++].position = m_vertexArray[3 * i].position;
-        }
-        target.draw(wireframe, states);
-    }
 }
 
 //==============================================================================

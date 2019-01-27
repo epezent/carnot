@@ -8,6 +8,8 @@
 
 namespace sfvg {
 
+class Shape;
+
 class Stroke : public sf::Drawable, public sf::Transformable {
 public:
 

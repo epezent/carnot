@@ -6,15 +6,27 @@ using namespace sfvg;
 class CircleObject : public GameObject {
 public:
     CircleObject(Engine& engine) : GameObject(engine) {
-        auto sr = addComponent<ShapeRenderer>();
-        sr->shape = CircleShape(50);
-        sr->shape.setColor(randomColor());
+        sr1 = addComponent<ShapeRenderer>();
+        sr1->shape = RectangleShape(100,20);
+        sr1->setColor(randomColor());
+
+        sr2 = addComponent<ShapeRenderer>();
+        sr2->shape = RectangleShape(100,20);
+        sr2->shape.setPosition(100, 100);
+        sr2->setColor(randomColor());
     }
 
     void update() {
-
-        engine.debug.drawText(str(transform.worldToLocal(input.getMousePosition())), transform.getPosition());
+        if (input.getKeyDown(Key::Space))
+            sr1->shape.setRadii(5);
+        if (input.getKey(Key::R))
+            sr1->shape.rotate(60*engine.deltaTime());
+        if (input.getKey(Key::Right))
+            transform.rotate(60*engine.deltaTime());
+        engine.debug.drawText("Hello,World", transform.getPosition());
     }
+    Handle<ShapeRenderer> sr1;
+    Handle<ShapeRenderer> sr2;
 };
 
 class SquareObject : public GameObject {
@@ -26,11 +38,11 @@ public:
 
         sr1 = addComponent<ShapeRenderer>();
         sr1->shape = SquareShape(50);
-        sr1->shape.setColor(randomColor());
+        sr1->setColor(randomColor());
 
         sr2 = addComponent<ShapeRenderer>();
         sr2->shape = SquareShape(25);
-        sr2->shape.setColor(randomColor());
+        sr2->setColor(randomColor());
 
         makeChild<CircleObject>()->transform.setLocalPosition(250, 250);
     }

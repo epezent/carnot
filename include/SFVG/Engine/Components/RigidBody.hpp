@@ -49,24 +49,27 @@ public:
     /// Get RigidBody moment
     float getMoment() const;
 
+    /// Get RigidBody center of gravity
+    Vector2f getCOG() const;
+
     //==============================================================================
     // SHAPES
     //==============================================================================
 
+    /// Add a generic shape (must be convex)
+    void addShape(const Shape& shape, float skin = 0.0f);
     /// Adds a centered box shape to the RigidBody
-    void addBoxShape(float width, float height, float radius = 0.0f);
+    void addBoxShape(float width, float height, const Vector2f& offset = Vector2f(), float skin = 0.0f);
     /// Adds a cenetered circle shape to the RigidBody
-    void addCircleShape(float radius);
-    /// Add a generic shape
-    void addShape(const Shape& shape);
-    /// Adds a CircleShape
-    void addShape(const CircleShape& shape);
+    void addCircleShape(float radius, const Vector2f& offset = Vector2f());
 
     /// Gets the number of shapes attached to RigidBody
     std::size_t getShapeCount() const;
 
     /// Set a shape's mass
     void setShapeMass(std::size_t index, float mass);
+    /// Set a shape's density
+    void setShapeDensity(std::size_t index, float density);
     /// Set a shape's friction
     void setShapeFriction(std::size_t index, float friction);
     /// Set a shape's elasticity
@@ -74,6 +77,8 @@ public:
 
     /// Get a shape's mass
     float getShapeMass(std::size_t index) const;
+    /// Get a shape's density
+    float getShapeDensity(std::size_t index) const;
     /// Get a shape's moment
     float getShapeMoment(std::size_t index) const;
     /// Get a shape's friction

@@ -21,7 +21,7 @@ private:
     void updateCircleShape();
 
 private:
-    float m_radius;
+
     std::size_t m_smoothness;
 };
 

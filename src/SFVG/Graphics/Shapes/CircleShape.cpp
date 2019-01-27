@@ -4,19 +4,19 @@
 namespace sfvg {
 
 CircleShape::CircleShape(float radius, std::size_t smoothness) :
-    m_radius(radius),
     m_smoothness(smoothness)
 {
+    m_circleRadius = radius;
     updateCircleShape();
 }
 
 void CircleShape::setCircleRadius(float radius) {
-    m_radius = radius;
+    m_circleRadius = radius;
     updateCircleShape();
 }
 
 float CircleShape::getCircleRadius() const {
-    return m_radius;
+    return m_circleRadius;
 }
 
 void CircleShape::setSmoothness(std::size_t smoothness) {
@@ -33,7 +33,7 @@ void CircleShape::updateCircleShape() {
     float angleIncrement = 2.0f * PI / m_smoothness;
     for (std::size_t i = 0; i < m_smoothness; i++) {
         float angle = i * angleIncrement - 0.5f * PI;
-        setPoint(i, Point(std::cos(angle) * m_radius, std::sin(angle) * m_radius));
+        setPoint(i, Point(std::cos(angle) * m_circleRadius, std::sin(angle) * m_circleRadius));
     }
 }
 

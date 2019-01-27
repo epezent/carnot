@@ -10,7 +10,20 @@
 
 namespace sfvg {
 
-struct DebugInfo {
+namespace {
+    static const std::array<std::string, DebugSystem::WidgetCount> g_widgetNames {
+        "Local Bounds",
+        "World Bounds",
+        "Wireframe",
+        "Physics COG",
+        "Physics Shapes"
+    };
+
+    static std::array<Color, DebugSystem::WidgetCount> g_widgetColors;
+
+} // namespace name
+
+struct DebugSystem::Info {
     float       elapsedTime = 0.0f;
     std::size_t frames = 0;
     std::size_t fpsDisplay = 0;
@@ -19,7 +32,6 @@ struct DebugInfo {
     double cpuDisplay = 0.0;
     std::size_t ramSum = 0;
     std::size_t ramDisplay = 0;
-
 };
 
 DebugSystem::DebugSystem(Engine& engine, const Name& name) :
@@ -27,8 +39,16 @@ DebugSystem::DebugSystem(Engine& engine, const Name& name) :
     m_show(false),
     m_paused(false),
     m_advance(false),
-    m_info(new DebugInfo())
-{ }
+    m_info(new DebugSystem::Info())
+{
+    widgets.fill(false);
+    g_widgetColors[0] =  DEBUG_LOCAL_BOUNDS_COLOR;
+    g_widgetColors[1] =  DEBUG_WORLD_BOUNDS_COLOR;
+    g_widgetColors[2] =  DEBUG_WIREFRAME_COLOR;
+    g_widgetColors[3] =  DEBUG_PHYSICS_COG_COLOR;
+    g_widgetColors[4] =  DEBUG_PHYSICS_SHAPE_COLOR;
+
+}
 
 void DebugSystem::show(bool _show) {
     m_show = _show;
@@ -38,12 +58,7 @@ bool DebugSystem::isShown() const {
     return m_show;
 }
 
-void DebugSystem::drawPoint(const Point& position, const Color& color) {
-    // auto sqr = std::make_shared<SquareShape>(3);
-    // sqr->setPosition(position);
-    // sqr->setColor(color);
-    // m_drawables.push_back(sqr);
-
+void DebugSystem::drawPoint(const Vector2f& position, const Color& color) {
     auto rect = std::make_shared<VertexArray>(sf::TriangleStrip);
     rect->resize(4);
     (*rect)[0].position = position + Point( 2.0f, -2.0f);
@@ -70,7 +85,27 @@ void DebugSystem::drawLine(const Point& start,
     m_drawables.push_back(line);
 }
 
-void DebugSystem::drawTriangle(const Point& a, const Point& b, const Point& c, const Color& color) {
+void DebugSystem::drawLines(const std::vector<Vector2f> &points, const Color& color) {
+    auto lines = std::make_shared<VertexArray>(sf::Lines);
+    lines->resize(points.size());
+    for (std::size_t i = 0; i < points.size(); ++i) {
+        (*lines)[i].position = points[i];
+        (*lines)[i].color    = color;
+    }
+    m_drawables.push_back(lines);
+}
+
+void DebugSystem::drawLineStrip(const std::vector<Vector2f> &points, const Color& color) {
+    auto lines = std::make_shared<VertexArray>(sf::LineStrip);
+    lines->resize(points.size());
+    for (std::size_t i = 0; i < points.size(); ++i) {
+        (*lines)[i].position = points[i];
+        (*lines)[i].color    = color;
+    }
+    m_drawables.push_back(lines);
+}
+
+void DebugSystem::drawTriangle(const Vector2f& a, const Vector2f& b, const Vector2f& c, const Color& color) {
     auto tri = std::make_shared<VertexArray>(sf::LineStrip);
     tri->resize(4);
     (*tri)[0].position = a;
@@ -84,14 +119,14 @@ void DebugSystem::drawTriangle(const Point& a, const Point& b, const Point& c, c
     m_drawables.push_back(tri);
 }
 
-void DebugSystem::drawRectangle(const Point& position, float width, float height,  const Color& color) {
+void DebugSystem::drawRectangle(const Vector2f& position, float width, float height,  const Color& color) {
     auto rect = std::make_shared<VertexArray>(sf::LineStrip);
     rect->resize(5);
-    (*rect)[0].position = position + Point(-width, -height) * 0.5f;
-    (*rect)[1].position = position + Point( width, -height) * 0.5f;
-    (*rect)[2].position = position + Point( width,  height) * 0.5f;
-    (*rect)[3].position = position + Point(-width,  height) * 0.5f;
-    (*rect)[4].position = position + Point(-width, -height) * 0.5f;
+    (*rect)[0].position = position + Vector2f(-width, -height) * 0.5f;
+    (*rect)[1].position = position + Vector2f( width, -height) * 0.5f;
+    (*rect)[2].position = position + Vector2f( width,  height) * 0.5f;
+    (*rect)[3].position = position + Vector2f(-width,  height) * 0.5f;
+    (*rect)[4].position = position + Vector2f(-width, -height) * 0.5f;
     (*rect)[0].color = color;
     (*rect)[1].color = color;
     (*rect)[2].color = color;
@@ -100,14 +135,14 @@ void DebugSystem::drawRectangle(const Point& position, float width, float height
     m_drawables.push_back(rect);
 }
 
-void DebugSystem::drawCircle(const Point &position, float radius, const Color& color) {
-    std::size_t smoothness = 100;
+void DebugSystem::drawCircle(const Vector2f &position, float radius, const Color& color) {
+    std::size_t smoothness = 36;
     auto circle = std::make_shared<VertexArray>(sf::LineStrip);
     circle->resize(smoothness + 1);
     float angleIncrement = 2.0f * PI / smoothness;
     for (std::size_t i = 0; i < smoothness + 1; i++) {
         float angle = i * angleIncrement - 0.5f * PI;
-        (*circle)[i].position = position + Point(std::cos(angle) * radius, std::sin(angle) * radius);
+        (*circle)[i].position = position + Vector2f(std::cos(angle) * radius, std::sin(angle) * radius);
         (*circle)[i].color = color;
     }
     m_drawables.push_back(circle);
@@ -136,8 +171,18 @@ void DebugSystem::start() {
     m_infoText.setFillColor(DEBUG_COLOR);
     m_infoText.scale(0.5f, 0.5f);
     m_pauseText = m_infoText;
-    m_pauseText.setString("PAUSED");
+    m_pauseText.setString("PAUSED (F2 = RESUME | F3 = STEP)");
     alignTopCenter(m_pauseText);
+
+    // setup widget labels
+    for (std::size_t i = 0; i < WidgetCount; ++i) {
+        m_widgetLabels[i].setFont(engine.fonts.get("RobotoMonoBold"));
+        m_widgetLabels[i].setString(g_widgetNames[i]);
+        m_widgetLabels[i].setFillColor(g_widgetColors[i]);
+        m_widgetLabels[i].setCharacterSize(20);
+        m_widgetLabels[i].scale(0.5f, 0.5f);
+        alignTopLeft(m_widgetLabels[i]);
+    }
 }
 
 void DebugSystem::update() {
@@ -167,6 +212,7 @@ void DebugSystem::update() {
         // draw info
         engine.window.setView(engine.window.getDefaultView());
         engine.window.draw(m_infoText);
+        updateWidgetMenu();
     }
     else {
         // clear drawables if we aren't drawing
@@ -219,7 +265,36 @@ void DebugSystem::updateInfo() {
     m_ss << "OBJ:  " << Object::getObjectCount() << "\n";
     m_ss << "RND:  " << Renderer::getRendererCount() << "\n";
     m_ss << "BDY:  " << RigidBody::getRigidBodyCount() << "\n";
-    m_infoText.setString(m_ss.str()) ;
+    m_infoText.setString(m_ss.str());
+}
+
+void DebugSystem::updateWidgetMenu() {
+    // setup widget labels
+    float maxWidth = 0.0f;
+    float maxHeight = 0.0f;
+    for (std::size_t i = 0; i < WidgetCount; ++i) {
+        if (m_widgetLabels[i].getGlobalBounds().width > maxWidth)
+            maxWidth = m_widgetLabels[i].getGlobalBounds().width;
+        if (m_widgetLabels[i].getGlobalBounds().height > maxHeight)
+            maxHeight = m_widgetLabels[i].getGlobalBounds().height;
+    }
+    float width = (float)engine.window.getSize().x;
+    for (std::size_t i = 0; i < WidgetCount; ++i) {
+        m_widgetLabels[i].setPosition(width - 5 - maxWidth, 5 + (maxHeight * 1.4f) * i);
+        if (inBounds(engine.input.getMousePosition(engine.window.getDefaultView()), m_widgetLabels[i].getGlobalBounds())) {
+            m_widgetLabels[i].setFillColor(Whites::White);
+            if (input.getMouseDown(MouseButton::Left)) {
+                widgets[i] = !widgets[i];
+            }
+        }
+        else {
+            if (widgets[i])
+                m_widgetLabels[i].setFillColor(g_widgetColors[i]);
+            else
+                m_widgetLabels[i].setFillColor(Grays::Gray50);
+        }
+        engine.window.draw(m_widgetLabels[i]);
+    }
 }
 
 

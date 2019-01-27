@@ -86,9 +86,13 @@ public:
     //==========================================================================
 
     /// Transforms local point to world point
-    Vector2f localToWorld(const Vector2f point);
+    Vector2f localToWorld(const Vector2f& point);
+    /// Transform local rect to world rect
+    FloatRect localToWorld(const FloatRect& rect);
     /// Transforms world point to local point
-    Vector2f worldToLocal(const Vector2f point);
+    Vector2f worldToLocal(const Vector2f& point);
+    /// Transform local rect to world rect
+    FloatRect worldToLocal(const FloatRect& rect);
 
 public:
 

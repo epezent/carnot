@@ -5,7 +5,7 @@
 
 namespace sfvg {
 
-class Shape;
+class ShapeRenderer;
 class Stroke;
 
 class Gradient {
@@ -30,7 +30,7 @@ public:
 
 private:
 
-    friend class Shape;
+    friend class ShapeRenderer;
     friend class Stroke;
 
     sf::Shader* getShader() const;
