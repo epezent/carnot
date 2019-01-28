@@ -17,9 +17,7 @@ ShapeRenderer::ShapeRenderer(GameObject& _gameObject) :
     m_textureRect(),
     m_gradient(),
     m_needsUpdate(true),
-    m_hasSolidFill(true),
-    m_showWireFrame(false),
-    m_showBoundsBox(false)
+    m_hasSolidFill(true)
 {
     setTextureRect(sf::IntRect(0, 0, 1, 1));
 }

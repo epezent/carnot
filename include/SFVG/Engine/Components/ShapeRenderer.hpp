@@ -66,9 +66,6 @@ private:
     Gradient m_gradient;
     bool m_needsUpdate;
     bool m_hasSolidFill;
-    bool m_showWireFrame;
-    bool m_showBoundsBox;
-
 };
 
 } // namespace sfvg

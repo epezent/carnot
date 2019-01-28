@@ -72,6 +72,18 @@ public:
             engine.physics.setGravity(Vector2f(0,1000) - engine.physics.getGravity());
         if (input.getMouseDown(MouseButton::Right))
             makeChild<RectObject>();
+        if (input.getMouseDown(MouseButton::Middle)) {
+            auto go = makeChild<GameObject>();
+            go->transform.setPosition(input.getMousePosition());
+            go->addComponent<ShapeRenderer>();
+            go->getComponent<ShapeRenderer>()->setColor(randomColor());
+            go->getComponent<ShapeRenderer>()->shape = CircleShape(30);
+            go->getComponent<ShapeRenderer>()->shape.addHole(StarShape(20,25,20));
+            go->addComponent<RigidBody>();
+            go->getComponent<RigidBody>()->addCircleShape(30);
+            go->getComponent<RigidBody>()->setShapeDensity(0, 1.0f);
+
+        }
     }
 
 

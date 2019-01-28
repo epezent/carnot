@@ -33,6 +33,7 @@ using sf::Vector2f;
 using sf::Vector2i;
 using sf::Vector2u;
 using sf::FloatRect;
+using sf::IntRect;
 using sf::Font;
 using sf::RenderWindow;
 using sf::Text;
