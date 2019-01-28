@@ -3,7 +3,6 @@
 #include <SFVG/Engine/Engine.hpp>
 #include <SFVG/Engine/Object.hpp>
 #include <SFVG/Engine/Coroutine.hpp>
-#include <SFVG/Graphics.hpp>
 #include <algorithm>
 #include <cmath>
 

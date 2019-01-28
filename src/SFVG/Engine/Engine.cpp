@@ -1,7 +1,6 @@
 #include <SFML/Window/Event.hpp>
 #include <SFVG/Engine/Engine.hpp>
 #include <SFVG/Engine/GameObject.hpp>
-#include <SFVG/Graphics.hpp>
 #include <cassert>
 #include "Fonts/EngineFonts.hpp"
 #include <SFVG/Engine/Components/Renderer.hpp>
@@ -41,15 +40,9 @@ Engine::Engine(unsigned int width, unsigned int height, unsigned int style) :
     m_frame(0)
 {
     assert(!g_engineLoaded);
-
     // load resources
-    sfvgInit();
-    fonts.load("Roboto",           &Roboto_Regular_ttf,     Roboto_Regular_ttf_len);
-    fonts.load("RobotoBold",       &Roboto_Bold_ttf,        Roboto_Bold_ttf_len);
-    fonts.load("RobotoItalic",     &Roboto_Italic_ttf,      Roboto_Italic_ttf_len);
-    fonts.load("RobotoMono",       &RobotoMono_Regular_ttf, RobotoMono_Regular_ttf_len);
-    fonts.load("RobotoMonoBold",   &RobotoMono_Bold_ttf,    RobotoMono_Bold_ttf_len);
-    fonts.load("RobotoMonoItalic", &RobotoMono_Italic_ttf,  RobotoMono_Italic_ttf_len);
+    loadBuiltInResources();
+
 
     // create Window and set settings
     sf::ContextSettings settings;
@@ -91,6 +84,9 @@ void Engine::run() {
             m_root->onPhysics();
             // update all objects
             m_root->updateAll();
+            // late update all object
+            m_root->lateUpdateAll();
+            // increment frame
             m_frame++;
         }
         // clear window
@@ -167,6 +163,13 @@ Handle<GameObject> Engine::getRoot() const {
     return Handle<GameObject>(m_root);
 }
 
+
+//==============================================================================
+// PRIVATE
+//==============================================================================
+
+
+
 void Engine::processEvents() {
     Event event;
     while (window.pollEvent(event)) {
@@ -206,5 +209,52 @@ void Engine::render() {
         }
     }
 }
+
+//==============================================================================
+// RESOURCES
+//==============================================================================
+
+namespace {
+    const std::string g_solidShaderGlsl = \
+        "uniform vec4 u_color;" \
+        "uniform sampler2D u_texture;" \
+        "void main() {" \
+        "    vec4 pixel = texture2D(u_texture, gl_TexCoord[0].xy);" \
+        "    gl_FragColor = u_color * pixel;" \
+        "}";
+
+    const std::string g_gradientShaderGlsl = \
+        "uniform vec4 u_color1;" \
+        "uniform vec4 u_color2;" \
+        "uniform float u_angle;" \
+        "uniform sampler2D u_texture;" \
+        "void main() {" \
+        "    vec4 pixel = texture2D(u_texture, gl_TexCoord[0].xy);" \
+        "    vec2 center = gl_TexCoord[0].xy - 0.5;" \
+        "    float radians = -0.0174532925199433 * u_angle;" \
+        "    float t = center.x * sin(radians) + center.y * cos(radians) + 0.5;" \
+        "    gl_FragColor = mix(u_color1, u_color2, t) * pixel;" \
+        "}";
+
+} // namespace name
+
+void Engine::loadBuiltInResources() {
+    // fonts
+    fonts.load("Roboto",           &Roboto_Regular_ttf,     Roboto_Regular_ttf_len);
+    fonts.load("RobotoBold",       &Roboto_Bold_ttf,        Roboto_Bold_ttf_len);
+    fonts.load("RobotoItalic",     &Roboto_Italic_ttf,      Roboto_Italic_ttf_len);
+    fonts.load("RobotoMono",       &RobotoMono_Regular_ttf, RobotoMono_Regular_ttf_len);
+    fonts.load("RobotoMonoBold",   &RobotoMono_Bold_ttf,    RobotoMono_Bold_ttf_len);
+    fonts.load("RobotoMonoItalic", &RobotoMono_Italic_ttf,  RobotoMono_Italic_ttf_len);
+    // shaders
+    shaders.load("Solid"   ,g_solidShaderGlsl,    sf::Shader::Fragment);
+    shaders.load("Gradient",g_gradientShaderGlsl, sf::Shader::Fragment);
+    // textures
+    Image whitePixel;
+    whitePixel.create(1, 1, Color::White);
+    sfvgInit();
+
+}
+
 
 } // namespace sfvg

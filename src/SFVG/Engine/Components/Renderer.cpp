@@ -52,7 +52,8 @@ std::size_t Renderer::getRendererCount() {
 }
 
 void Renderer::onRender(RenderQue& que) {
-    que[m_layer].emplace_back(this);
+    if (isEnabled())
+        que[m_layer].emplace_back(this);
 }
 
 

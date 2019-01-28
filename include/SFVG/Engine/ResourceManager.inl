@@ -18,7 +18,7 @@ void ResourceManager<Resource, Identifier>::load(Identifier id, const std::strin
 {
     // Create and load resource
     std::unique_ptr<Resource> resource(new Resource());
-    if (!resource->loadFromFile(filename, secondParam))
+    if (!resource->loadFromMemory(filename, secondParam))
         throw std::runtime_error("ResourceManager::load - Failed to load " + filename);
 
     // If loading successful, insert resource to map

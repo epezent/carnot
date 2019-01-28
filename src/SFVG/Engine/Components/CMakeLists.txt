@@ -7,3 +7,5 @@ target_sources(sfvg
         TextRenderer.cpp
 		Transform.cpp
 )
+
+add_subdirectory(Detail)

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <SFVG/Imports.hpp>
+#include <SFVG/Common/Imports.hpp>
 #include <SFVG/Engine/System.hpp>
 #include <array>
 

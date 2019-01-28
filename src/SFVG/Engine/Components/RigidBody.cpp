@@ -1,9 +1,9 @@
 #include <SFVG/Engine/Components/RigidBody.hpp>
 #include <SFVG/Engine/Engine.hpp>
-#include <SFVG/Math.hpp>
+#include <SFVG/Common/Math.hpp>
 #include <chipmunk/chipmunk_private.h>
 #include <cassert>
-#include <SFVG/Graphics/Shapes/CircleShape.hpp>
+#include <SFVG/Geometry/CircleShape.hpp>
 
 namespace sfvg {
 

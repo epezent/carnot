@@ -3,10 +3,11 @@ target_sources(sfvg
 		Component.cpp
 		Coroutine.cpp
 		Engine.cpp
+		GameObject.cpp
 		Id.cpp
 		Object.cpp
-        GameObject.cpp
 		ProcessInfo.cpp
+		SharedResources.cpp
         System.cpp
 		XboxController.cpp
 )

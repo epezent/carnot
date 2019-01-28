@@ -3,9 +3,9 @@
 #include <SFVG/Engine/Coroutine.hpp>
 #include <SFVG/Engine/Handle.hpp>
 #include <SFVG/Engine/Id.hpp>
-#include <SFVG/Imports.hpp>
-#include <SFVG/Print.hpp>
-#include <SFVG/Random.hpp>
+#include <SFVG/Common/Imports.hpp>
+#include <SFVG/Common/Print.hpp>
+#include <SFVG/Common/Random.hpp>
 #include <vector>
 #include <utility>
 

@@ -1,12 +1,13 @@
 #include <SFVG/Engine/Systems/DebugSystem.hpp>
 #include <SFVG/Engine/Engine.hpp>
-#include <SFVG/Graphics/Alignment.hpp>
+#include <SFVG/Common/Alignment.hpp>
 #include <SFVG/Engine/ProcessInfo.hpp>
 #include <sstream>
 #include <iomanip>
 #include <iostream>
 #include <SFVG/Engine/Components/Renderer.hpp>
 #include <SFVG/Engine/Components/RigidBody.hpp>
+#include <SFVG/Common/Math.hpp>
 
 namespace sfvg {
 
@@ -61,10 +62,10 @@ bool DebugSystem::isShown() const {
 void DebugSystem::drawPoint(const Vector2f& position, const Color& color) {
     auto rect = std::make_shared<VertexArray>(sf::TriangleStrip);
     rect->resize(4);
-    (*rect)[0].position = position + Point( 2.0f, -2.0f);
-    (*rect)[1].position = position + Point(-2.0f, -2.0f);
-    (*rect)[2].position = position + Point( 2.0f,  2.0f);
-    (*rect)[3].position = position + Point(-2.0f,  2.0f);
+    (*rect)[0].position = position + Vector2f( 2.0f, -2.0f);
+    (*rect)[1].position = position + Vector2f(-2.0f, -2.0f);
+    (*rect)[2].position = position + Vector2f( 2.0f,  2.0f);
+    (*rect)[3].position = position + Vector2f(-2.0f,  2.0f);
     (*rect)[0].color = color;
     (*rect)[1].color = color;
     (*rect)[2].color = color;
@@ -72,8 +73,8 @@ void DebugSystem::drawPoint(const Vector2f& position, const Color& color) {
     m_drawables.push_back(rect);
 }
 
-void DebugSystem::drawLine(const Point& start,
-              const Point& end,
+void DebugSystem::drawLine(const Vector2f& start,
+              const Vector2f& end,
               const Color& color)
 {
     auto line = std::make_shared<VertexArray>(sf::Lines);
@@ -149,7 +150,7 @@ void DebugSystem::drawCircle(const Vector2f &position, float radius, const Color
 }
 
 void DebugSystem::drawText(const std::string& _text,
-               const Point& position,
+               const Vector2f& position,
                const Color& color)
 {
     auto text = std::make_shared<Text>();

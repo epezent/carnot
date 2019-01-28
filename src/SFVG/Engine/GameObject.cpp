@@ -4,7 +4,6 @@
 #include <SFVG/Engine/GameObject.hpp>
 #include <SFVG/Engine/Engine.hpp>
 #include <SFVG/Engine/Coroutine.hpp>
-#include <SFVG/Graphics.hpp>
 #include <algorithm>
 #include <cmath>
 
@@ -281,6 +280,25 @@ void GameObject::updateAll() {
         if (hasCoroutines())
             resumeCoroutines();
         updateChildren();
+    }
+    processDeletions();
+}
+
+void GameObject::lateUpdateAll() {
+    processAdditions();
+    if (isEnabled()) {
+        // update components
+        m_iteratingComponents = true;
+        for (const auto& comp : m_components)
+            comp->lateUpdate();
+        m_iteratingComponents = false;
+        // update self
+        lateUpdate();
+        // update children
+        m_iteratingChildren = true;
+        for (const auto& child : m_children)
+            child->lateUpdateAll();
+        m_iteratingChildren = false;
     }
     processDeletions();
 }

@@ -1,9 +1,9 @@
 #pragma once
 
 #include <SFVG/Engine/System.hpp>
-#include <SFVG/Imports.hpp>
-#include <SFVG/Graphics.hpp>
+#include <SFVG/Common/Imports.hpp>
 #include <sstream>
+#include <array>
 
 namespace sfvg {
 

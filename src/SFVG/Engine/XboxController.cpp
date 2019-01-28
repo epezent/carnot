@@ -1,7 +1,7 @@
 #include <Windows.h>
 #include <Xinput.h>
 #include <SFVG/Engine/XboxController.hpp>
-#include <SFVG/Math.hpp>
+#include <SFVG/Common/Math.hpp>
 #include <array>
 
 namespace sfvg {

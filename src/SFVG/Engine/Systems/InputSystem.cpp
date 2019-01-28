@@ -1,5 +1,5 @@
 #include <SFVG/Engine/Systems/InputSystem.hpp>
-#include <SFVG/Print.hpp>
+#include <SFVG/Common/Print.hpp>
 #include <SFVG/Engine/Engine.hpp>
 
 namespace sfvg {

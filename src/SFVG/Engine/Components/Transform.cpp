@@ -1,6 +1,6 @@
 #include <SFVG/Engine/Components/Transform.hpp>
 #include <SFVG/Engine/GameObject.hpp>
-#include <SFVG/Math.hpp>
+#include <SFVG/Common/Math.hpp>
 
 namespace sfvg {
 

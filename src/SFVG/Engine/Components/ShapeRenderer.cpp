@@ -1,8 +1,8 @@
 #include <SFVG/Engine/Components/ShapeRenderer.hpp>
 #include <SFVG/Engine/GameObject.hpp>
 #include <SFVG/Engine/Engine.hpp>
-#include "../../Graphics/Detail/ExternalLibs.hpp"
-#include "../../Graphics/SharedResources.hpp"
+#include "Detail\earcut_custom.hpp"
+#include "../SharedResources.hpp"
 
 namespace sfvg {
 
@@ -164,6 +164,8 @@ FloatRect ShapeRenderer::getWorldBounds() const {
 }
 
 void ShapeRenderer::onDebugRender() {
+    if (!isEnabled())
+        return;
     // shape local bounds
     Matrix3x3 T = gameObject.transform.getWorldMatrix() * shape.getTransform();
     if (engine.debug.widgets[DebugSystem::Widget::LocalBounds]) {

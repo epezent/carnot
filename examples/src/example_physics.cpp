@@ -1,5 +1,4 @@
-#include <SFVG/Engine.hpp>
-#include <SFVG/Graphics.hpp>
+#include <SFVG/SFVG.hpp>
 
 using namespace sfvg;
 

@@ -1,17 +1,11 @@
 #pragma once
 
-#include <memory>
-#include <SFVG/Imports.hpp>
-#include <SFVG/Print.hpp>
-#include <SFVG/Random.hpp>
+#include <SFVG/Common/Imports.hpp>
+#include <SFVG/Engine/GameObject.hpp>
 #include <SFVG/Engine/ResourceManager.hpp>
+#include <SFVG/Engine/Systems/DebugSystem.hpp>
 #include <SFVG/Engine/Systems/InputSystem.hpp>
 #include <SFVG/Engine/Systems/PhysicsSystem.hpp>
-#include <SFVG/Engine/Systems/DebugSystem.hpp>
-#include <SFVG/Engine/Handle.hpp>
-#include <SFVG/Engine/Id.hpp>
-#include <SFVG/Engine/GameObject.hpp>
-#include <SFVG/Engine/Component.hpp>
 
 namespace sfvg {
 
@@ -77,6 +71,7 @@ public:
     ResourceManager<Texture, std::string> textures;
     ResourceManager<Font, std::string> fonts;
     ResourceManager<SoundBuffer, std::string> sounds;
+    ResourceManager<Shader, std::string> shaders;
 
     RenderWindow window;
     InputSystem input;
@@ -84,6 +79,7 @@ public:
     DebugSystem debug;
 
 private:
+    void loadBuiltInResources();
     void processEvents();
     void render();
 
@@ -110,5 +106,8 @@ Handle<T> Engine::makeRoot(Args... args) {
     setRoot(root);
     return getRoot().as<T>();
 }
+
+extern void sfvgInit();
+extern void sfvgFree();
 
 } // namespace sfvg

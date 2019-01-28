@@ -1,7 +1,6 @@
 #pragma once
 
-#include <SFVG/Imports.hpp>
-#include <SFVG/Graphics.hpp>
+#include <SFVG/Common/Imports.hpp>
 #include <SFVG/Engine/Component.hpp>
 
 namespace sfvg {

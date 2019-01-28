@@ -1,5 +1,4 @@
-#include <SFVG/Engine.hpp>
-#include <SFVG/Graphics.hpp>
+#include <SFVG/SFVG.hpp>
 
 using namespace sfvg;
 
@@ -13,7 +12,7 @@ public:
         sr2 = addComponent<ShapeRenderer>();
         sr2->shape = RectangleShape(100,20);
         sr2->shape.setPosition(100, 100);
-        sr2->setColor(randomColor());
+        sr2->setGradient(Gradient(randomColor(),randomColor()));
     }
 
     void update() {
