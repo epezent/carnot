@@ -1,4 +1,4 @@
-#include <SFVG/Common/Color.hpp>
+#include <SFVG/Graphics/Color.hpp>
 #include <SFVG/Common/Math.hpp>
 #include <cmath>
 #include <cstdio>

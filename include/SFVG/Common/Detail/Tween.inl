@@ -1,6 +1,4 @@
-#include <SFVG/Common/Math.hpp>
-#include <SFML/Graphics/Color.hpp>
-#include <SFVG/Common/Gradient.hpp>
+
 
 namespace sfvg {
 

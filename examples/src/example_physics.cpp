@@ -82,13 +82,14 @@ public:
             go->addComponent<RigidBody>();
             go->getComponent<RigidBody>()->addCircleShape(30);
             go->getComponent<RigidBody>()->setShapeDensity(0, 1.0f);
-
         }
     }
 
 
 
 };
+
+
 
 int main(int argc, char const *argv[]) {
     Engine engine(750,750);

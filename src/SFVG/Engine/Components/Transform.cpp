@@ -1,5 +1,6 @@
 #include <SFVG/Engine/Components/Transform.hpp>
 #include <SFVG/Engine/GameObject.hpp>
+#include <SFVG/Engine/Engine.hpp>
 #include <SFVG/Common/Math.hpp>
 
 namespace sfvg {
@@ -231,6 +232,24 @@ FloatRect Transform::worldToLocal(const FloatRect& rect) {
     return getInverseWorldMatrix().transformRect(rect);
 
     m_localTransform.getMatrix();
+}
+
+//==============================================================================
+// PRIVATE
+//==============================================================================
+
+void Transform::onDebugRender() {
+    if (!isEnabled())
+        return;
+    if (engine.debug.widgets[DebugSystem::Widget::Transform]) {
+        auto x = localToWorld(Vector2f(20.0f,0.0f));
+        auto y = localToWorld(Vector2f(0.0f,20.0f));
+        engine.debug.drawPoint(getPosition(), DEBUG_TRANSFORM_COLOR);
+        engine.debug.drawPoint(x, DEBUG_XAXIS_COLOR);
+        engine.debug.drawPoint(y, DEBUG_YAXIS_COLOR);
+        engine.debug.drawLine(getPosition(), x, DEBUG_XAXIS_COLOR);
+        engine.debug.drawLine(getPosition(), y, DEBUG_YAXIS_COLOR);
+    }
 }
 
 // SFML Transform.getMatrix()

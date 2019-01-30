@@ -4,7 +4,7 @@
 #include <SFML/Graphics/Transformable.hpp>
 #include <SFML/Graphics/VertexArray.hpp>
 #include <SFVG/Geometry/Points.hpp>
-#include <SFVG/Common/Gradient.hpp>
+#include <SFVG/Graphics/Gradient.hpp>
 
 namespace sfvg {
 

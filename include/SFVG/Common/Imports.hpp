@@ -59,6 +59,7 @@ using sf::SoundBuffer;
 using sf::Sound;
 using sf::Music;
 using sf::Shader;
+using sf::Vertex;
 
 using Key         = sf::Keyboard::Key;
 using MouseButton = sf::Mouse::Button;

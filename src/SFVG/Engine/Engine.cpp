@@ -4,6 +4,9 @@
 #include <cassert>
 #include "Fonts/EngineFonts.hpp"
 #include <SFVG/Engine/Components/Renderer.hpp>
+#include <SFVG/Engine/ImGui/imgui.h>
+#include <SFVG/Engine/ImGui/imgui-SFML.h>
+
 
 namespace sfvg {
 
@@ -42,17 +45,25 @@ Engine::Engine(unsigned int width, unsigned int height, unsigned int style) :
     assert(!g_engineLoaded);
     // load resources
     loadBuiltInResources();
-
-
     // create Window and set settings
     sf::ContextSettings settings;
     settings.antialiasingLevel = 8;
     window.create(sf::VideoMode(width, height), "", style, settings);
     window.setFramerateLimit(60);
-    window.requestFocus();
+    //window.requestFocus();
+    // initialize imgui
+    ImGui::SFML::Init(window);
+    ImGuiIO& IO = ImGui::GetIO();
+    IO.Fonts->Clear();
+    //IO.Fonts->AddFontFromFileTTF("Roboto-Regular.ttf", 20.0);
+    unsigned char* fontCopy = new unsigned char[RobotoMono_Bold_ttf_len];
+    std::memcpy(fontCopy, &RobotoMono_Bold_ttf, RobotoMono_Bold_ttf_len);
+    IO.Fonts->AddFontFromMemoryTTF(fontCopy, RobotoMono_Bold_ttf_len, 15.0f);
+    ImGui::SFML::UpdateFontTexture();
+    //ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[0]);
     // set Window view
     m_views[0] = window.getDefaultView();
-    m_views[0].setCenter(width * 0.5f, height * 0.5f);
+    // m_views[0].setCenter(width * 0.5f, height * 0.5f);
     // loaded
     g_engineLoaded = true;
 }
@@ -60,6 +71,7 @@ Engine::Engine(unsigned int width, unsigned int height, unsigned int style) :
 Engine::~Engine() {
     g_engineLoaded = false;
     sfvgFree();
+    ImGui::SFML::Shutdown();
 }
 
 void Engine::run() {
@@ -75,7 +87,11 @@ void Engine::run() {
         input.update();
         processEvents();
         // update delta time
-        m_deltaTimeValue = m_clock.restart().asSeconds();
+        auto deltaTimeTime = m_clock.restart();
+        m_deltaTimeValue = deltaTimeTime.asSeconds();
+        // upate imgui
+        ImGui::SFML::Update(window, deltaTimeTime);
+        // game update
         if (debug.proceed()) {
             // update continous time
             m_timeValue += m_deltaTimeValue;
@@ -89,10 +105,14 @@ void Engine::run() {
             // increment frame
             m_frame++;
         }
+
         // clear window
         window.clear(m_backgroundColor);
         // render
         render();
+
+        // draw imgui
+        ImGui::SFML::Render(window);
         // update debug
         if (debug.isShown())
             m_root->onDebugRender();
@@ -174,6 +194,7 @@ void Engine::processEvents() {
     Event event;
     while (window.pollEvent(event)) {
         input.processEvent(event);
+        ImGui::SFML::ProcessEvent(event);
         switch (event.type) {
             case Event::Closed: {
                 window.close();

@@ -36,14 +36,15 @@ public:
     {
 
         sr1 = addComponent<ShapeRenderer>();
-        sr1->shape = SquareShape(50);
-        sr1->setColor(randomColor());
+        sr1->shape = SquareShape(500);
+        sr1->setColor(Whites::White);
+        sr1->shape.addHole(SquareShape(498));
 
         sr2 = addComponent<ShapeRenderer>();
-        sr2->shape = SquareShape(25);
-        sr2->setColor(randomColor());
-
-        makeChild<CircleObject>()->transform.setLocalPosition(250, 250);
+        sr2->shape = RectangleShape(500,30);
+        sr2->setColor(Whites::White);
+        sr2->shape.setPosition(0, (-250 + 30/2.0f));
+        // makeChild<CircleObject>()->transform.setLocalPosition(250, 250);
     }
 
     void update() override {
@@ -55,6 +56,7 @@ public:
             sr1->decrementLayer();
         if (input.getKeyDown(Key::W))
             sr1->incrementLayer();
+
     }
 
 private:
@@ -64,11 +66,13 @@ private:
 };
 
 int main(int argc, char const *argv[]) {
-    Engine engine(500, 500);
+    Engine engine(500, 500, WindowStyle::None);
+    engine.getView(0).setCenter(0, 0);
     engine.setLayerCount(2);
     engine.window.setKeyRepeatEnabled(false);
     engine.makeRoot<SquareObject>();
     engine.window.setTitle("Evan's Engine");
+    // engine.window.setPosition(Vector2i(0,0));
     engine.run();
     return 0;
 }

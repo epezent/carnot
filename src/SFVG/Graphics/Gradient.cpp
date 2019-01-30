@@ -1,4 +1,4 @@
-#include <SFVG/Common/Gradient.hpp>
+#include <SFVG/Graphics/Gradient.hpp>
 #include "../Engine/SharedResources.hpp"
 #include <string>
 #include <iostream>
@@ -27,7 +27,7 @@ Gradient::Gradient() :
     colors({sf::Color::Black, sf::Color::Black}),
     angle(0.0f),
     m_shader(SFVG_GRADIENT_SHADER)
-{ 
+{
 }
 
 Gradient::Gradient(const sf::Color& color1, const sf::Color& color2, float angle_) :
@@ -35,7 +35,7 @@ Gradient::Gradient(const sf::Color& color1, const sf::Color& color2, float angle
     colors({color1, color2}),
     angle(angle_),
     m_shader(SFVG_GRADIENT_SHADER)
-{ 
+{
 }
 
 //==============================================================================

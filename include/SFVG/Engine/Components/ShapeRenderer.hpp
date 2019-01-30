@@ -1,7 +1,7 @@
 #pragma once
 
 #include <SFVG/Engine/Components/Renderer.hpp>
-#include <SFVG/Common/Gradient.hpp>
+#include <SFVG/Graphics/Gradient.hpp>
 #include <SFVG/Geometry/Shape.hpp>
 
 namespace sfvg {

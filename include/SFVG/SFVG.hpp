@@ -2,8 +2,6 @@
 
 #include <SFVG/Common/Alignment.hpp>
 #include <SFVG/Common/Assert.hpp>
-#include <SFVG/Common/Color.hpp>
-#include <SFVG/Common/Gradient.hpp>
 #include <SFVG/Common/Imports.hpp>
 #include <SFVG/Common/Math.hpp>
 #include <SFVG/Common/Options.hpp>
@@ -37,6 +35,9 @@
 #include <SFVG/Engine/Systems/PhysicsSystem.hpp>
 #include <SFVG/Engine/Systems/RenderSystem.hpp>
 
+#include <SFVG/Engine/ImGui/imgui.h>
+#include <SFVG/Engine/ImGui/imgui-SFML.h>
+
 #include <SFVG/Geometry/Anchor.hpp>
 #include <SFVG/Geometry/CircleShape.hpp>
 #include <SFVG/Geometry/CrossShape.hpp>
@@ -49,6 +50,5 @@
 #include <SFVG/Geometry/StarShape.hpp>
 #include <SFVG/Geometry/Stroke.hpp>
 
-
-
-
+#include <SFVG/Graphics/Color.hpp>
+#include <SFVG/Graphics/Gradient.hpp>

@@ -94,7 +94,11 @@ public:
     /// Transform local rect to world rect
     FloatRect worldToLocal(const FloatRect& rect);
 
-public:
+private:
+
+    void onDebugRender() override;
+
+private:
 
     Vector2f          m_origin;                 ///< Local Origin of translation/rotation/scaling of the object
     Vector2f          m_position;               ///< Local Position of the object in the 2D world
@@ -110,6 +114,8 @@ public:
     mutable bool      m_worldTransformDirty;    ///< Does the transform need to be recomputed?
     mutable bool      m_invLocalTransformDirty; ///< Does the transform need to be recomputed?
     mutable bool      m_invWorldTransformDirty; ///< Does the transform need to be recomputed?
+
+
 
 };
 

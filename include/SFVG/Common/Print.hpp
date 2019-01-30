@@ -1,11 +1,11 @@
 #pragma once
 
-#include <vector>
-#include <iostream>
-#include <utility>
-#include <SFVG/Common/Color.hpp>
 #include <SFVG/Common/Imports.hpp>
+#include <SFVG/Graphics/Color.hpp>
+#include <iostream>
 #include <sstream>
+#include <utility>
+#include <vector>
 
 namespace sfvg {
 

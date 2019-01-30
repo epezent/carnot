@@ -13,6 +13,7 @@ namespace sfvg {
 
 namespace {
     static const std::array<std::string, DebugSystem::WidgetCount> g_widgetNames {
+        "Transform",
         "Local Bounds",
         "World Bounds",
         "Wireframe",
@@ -43,11 +44,12 @@ DebugSystem::DebugSystem(Engine& engine, const Name& name) :
     m_info(new DebugSystem::Info())
 {
     widgets.fill(false);
-    g_widgetColors[0] =  DEBUG_LOCAL_BOUNDS_COLOR;
-    g_widgetColors[1] =  DEBUG_WORLD_BOUNDS_COLOR;
-    g_widgetColors[2] =  DEBUG_WIREFRAME_COLOR;
-    g_widgetColors[3] =  DEBUG_PHYSICS_COG_COLOR;
-    g_widgetColors[4] =  DEBUG_PHYSICS_SHAPE_COLOR;
+    g_widgetColors[Widget::Transform] = DEBUG_TRANSFORM_COLOR;
+    g_widgetColors[Widget::LocalBounds] =  DEBUG_LOCAL_BOUNDS_COLOR;
+    g_widgetColors[Widget::WorldBounds] =  DEBUG_WORLD_BOUNDS_COLOR;
+    g_widgetColors[Widget::Wireframe] =  DEBUG_WIREFRAME_COLOR;
+    g_widgetColors[Widget::PhysicsCOG] =  DEBUG_PHYSICS_COG_COLOR;
+    g_widgetColors[Widget::PhysicsShapes] =  DEBUG_PHYSICS_SHAPE_COLOR;
 
 }
 
@@ -60,108 +62,76 @@ bool DebugSystem::isShown() const {
 }
 
 void DebugSystem::drawPoint(const Vector2f& position, const Color& color) {
-    auto rect = std::make_shared<VertexArray>(sf::TriangleStrip);
-    rect->resize(4);
-    (*rect)[0].position = position + Vector2f( 2.0f, -2.0f);
-    (*rect)[1].position = position + Vector2f(-2.0f, -2.0f);
-    (*rect)[2].position = position + Vector2f( 2.0f,  2.0f);
-    (*rect)[3].position = position + Vector2f(-2.0f,  2.0f);
-    (*rect)[0].color = color;
-    (*rect)[1].color = color;
-    (*rect)[2].color = color;
-    (*rect)[3].color = color;
-    m_drawables.push_back(rect);
+    m_triangles.emplace_back(position + Vector2f( 2.0f, -2.0f), color);
+    m_triangles.emplace_back(position + Vector2f(-2.0f, -2.0f), color);
+    m_triangles.emplace_back(position + Vector2f( 2.0f,  2.0f), color);
+    m_triangles.emplace_back(position + Vector2f(-2.0f, -2.0f), color);
+    m_triangles.emplace_back(position + Vector2f( 2.0f,  2.0f), color);
+    m_triangles.emplace_back(position + Vector2f(-2.0f,  2.0f), color);
 }
 
-void DebugSystem::drawLine(const Vector2f& start,
-              const Vector2f& end,
-              const Color& color)
-{
-    auto line = std::make_shared<VertexArray>(sf::Lines);
-    line->resize(2);
-    (*line)[0].position = start;
-    (*line)[0].color = color;
-    (*line)[1].position = end;
-    (*line)[1].color = color;
-    m_drawables.push_back(line);
+void DebugSystem::drawLine(const Vector2f& start, const Vector2f& end, const Color& color) {
+    m_lines.emplace_back(start, color);
+    m_lines.emplace_back(end, color);
 }
 
 void DebugSystem::drawLines(const std::vector<Vector2f> &points, const Color& color) {
-    auto lines = std::make_shared<VertexArray>(sf::Lines);
-    lines->resize(points.size());
-    for (std::size_t i = 0; i < points.size(); ++i) {
-        (*lines)[i].position = points[i];
-        (*lines)[i].color    = color;
+    if (isEven((int)points.size())) {
+        for (std::size_t i = 0; i < points.size(); ++i)
+            m_lines.emplace_back(points[i], color);
     }
-    m_drawables.push_back(lines);
+    else {
+        for (std::size_t i = 0; i < points.size()-1; ++i)
+            m_lines.emplace_back(points[i], color);
+    }
 }
 
-void DebugSystem::drawLineStrip(const std::vector<Vector2f> &points, const Color& color) {
-    auto lines = std::make_shared<VertexArray>(sf::LineStrip);
-    lines->resize(points.size());
-    for (std::size_t i = 0; i < points.size(); ++i) {
-        (*lines)[i].position = points[i];
-        (*lines)[i].color    = color;
-    }
-    m_drawables.push_back(lines);
+void DebugSystem::drawPolyline(const std::vector<Vector2f> &points, const Color& color) {
+    for (std::size_t i = 0; i < points.size()-1; ++i)
+        drawLine(points[i],points[i+1],color);
 }
 
 void DebugSystem::drawTriangle(const Vector2f& a, const Vector2f& b, const Vector2f& c, const Color& color) {
-    auto tri = std::make_shared<VertexArray>(sf::LineStrip);
-    tri->resize(4);
-    (*tri)[0].position = a;
-    (*tri)[0].color = color;
-    (*tri)[1].position = b;
-    (*tri)[1].color = color;
-    (*tri)[2].position = c;
-    (*tri)[2].color = color;
-    (*tri)[3].position = a;
-    (*tri)[3].color = color;
-    m_drawables.push_back(tri);
+    drawLine(a,b,color);
+    drawLine(b,c,color);
+    drawLine(c,a,color);
 }
 
 void DebugSystem::drawRectangle(const Vector2f& position, float width, float height,  const Color& color) {
-    auto rect = std::make_shared<VertexArray>(sf::LineStrip);
-    rect->resize(5);
-    (*rect)[0].position = position + Vector2f(-width, -height) * 0.5f;
-    (*rect)[1].position = position + Vector2f( width, -height) * 0.5f;
-    (*rect)[2].position = position + Vector2f( width,  height) * 0.5f;
-    (*rect)[3].position = position + Vector2f(-width,  height) * 0.5f;
-    (*rect)[4].position = position + Vector2f(-width, -height) * 0.5f;
-    (*rect)[0].color = color;
-    (*rect)[1].color = color;
-    (*rect)[2].color = color;
-    (*rect)[3].color = color;
-    (*rect)[4].color = color;
-    m_drawables.push_back(rect);
+    auto a = position + Vector2f(-width, -height) * 0.5f;
+    auto b = position + Vector2f( width, -height) * 0.5f;
+    auto c = position + Vector2f( width,  height) * 0.5f;
+    auto d = position + Vector2f(-width,  height) * 0.5f;
+    drawLine(a,b,color);
+    drawLine(b,c,color);
+    drawLine(c,d,color);
+    drawLine(d,a,color);
 }
 
 void DebugSystem::drawCircle(const Vector2f &position, float radius, const Color& color) {
     std::size_t smoothness = 36;
-    auto circle = std::make_shared<VertexArray>(sf::LineStrip);
-    circle->resize(smoothness + 1);
     float angleIncrement = 2.0f * PI / smoothness;
+    std::vector<Vector2f> polyline(smoothness + 1);
     for (std::size_t i = 0; i < smoothness + 1; i++) {
         float angle = i * angleIncrement - 0.5f * PI;
-        (*circle)[i].position = position + Vector2f(std::cos(angle) * radius, std::sin(angle) * radius);
-        (*circle)[i].color = color;
+        polyline[i] = position + Vector2f(std::cos(angle) * radius, std::sin(angle) * radius);
     }
-    m_drawables.push_back(circle);
+    drawPolyline(polyline,color);
 }
 
 void DebugSystem::drawText(const std::string& _text,
                const Vector2f& position,
                const Color& color)
 {
-    auto text = std::make_shared<Text>();
-    text->setFont(engine.fonts.get("RobotoMonoBold"));
-    text->setPosition(position);
-    text->setCharacterSize(20);
-    text->setScale(0.5f, 0.5f);
-    text->setFillColor(color);
-    text->setString(_text);
-    alignCenter(*text.get());
-    m_drawables.push_back(text);
+    Text text;
+    text.setFont(engine.fonts.get("RobotoMonoBold"));
+    text.setPosition(position);
+    text.setCharacterSize(20);
+    text.setScale(0.5f, 0.5f);
+    text.setFillColor(color);
+    text.setString(_text);
+    alignCenter(text);
+    m_text.push_back(text);
 }
 
 
@@ -205,20 +175,23 @@ void DebugSystem::update() {
     // draw debug
     if (m_show) {
         // draw drawables
-        for (auto& drawable : m_drawables)
-            engine.window.draw(*drawable.get());
+        if (m_triangles.size() > 0)
+            engine.window.draw(&m_triangles[0], m_triangles.size(), sf::Triangles);
+        if (m_lines.size() > 0)
+            engine.window.draw(&m_lines[0], m_lines.size(), sf::Lines);
+        for (auto& text : m_text)
+            engine.window.draw(text);
         // clear drawbales if we are going to advance frames
         if (!m_paused || m_advance)
-            m_drawables.clear();
+            clearDrawables();
         // draw info
         engine.window.setView(engine.window.getDefaultView());
         engine.window.draw(m_infoText);
         updateWidgetMenu();
     }
-    else {
-        // clear drawables if we aren't drawing
-        m_drawables.clear();
-    }
+    else
+        clearDrawables();
+
     // draw paused label
     if (m_paused) {
         engine.window.setView(engine.window.getDefaultView());
@@ -296,6 +269,12 @@ void DebugSystem::updateWidgetMenu() {
         }
         engine.window.draw(m_widgetLabels[i]);
     }
+}
+
+void DebugSystem::clearDrawables() {
+    m_text.clear();
+    m_lines.clear();
+    m_triangles.clear();
 }
 
 

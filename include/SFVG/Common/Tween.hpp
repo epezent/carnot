@@ -1,5 +1,9 @@
 #pragma once
 
+#include <SFVG/Common/Math.hpp>
+#include <SFML/Graphics/Color.hpp>
+#include <SFVG/Graphics/Gradient.hpp>
+
 namespace sfvg {
 
 namespace Tween

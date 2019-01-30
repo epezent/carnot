@@ -15,3 +15,4 @@ target_sources(sfvg
 add_subdirectory(Components)
 add_subdirectory(Fonts)
 add_subdirectory(Systems)
+add_subdirectory(ImGui)

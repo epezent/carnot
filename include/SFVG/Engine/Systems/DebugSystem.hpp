@@ -8,6 +8,9 @@
 namespace sfvg {
 
 #define DEBUG_COLOR               Greens::Chartreuse
+#define DEBUG_XAXIS_COLOR         Reds::Red
+#define DEBUG_YAXIS_COLOR         Greens::Chartreuse
+#define DEBUG_TRANSFORM_COLOR     Whites::White
 #define DEBUG_LOCAL_BOUNDS_COLOR  Blues::Blue
 #define DEBUG_WORLD_BOUNDS_COLOR  Cyans::Cyan
 #define DEBUG_WIREFRAME_COLOR     Yellows::Yellow
@@ -22,6 +25,7 @@ public:
 
     /// Types of Widgets that can be displayed
     enum Widget {
+        Transform,
         LocalBounds,
         WorldBounds,
         Wireframe,
@@ -49,8 +53,8 @@ public:
                    const Color& color = DEBUG_COLOR);
 
     /// Draws a connected polyline between a series of poits in global coordinates
-    void drawLineStrip(const std::vector<Vector2f>& points,
-                   const Color& color = DEBUG_COLOR);
+    void drawPolyline(const std::vector<Vector2f>& points,
+                      const Color& color = DEBUG_COLOR);
 
     /// Draws a triangle in global coordinates
     void drawTriangle(const Vector2f& a, const Vector2f& b, const Vector2f& c,
@@ -96,6 +100,9 @@ private:
     /// Draws Widget Selector
     void updateWidgetMenu();
 
+    /// Clear all drawables
+    void clearDrawables();
+
 private:
 
     bool m_show;
@@ -107,7 +114,9 @@ private:
     Text m_pauseText;
     std::array<Text, WidgetCount> m_widgetLabels;
 
-    std::vector<Ptr<Drawable>> m_drawables;
+    std::vector<Vertex> m_triangles;
+    std::vector<Vertex> m_lines;
+    std::vector<Text> m_text;
 
     Ptr<Info> m_info;
     std::ostringstream m_ss;

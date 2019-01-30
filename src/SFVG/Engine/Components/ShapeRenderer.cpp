@@ -172,7 +172,7 @@ void ShapeRenderer::onDebugRender() {
         auto b = T.transformPoint(bounds.left+bounds.width,bounds.top);
         auto c = T.transformPoint(bounds.left+bounds.width,bounds.top+bounds.height);
         auto d = T.transformPoint(bounds.left,bounds.top+bounds.height);
-        engine.debug.drawLineStrip({a,b,c,d,a},Blues::Blue);
+        engine.debug.drawPolyline({a,b,c,d,a},Blues::Blue);
     }
     // draw world bounds
     if (engine.debug.widgets[DebugSystem::Widget::WorldBounds]) {
@@ -181,7 +181,7 @@ void ShapeRenderer::onDebugRender() {
         auto b = Vector2f(bounds.left+bounds.width,bounds.top);
         auto c = Vector2f(bounds.left+bounds.width,bounds.top+bounds.height);
         auto d = Vector2f(bounds.left,bounds.top+bounds.height);
-        engine.debug.drawLineStrip({a,b,c,d,a},Cyans::Cyan);
+        engine.debug.drawPolyline({a,b,c,d,a},Cyans::Cyan);
     }
     // wireframe
     if (engine.debug.widgets[DebugSystem::Widget::Wireframe]) {
