@@ -115,7 +115,7 @@ int closeKeyboardIME()
 namespace
 {
 // data
-static bool s_windowHasFocus = false;
+static bool s_windowHasFocus = true;
 static bool s_mousePressed[3] = { false, false, false };
 static bool s_touchDown[3] = { false, false, false };
 static bool s_mouseMoved = false;

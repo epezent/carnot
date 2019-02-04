@@ -5,6 +5,8 @@ macro(sfvg_example SFVG_EXAMPLE_NAME)
     set_target_properties(${SFVG_EXAMPLE_NAME} PROPERTIES FOLDER "Examples")
 endmacro()
 
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup")
+
 
 # sfvg_example(color)
 # sfvg_example(coroutine)

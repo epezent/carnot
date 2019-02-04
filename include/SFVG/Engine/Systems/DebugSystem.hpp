@@ -97,8 +97,11 @@ private:
     /// Updates info text
     void updateInfo();
 
+    /// Draws info text
+    void showInfo();
+
     /// Draws Widget Selector
-    void updateWidgetMenu();
+    void showWidgetMenu();
 
     /// Clear all drawables
     void clearDrawables();
@@ -110,16 +113,15 @@ private:
     bool m_paused;
     bool m_advance;
 
-    Text m_infoText;
     Text m_pauseText;
-    std::array<Text, WidgetCount> m_widgetLabels;
 
     std::vector<Vertex> m_triangles;
     std::vector<Vertex> m_lines;
     std::vector<Text> m_text;
 
     Ptr<Info> m_info;
-    std::ostringstream m_ss;
+
+    bool m_widgetFrameActive;
 };
 
 } // namespace sfvg

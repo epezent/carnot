@@ -8,6 +8,8 @@
 #include <SFVG/Engine/Components/Renderer.hpp>
 #include <SFVG/Engine/Components/RigidBody.hpp>
 #include <SFVG/Common/Math.hpp>
+#include <SFVG/Engine/ImGui/imgui.h>
+#include <SFVG/Engine/ImGui/imgui-SFML.h>
 
 namespace sfvg {
 
@@ -20,9 +22,7 @@ namespace {
         "Physics COG",
         "Physics Shapes"
     };
-
     static std::array<Color, DebugSystem::WidgetCount> g_widgetColors;
-
 } // namespace name
 
 struct DebugSystem::Info {
@@ -136,24 +136,9 @@ void DebugSystem::drawText(const std::string& _text,
 
 
 void DebugSystem::start() {
-    m_infoText.setFont(engine.fonts.get("RobotoMonoBold"));
-    m_infoText.setPosition(5, 5);
-    m_infoText.setCharacterSize(20);
-    m_infoText.setFillColor(DEBUG_COLOR);
-    m_infoText.scale(0.5f, 0.5f);
-    m_pauseText = m_infoText;
+    // m_pauseText
     m_pauseText.setString("PAUSED (F2 = RESUME | F3 = STEP)");
     alignTopCenter(m_pauseText);
-
-    // setup widget labels
-    for (std::size_t i = 0; i < WidgetCount; ++i) {
-        m_widgetLabels[i].setFont(engine.fonts.get("RobotoMonoBold"));
-        m_widgetLabels[i].setString(g_widgetNames[i]);
-        m_widgetLabels[i].setFillColor(g_widgetColors[i]);
-        m_widgetLabels[i].setCharacterSize(20);
-        m_widgetLabels[i].scale(0.5f, 0.5f);
-        alignTopLeft(m_widgetLabels[i]);
-    }
 }
 
 void DebugSystem::update() {
@@ -186,8 +171,8 @@ void DebugSystem::update() {
             clearDrawables();
         // draw info
         engine.window.setView(engine.window.getDefaultView());
-        engine.window.draw(m_infoText);
-        updateWidgetMenu();
+        showInfo();
+        showWidgetMenu();
     }
     else
         clearDrawables();
@@ -205,6 +190,18 @@ bool DebugSystem::proceed() {
     bool ret = !m_paused || m_advance;
     m_advance = false;
     return ret;
+}
+
+void showContextMenu(int& corner) {
+    if (ImGui::BeginPopupContextWindow())
+    {
+        if (ImGui::MenuItem("Custom",       NULL, corner == -1)) corner = -1;
+        if (ImGui::MenuItem("Top-left",     NULL, corner == 0)) corner = 0;
+        if (ImGui::MenuItem("Top-right",    NULL, corner == 1)) corner = 1;
+        if (ImGui::MenuItem("Bottom-left",  NULL, corner == 2)) corner = 2;
+        if (ImGui::MenuItem("Bottom-right", NULL, corner == 3)) corner = 3;
+        ImGui::EndPopup();
+    }
 }
 
 void DebugSystem::updateInfo() {
@@ -226,49 +223,54 @@ void DebugSystem::updateInfo() {
         m_info->ramSum = 0;
         m_info->elapsedTime = 0.0f;
     }
-
-    // form string
-    m_ss.str(std::string());
-    m_ss << "CLK:  " << (int)engine.time() << " s\n";
-    m_ss << "FPS:  " << m_info->fpsDisplay << "\n";
-    m_ss << "FRM:  " << m_info->framesDisplay << "\n";
-    m_ss << "CPU:  " << std::setprecision(3) << m_info->cpuDisplay << "%\n";
-    m_ss << "RAM:  " << m_info->ramDisplay << " MB\n";
-    m_ss << "PIX:  " << input.getRawMousePosition().x << "," << input.getRawMousePosition().y << " px\n";
-    m_ss << "X,Y:  " << std::fixed << input.getMousePosition().x << "," << input.getMousePosition().y << "\n";
-    m_ss << "OBJ:  " << Object::getObjectCount() << "\n";
-    m_ss << "RND:  " << Renderer::getRendererCount() << "\n";
-    m_ss << "BDY:  " << RigidBody::getRigidBodyCount() << "\n";
-    m_infoText.setString(m_ss.str());
 }
 
-void DebugSystem::updateWidgetMenu() {
-    // setup widget labels
-    float maxWidth = 0.0f;
-    float maxHeight = 0.0f;
-    for (std::size_t i = 0; i < WidgetCount; ++i) {
-        if (m_widgetLabels[i].getGlobalBounds().width > maxWidth)
-            maxWidth = m_widgetLabels[i].getGlobalBounds().width;
-        if (m_widgetLabels[i].getGlobalBounds().height > maxHeight)
-            maxHeight = m_widgetLabels[i].getGlobalBounds().height;
+void DebugSystem::showInfo() {
+    const float DISTANCE = 10.0f;
+    static int corner = 0;
+    ImGuiIO& io = ImGui::GetIO();
+    ImVec2 window_pos = ImVec2((corner & 1) ? io.DisplaySize.x - DISTANCE : DISTANCE, (corner & 2) ? io.DisplaySize.y - DISTANCE : DISTANCE);
+    ImVec2 window_pos_pivot = ImVec2((corner & 1) ? 1.0f : 0.0f, (corner & 2) ? 1.0f : 0.0f);
+    if (corner != -1)
+        ImGui::SetNextWindowPos(window_pos, ImGuiCond_Always, window_pos_pivot);
+    ImGui::SetNextWindowBgAlpha(0.3f); // Transparent background
+    if (ImGui::Begin("Debug Info", &m_widgetFrameActive, (corner != -1 ? ImGuiWindowFlags_NoMove : 0) | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize /*| ImGuiWindowFlags_AlwaysAutoResize*/ | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav))
+    {
+        ImGui::Text("CLK: %.2f s", engine.time());
+        ImGui::Text("FPS: %u", (int)m_info->fpsDisplay);
+        ImGui::Text("FRM: %u", (int)m_info->framesDisplay);
+        ImGui::Separator();
+        ImGui::Text("CPU: %.2f",   m_info->cpuDisplay);
+        ImGui::Text("RAM: %u MB", (int)m_info->ramDisplay);
+        ImGui::Separator();
+        ImGui::Text("PIX: %d,%d px", input.getRawMousePosition().x, input.getRawMousePosition().y);
+        ImGui::Text("X,Y: %.2f, %.2f", input.getMousePosition().x, input.getMousePosition().y);
+        ImGui::Separator();
+        ImGui::Text("OBJ: %i", (int)Object::getObjectCount());
+        ImGui::Text("RND: %i", (int)Renderer::getRendererCount());
+        ImGui::Text("BDY: %i", (int)RigidBody::getRigidBodyCount());
+        showContextMenu(corner);
     }
-    float width = (float)engine.window.getSize().x;
-    for (std::size_t i = 0; i < WidgetCount; ++i) {
-        m_widgetLabels[i].setPosition(width - 5 - maxWidth, 5 + (maxHeight * 1.4f) * i);
-        if (inBounds(engine.input.getMousePosition(engine.window.getDefaultView()), m_widgetLabels[i].getGlobalBounds())) {
-            m_widgetLabels[i].setFillColor(Whites::White);
-            if (input.getMouseDown(MouseButton::Left)) {
-                widgets[i] = !widgets[i];
-            }
-        }
-        else {
-            if (widgets[i])
-                m_widgetLabels[i].setFillColor(g_widgetColors[i]);
-            else
-                m_widgetLabels[i].setFillColor(Grays::Gray50);
-        }
-        engine.window.draw(m_widgetLabels[i]);
+    ImGui::End();
+}
+
+
+void DebugSystem::showWidgetMenu() {
+    const float DISTANCE = 10.0f;
+    static int corner = 1;
+    ImGuiIO& io = ImGui::GetIO();
+    ImVec2 window_pos = ImVec2((corner & 1) ? io.DisplaySize.x - DISTANCE : DISTANCE, (corner & 2) ? io.DisplaySize.y - DISTANCE : DISTANCE);
+    ImVec2 window_pos_pivot = ImVec2((corner & 1) ? 1.0f : 0.0f, (corner & 2) ? 1.0f : 0.0f);
+    if (corner != -1)
+        ImGui::SetNextWindowPos(window_pos, ImGuiCond_Always, window_pos_pivot);
+    ImGui::SetNextWindowBgAlpha(0.3f); // Transparent background
+    if (ImGui::Begin("Debug Widgets", &m_widgetFrameActive, (corner != -1 ? ImGuiWindowFlags_NoMove : 0) | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav))
+    {
+        for (std::size_t i = 0; i < WidgetCount; ++i)
+            ImGui::Selectable(g_widgetNames[i].c_str(), &widgets[i]);
+        showContextMenu(corner);
     }
+    ImGui::End();
 }
 
 void DebugSystem::clearDrawables() {

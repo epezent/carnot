@@ -1,4 +1,4 @@
-#include <SFVG/SFVG.hpp>
+#include "imgui_demo.cpp"
 
 using namespace sfvg;
 
@@ -8,50 +8,48 @@ public:
         sr = addComponent<ShapeRenderer>();
         sr->setColor(Whites::White);
         sr->shape = PolygonShape(6, PolygonShape::CircumscribedRadius, 100);
+        engine.textures.load("paper", "../../textures/paper.png");
     }
 
     void guiCode() {
-        ImGui::Begin("My First Tool", &my_tool_active, ImGuiWindowFlags_MenuBar);
-        if (ImGui::BeginMenuBar())
+
+        const float DISTANCE = 10.0f;
+        static int corner = 0;
+        ImGuiIO& io = ImGui::GetIO();
+        ImVec2 window_pos = ImVec2((corner & 1) ? io.DisplaySize.x - DISTANCE : DISTANCE, (corner & 2) ? io.DisplaySize.y - DISTANCE : DISTANCE);
+        ImVec2 window_pos_pivot = ImVec2((corner & 1) ? 1.0f : 0.0f, (corner & 2) ? 1.0f : 0.0f);
+        static bool selection[6] = { false, true, false, false, false, true };
+
+        if (corner != -1)
+            ImGui::SetNextWindowPos(window_pos, ImGuiCond_Always, window_pos_pivot);
+        ImGui::SetNextWindowBgAlpha(0.3f); // Transparent background
+        if (ImGui::Begin("SFVG Gizmos", &my_tool_active, (corner != -1 ? ImGuiWindowFlags_NoMove : 0) | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav))
         {
-            if (ImGui::BeginMenu("File"))
+            ImGui::Selectable("Transform", &selection[0]);
+            ImGui::Selectable("Local Bounds", &selection[1]);
+            ImGui::Selectable("World Bounds", &selection[2]);
+            ImGui::Selectable("Wireframe", &selection[3]);
+            ImGui::Selectable("Physics COG", &selection[4]);
+            ImGui::Selectable("Physics Shape", &selection[5]);
+            if (ImGui::BeginPopupContextWindow())
             {
-                if (ImGui::MenuItem("Open..", "Ctrl+O")) { /* Do stuff */ }
-                if (ImGui::MenuItem("Save", "Ctrl+S")) {
-                    print("Saved!");
-                }
-                if (ImGui::MenuItem("Close", "Ctrl+W")) { my_tool_active = false; }
-                ImGui::EndMenu();
+                if (ImGui::MenuItem("Custom",       NULL, corner == -1)) corner = -1;
+                if (ImGui::MenuItem("Top-left",     NULL, corner == 0)) corner = 0;
+                if (ImGui::MenuItem("Top-right",    NULL, corner == 1)) corner = 1;
+                if (ImGui::MenuItem("Bottom-left",  NULL, corner == 2)) corner = 2;
+                if (ImGui::MenuItem("Bottom-right", NULL, corner == 3)) corner = 3;
+                if (my_tool_active && ImGui::MenuItem("Close")) my_tool_active = false;
+                ImGui::EndPopup();
             }
-            ImGui::EndMenuBar();
         }
-
-        // Edit a color (stored as ~4 floats)
-        ImGui::ColorEdit4("Color", my_color);
-        // Plot some values
-        const float my_values[] = { 0.2f, 0.1f, 1.0f, 0.5f, 0.9f, 2.2f };
-        ImGui::PlotLines("Frame Times", my_values, IM_ARRAYSIZE(my_values));
-
-        // Display contents in a scrolling region
-        ImGui::TextColored(ImVec4(1, 1, 0, 1), "Important Stuff");
-        ImGui::BeginChild("Scrolling");
-        for (int n = 0; n < 50; n++)
-            ImGui::Text("%04d: Some text", n);
-        ImGui::EndChild();
         ImGui::End();
-
-        Color col;
-        col.r = my_color[0] * 255;
-        col.g = my_color[1] * 255;
-        col.b = my_color[2] * 255;
-        col.a = my_color[3] * 255;
-
-        sr->setColor(col);
     }
 
     void update() {
-        guiCode();
+        //guiCode();
+        ImGui::ShowDemoWindow(&my_tool_active);
     }
+
 
     float my_color[4] = { 0.5, 0.5, 0.5, 0.5 };
     bool my_tool_active;
@@ -68,4 +66,3 @@ int main(int argc, char const *argv[])
     engine.run();
     return 0;
 }
-

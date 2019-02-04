@@ -50,7 +50,6 @@ Engine::Engine(unsigned int width, unsigned int height, unsigned int style) :
     settings.antialiasingLevel = 8;
     window.create(sf::VideoMode(width, height), "", style, settings);
     window.setFramerateLimit(60);
-    //window.requestFocus();
     // initialize imgui
     ImGui::SFML::Init(window);
     ImGuiIO& IO = ImGui::GetIO();
@@ -66,6 +65,7 @@ Engine::Engine(unsigned int width, unsigned int height, unsigned int style) :
     // m_views[0].setCenter(width * 0.5f, height * 0.5f);
     // loaded
     g_engineLoaded = true;
+    window.requestFocus();
 }
 
 Engine::~Engine() {
@@ -110,13 +110,12 @@ void Engine::run() {
         window.clear(m_backgroundColor);
         // render
         render();
-
-        // draw imgui
-        ImGui::SFML::Render(window);
         // update debug
         if (debug.isShown())
             m_root->onDebugRender();
         debug.update();
+        // draw imgui
+        ImGui::SFML::Render(window);
         // display window
         window.display();
     }
