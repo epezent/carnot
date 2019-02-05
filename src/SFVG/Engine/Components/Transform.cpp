@@ -34,10 +34,7 @@ Transform::Transform(GameObject& _gameObject) :
 void Transform::setLocalPosition(float x, float y) {
     m_position.x = x;
     m_position.y = y;
-    m_localTransformDirty = true;
-    m_invLocalTransformDirty = true;
-    m_worldTransformDirty = true;
-    m_invWorldTransformDirty = true;
+    makeDirty();
 }
 
 void Transform::setLocalPosition(const Vector2f& position) {
@@ -48,20 +45,13 @@ void Transform::setLocalRotation(float angle) {
     m_rotation = static_cast<float>(fmod(angle, 360));
     if (m_rotation < 0)
         m_rotation += 360.f;
-
-    m_localTransformDirty = true;
-    m_invLocalTransformDirty = true;
-    m_worldTransformDirty = true;
-    m_invWorldTransformDirty = true;
+    makeDirty();
 }
 
 void Transform::setLocalScale(float factorX, float factorY) {
     m_scale.x = factorX;
     m_scale.y = factorY;
-    m_localTransformDirty = true;
-    m_invLocalTransformDirty = true;
-    m_worldTransformDirty = true;
-    m_invWorldTransformDirty = true;
+    makeDirty();
 }
 
 void Transform::setLocalScale(const Vector2f& factors) {
@@ -71,10 +61,7 @@ void Transform::setLocalScale(const Vector2f& factors) {
 void Transform::setLocalOrigin(float x, float y) {
     m_origin.x = x;
     m_origin.y = y;
-    m_localTransformDirty = true;
-    m_invLocalTransformDirty = true;
-    m_worldTransformDirty = true;
-    m_invWorldTransformDirty = true;
+    makeDirty();
 }
 
 void Transform::setLocalOrigin(const Vector2f& origin) {
@@ -216,6 +203,13 @@ const Vector2f Transform::getScale() const {
 // Utility Functions
 //==========================================================================
 
+// SFML Transform.getMatrix()
+//     m_localTransform.getMatrix();
+//     [m0  m4  m8  m12]    []
+//     [m1  m5  m9  m13]
+//     [m2  m6  m10 m14]
+//     [m3  m4  m11 m15]
+
 Vector2f Transform::localToWorld(const Vector2f& point) {
     return getWorldMatrix().transformPoint(point);
 }
@@ -252,11 +246,30 @@ void Transform::onDebugRender() {
     }
 }
 
-// SFML Transform.getMatrix()
-//     m_localTransform.getMatrix();
-//     [m0  m4  m8  m12]    []
-//     [m1  m5  m9  m13]
-//     [m2  m6  m10 m14]
-//     [m3  m4  m11 m15]
+void Transform::makeDirty() {
+    m_localTransformDirty = true;
+    m_invLocalTransformDirty = true;
+    m_worldTransformDirty = true;
+    m_invWorldTransformDirty = true;
+    callCallbacks();
+}
+
+//==============================================================================
+// Callbacks
+//==============================================================================
+
+void Transform::registerCallback(std::function<void(void)> callback) {
+    m_callbacks.push_back(callback);
+}
+
+void Transform::callCallbacks() {
+    // call our callbacks
+    for (auto& c : m_callbacks)
+        c();
+    // call children callbacks
+    for (std::size_t i = 0; i < gameObject.getChildCount(); ++i)
+        gameObject.getChild(i)->transform.callCallbacks();
+}
 
 } // namespace sfvg
+

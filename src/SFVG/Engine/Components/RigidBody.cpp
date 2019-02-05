@@ -38,12 +38,11 @@ RigidBody::RigidBody(GameObject& _gameObject, BodyType type, float mass, float m
     m_body = cpBodyNew((cpFloat)mass, (cpFloat)moment);
     setBodyType(type);
     // set initial position
-    auto position = gameObject.transform.getPosition();
-    auto rotation = gameObject.transform.getRotation();
-    cpBodySetPosition(m_body, sf2cp(position));
-    cpBodySetAngle(m_body, (cpFloat)rotation);
+    syncTransform();
     cpSpaceAddBody(engine.physics.m_space, m_body);
     g_rigidBodyCount++;
+    // register with Transform
+    gameObject.transform.registerCallback(std::bind(&RigidBody::syncTransform, this));
 }
 
 RigidBody::~RigidBody() {
@@ -304,6 +303,15 @@ void RigidBody::onDebugRender() {
         engine.debug.drawPoint(cog - Vector2f(2,2), DEBUG_PHYSICS_COG_COLOR);
 
     }
+}
+
+//==============================================================================
+// PRIVATE
+//==============================================================================
+
+void RigidBody::syncTransform() {
+    setPosition(gameObject.transform.getPosition());
+    setRotation(gameObject.transform.getRotation());
 }
 
 } // namespace sfvg

@@ -125,8 +125,10 @@ public:
     /// Gets the number of RigidBodys currently in the Engine
     static std::size_t getRigidBodyCount();
 
-protected:
+private:
 
+    /// Syncs RigidBody position/rotation with Transform
+    void syncTransform();
     /// Updates GameObject transform
     void onPhysics() override;
     /// Draws Shapes and RigidBody info

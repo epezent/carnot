@@ -29,13 +29,39 @@ public:
         reset();
     }
 
+    void update() {
+        if (input.getKeyDown(Key::R))
+            reset();
+    }
+
     void reset() {
-        rb->setPosition(500,250);
-        rb->setVelocity(random(-1000,1000),random(-250,250));
+        transform.setPosition(500,250);
+        rb->setVelocity(unit(Vector2f(random(-10.0f,10.0f),random(-2.0f,2.0f)))*750.0f);
     }
 
     Handle<RigidBody> rb;
-    Handle<RigidBody> sr;
+};
+
+class Paddle : public GameObject {
+public:
+    Paddle(Engine& e) : GameObject(e) {
+        auto sr = addComponent<ShapeRenderer>();
+        sr->setColor(Color::White);
+        sr->shape = RectangleShape(10,100);
+        transform.setPosition(125,250);
+        rb = addComponent<RigidBody>(RigidBody::Kinematic);
+        rb->addBoxShape(10, 100);
+        rb->setShapeElasticity(0, 1.0f);
+    }
+
+    void update() override {
+        if (input.getKey(Key::Up))
+            rb->setPosition(rb->getPosition() + Vector2f(0,-500) * engine.deltaTime());
+        else if (input.getKey(Key::Down))
+            rb->setPosition(rb->getPosition() + Vector2f(0,500) * engine.deltaTime());
+    }
+
+    Handle <RigidBody> rb;
 };
 
 class Pong : public GameObject {
@@ -46,9 +72,11 @@ public:
         makeChild<Wall>(1000,10,500,5);
         makeChild<Wall>(1000,10,500,495);
         ball = makeChild<Ball>();
+        paddle = makeChild<Paddle>();
     }
 
     Handle<Ball> ball;
+    Handle<Paddle> paddle;
 };
 
 int main(int argc, char const *argv[])
