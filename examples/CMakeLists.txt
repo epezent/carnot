@@ -13,7 +13,7 @@ set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:WINDOWS /ENTRY:
 sfvg_example(engine)
 # sfvg_example(online)
 sfvg_example(physics)
-# sfvg_example(pong)
+sfvg_example(pong)
 # sfvg_example(shapes)
 # sfvg_example(tween)
 # sfvg_example(turbulent)

@@ -10,6 +10,7 @@
 #include <SFVG/Common/Math.hpp>
 #include <SFVG/Engine/ImGui/imgui.h>
 #include <SFVG/Engine/ImGui/imgui-SFML.h>
+#include <SFVG/Engine/FontAwesome5.hpp>
 
 namespace sfvg {
 
@@ -159,6 +160,10 @@ void DebugSystem::update() {
     updateInfo();
     // draw debug
     if (m_show) {
+        // imgui
+        showInfo();
+        showWidgetMenu();
+        showPlayMenu();
         // draw drawables
         if (m_triangles.size() > 0)
             engine.window.draw(&m_triangles[0], m_triangles.size(), sf::Triangles);
@@ -169,10 +174,6 @@ void DebugSystem::update() {
         // clear drawbales if we are going to advance frames
         if (!m_paused || m_advance)
             clearDrawables();
-        // draw info
-        engine.window.setView(engine.window.getDefaultView());
-        showInfo();
-        showWidgetMenu();
     }
     else
         clearDrawables();
@@ -206,17 +207,17 @@ void showContextMenu(int& corner) {
 
 void DebugSystem::updateInfo() {
     m_info->frames++;
-    m_info->cpuSum      += cpu_usage_process();
-    m_info->ramSum      += ram_used_process() / 1000000;
-    m_info->elapsedTime += engine.deltaTime();
+    m_info->cpuSum       += cpu_usage_process();
+    m_info->ramSum       += ram_used_process() / 1000000;
+    m_info->elapsedTime  += engine.deltaTime();
+    m_info->framesDisplay = engine.frame();
 
-    // update every second
+    // updated every second
     if (m_info->elapsedTime >= 1.0) {
         // calculate averages
         m_info->fpsDisplay = m_info->frames;
         m_info->cpuDisplay = m_info->cpuSum / m_info->frames;
         m_info->ramDisplay = m_info->ramSum / m_info->frames;
-        m_info->framesDisplay = engine.frame();
         // reset
         m_info->frames = 0;
         m_info->cpuSum = 0.0;
@@ -225,30 +226,87 @@ void DebugSystem::updateInfo() {
     }
 }
 
+void DebugSystem::showPlayMenu() {
+    const float DISTANCE = 10.0f;
+    ImGuiIO& io = ImGui::GetIO();
+    ImVec2 window_pos = ImVec2(io.DisplaySize.x * 0.5f, DISTANCE);
+    ImVec2 window_piv = ImVec2(0.5f, 0.0f);
+    ImGui::SetNextWindowPos(window_pos, ImGuiCond_Always, window_piv);
+    ImGui::SetNextWindowBgAlpha(0.3f); // Transparent background
+    if (ImGui::Begin("Play Menu", &m_widgetFrameActive, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize /*| ImGuiWindowFlags_AlwaysAutoResize*/ | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav))
+    {
+
+        if (!m_paused) {
+            if (ImGui::Button(ICON_FA_PAUSE))
+                m_paused = true;
+            if (ImGui::IsItemHovered())
+                ImGui::SetTooltip("Pause Game (F2)");
+        }
+        else {
+            if (ImGui::Button(ICON_FA_PLAY))
+                m_paused = false;
+            if (ImGui::IsItemHovered())
+                ImGui::SetTooltip("Play Game (F2)");
+        }
+        ImGui::SameLine();
+        if (ImGui::Button(ICON_FA_STEP_FORWARD)) {
+            if (!m_paused)
+                m_paused = !m_paused;
+            else
+                m_advance = true;
+        }            
+        if (ImGui::IsItemHovered())
+            ImGui::SetTooltip("Step Game (F3)");
+    }
+    ImGui::End();
+}
+
 void DebugSystem::showInfo() {
     const float DISTANCE = 10.0f;
     static int corner = 0;
     ImGuiIO& io = ImGui::GetIO();
     ImVec2 window_pos = ImVec2((corner & 1) ? io.DisplaySize.x - DISTANCE : DISTANCE, (corner & 2) ? io.DisplaySize.y - DISTANCE : DISTANCE);
-    ImVec2 window_pos_pivot = ImVec2((corner & 1) ? 1.0f : 0.0f, (corner & 2) ? 1.0f : 0.0f);
+    ImVec2 window_piv = ImVec2((corner & 1) ? 1.0f : 0.0f, (corner & 2) ? 1.0f : 0.0f);
     if (corner != -1)
-        ImGui::SetNextWindowPos(window_pos, ImGuiCond_Always, window_pos_pivot);
+        ImGui::SetNextWindowPos(window_pos, ImGuiCond_Always, window_piv);
     ImGui::SetNextWindowBgAlpha(0.3f); // Transparent background
     if (ImGui::Begin("Debug Info", &m_widgetFrameActive, (corner != -1 ? ImGuiWindowFlags_NoMove : 0) | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize /*| ImGuiWindowFlags_AlwaysAutoResize*/ | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav))
     {
         ImGui::Text("CLK: %.2f s", engine.time());
+        if (ImGui::IsItemHovered()) ImGui::SetTooltip("Current time");
+
         ImGui::Text("FPS: %u", (int)m_info->fpsDisplay);
+        if (ImGui::IsItemHovered()) ImGui::SetTooltip("Frames per second");
+
         ImGui::Text("FRM: %u", (int)m_info->framesDisplay);
+        if (ImGui::IsItemHovered()) ImGui::SetTooltip("Current frame");
+
         ImGui::Separator();
         ImGui::Text("CPU: %.2f",   m_info->cpuDisplay);
+        if (ImGui::IsItemHovered()) ImGui::SetTooltip("Percent CPU utilized");
+
         ImGui::Text("RAM: %u MB", (int)m_info->ramDisplay);
+        if (ImGui::IsItemHovered()) ImGui::SetTooltip("Amount of RAM used");
+
         ImGui::Separator();
         ImGui::Text("PIX: %d,%d px", input.getRawMousePosition().x, input.getRawMousePosition().y);
+        if (ImGui::IsItemHovered()) ImGui::SetTooltip("Mouse pixel position");
+
+
         ImGui::Text("X,Y: %.2f, %.2f", input.getMousePosition().x, input.getMousePosition().y);
+        if (ImGui::IsItemHovered()) ImGui::SetTooltip("Mouse world position");
+
         ImGui::Separator();
         ImGui::Text("OBJ: %i", (int)Object::getObjectCount());
+        if (ImGui::IsItemHovered()) ImGui::SetTooltip("Total Object count");
+
         ImGui::Text("RND: %i", (int)Renderer::getRendererCount());
+        if (ImGui::IsItemHovered()) ImGui::SetTooltip("Total Renderer count");
+
         ImGui::Text("BDY: %i", (int)RigidBody::getRigidBodyCount());
+        if (ImGui::IsItemHovered()) ImGui::SetTooltip("Total RigidBody count");
+
+
         showContextMenu(corner);
     }
     ImGui::End();
@@ -260,9 +318,9 @@ void DebugSystem::showWidgetMenu() {
     static int corner = 1;
     ImGuiIO& io = ImGui::GetIO();
     ImVec2 window_pos = ImVec2((corner & 1) ? io.DisplaySize.x - DISTANCE : DISTANCE, (corner & 2) ? io.DisplaySize.y - DISTANCE : DISTANCE);
-    ImVec2 window_pos_pivot = ImVec2((corner & 1) ? 1.0f : 0.0f, (corner & 2) ? 1.0f : 0.0f);
+    ImVec2 window_piv = ImVec2((corner & 1) ? 1.0f : 0.0f, (corner & 2) ? 1.0f : 0.0f);
     if (corner != -1)
-        ImGui::SetNextWindowPos(window_pos, ImGuiCond_Always, window_pos_pivot);
+        ImGui::SetNextWindowPos(window_pos, ImGuiCond_Always, window_piv);
     ImGui::SetNextWindowBgAlpha(0.3f); // Transparent background
     if (ImGui::Begin("Debug Widgets", &m_widgetFrameActive, (corner != -1 ? ImGuiWindowFlags_NoMove : 0) | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav))
     {

@@ -24,8 +24,8 @@ public:
     /// Gets the global gravity vector
     Vector2f getGravity() const;
 
-    /// Set global damping for 0 to 1 (default = 1)
-    void setDamping(float daping);
+    /// Set global damping for 0 to 1 (default = 0.9)
+    void setDamping(float damping);
     /// Get global damping
     float getDamping() const;
 

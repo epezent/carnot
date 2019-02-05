@@ -34,6 +34,18 @@ public:
     // PROPERTIES
     //==============================================================================
 
+    /// Sets the RigidBody position (world coordinates)
+    void setPosition(const Vector2f& position);
+    /// Sets the RigidBody position (world coordinates)
+    void setPosition(float x, float y);
+    /// Gets the RigidBody position (world coordinates)
+    Vector2f getPosition() const;
+
+    /// Sets the global rotation of the Object
+    void setRotation(float angle);
+    /// Gets the global rotation of the Object
+    float getRotation() const;
+
     /// Sets the BodyType
     void setBodyType(BodyType type);
     /// Gets the BodyType
@@ -92,6 +104,8 @@ public:
 
     /// Set RigidBody velocity
     void setVelocity(const Vector2f& velocity);
+    /// Set RigidBody velocity
+    void setVelocity(float vx, float vy);
     /// Get RigidBody velocity
     Vector2f getVelocity() const;
 
@@ -101,6 +115,8 @@ public:
 
     /// Apply force to RigidBody center
     void applyForceToCenter(const Vector2f& force);
+    /// Apply force to RigidBody center
+    void applyForceToCenter(float fx, float fy);
     /// Apply torque to RigidBody center
     void applyTorqueToCenter(float torque);
 

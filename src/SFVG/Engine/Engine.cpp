@@ -6,7 +6,7 @@
 #include <SFVG/Engine/Components/Renderer.hpp>
 #include <SFVG/Engine/ImGui/imgui.h>
 #include <SFVG/Engine/ImGui/imgui-SFML.h>
-
+#include <SFVG/Engine/FontAwesome5.hpp>
 
 namespace sfvg {
 
@@ -50,14 +50,24 @@ Engine::Engine(unsigned int width, unsigned int height, unsigned int style) :
     settings.antialiasingLevel = 8;
     window.create(sf::VideoMode(width, height), "", style, settings);
     window.setFramerateLimit(60);
+
     // initialize imgui
     ImGui::SFML::Init(window);
-    ImGuiIO& IO = ImGui::GetIO();
-    IO.Fonts->Clear();
-    //IO.Fonts->AddFontFromFileTTF("Roboto-Regular.ttf", 20.0);
-    unsigned char* fontCopy = new unsigned char[RobotoMono_Bold_ttf_len];
-    std::memcpy(fontCopy, &RobotoMono_Bold_ttf, RobotoMono_Bold_ttf_len);
-    IO.Fonts->AddFontFromMemoryTTF(fontCopy, RobotoMono_Bold_ttf_len, 15.0f);
+    ImGuiIO& io = ImGui::GetIO();
+    io.Fonts->Clear();
+    unsigned char* fontCopy1 = new unsigned char[RobotoMono_Bold_ttf_len];
+    std::memcpy(fontCopy1, &RobotoMono_Bold_ttf, RobotoMono_Bold_ttf_len);
+    io.Fonts->AddFontFromMemoryTTF(fontCopy1, RobotoMono_Bold_ttf_len, 14.0f);
+    // merge in icons from font awesome
+    static const ImWchar icons_ranges[] = { ICON_MIN_FA, ICON_MAX_FA, 0 };
+    ImFontConfig icons_config;
+    icons_config.MergeMode = true;
+    icons_config.PixelSnapH = true;
+    icons_config.GlyphMinAdvanceX = 14.0f;
+    unsigned char* fontCopy2 = new unsigned char[fa_solid_900_ttf_len];
+    std::memcpy(fontCopy2, &fa_solid_900_ttf, fa_solid_900_ttf_len);
+    io.Fonts->AddFontFromMemoryTTF(fontCopy2, fa_solid_900_ttf_len, 10.0f, &icons_config, icons_ranges );
+
     ImGui::SFML::UpdateFontTexture();
     //ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[0]);
     // set Window view
@@ -114,6 +124,7 @@ void Engine::run() {
         if (debug.isShown())
             m_root->onDebugRender();
         debug.update();
+        window.setView(window.getDefaultView());
         // draw imgui
         ImGui::SFML::Render(window);
         // display window
@@ -271,12 +282,13 @@ namespace {
 
 void Engine::loadBuiltInResources() {
     // fonts
-    fonts.load("Roboto",           &Roboto_Regular_ttf,     Roboto_Regular_ttf_len);
-    fonts.load("RobotoBold",       &Roboto_Bold_ttf,        Roboto_Bold_ttf_len);
-    fonts.load("RobotoItalic",     &Roboto_Italic_ttf,      Roboto_Italic_ttf_len);
-    fonts.load("RobotoMono",       &RobotoMono_Regular_ttf, RobotoMono_Regular_ttf_len);
-    fonts.load("RobotoMonoBold",   &RobotoMono_Bold_ttf,    RobotoMono_Bold_ttf_len);
-    fonts.load("RobotoMonoItalic", &RobotoMono_Italic_ttf,  RobotoMono_Italic_ttf_len);
+    fonts.load("Roboto",           &Roboto_Regular_ttf,      Roboto_Regular_ttf_len);
+    fonts.load("RobotoBold",       &Roboto_Bold_ttf,         Roboto_Bold_ttf_len);
+    fonts.load("RobotoItalic",     &Roboto_Italic_ttf,       Roboto_Italic_ttf_len);
+    fonts.load("RobotoMono",       &RobotoMono_Regular_ttf,  RobotoMono_Regular_ttf_len);
+    fonts.load("RobotoMonoBold",   &RobotoMono_Bold_ttf,     RobotoMono_Bold_ttf_len);
+    fonts.load("RobotoMonoItalic", &RobotoMono_Italic_ttf,   RobotoMono_Italic_ttf_len);
+    fonts.load("FontAwesome5",     &fa_solid_900_ttf,        fa_solid_900_ttf_len);
     // shaders
     shaders.load("Solid"   ,g_solidShaderGlsl,    sf::Shader::Fragment);
     shaders.load("Gradient",g_gradientShaderGlsl, sf::Shader::Fragment);

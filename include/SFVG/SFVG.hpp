@@ -14,6 +14,7 @@
 #include <SFVG/Engine/Component.hpp>
 #include <SFVG/Engine/Coroutine.hpp>
 #include <SFVG/Engine/Engine.hpp>
+#include <SFVG/Engine/FontAwesome5.hpp>
 #include <SFVG/Engine/GameObject.hpp>
 #include <SFVG/Engine/Handle.hpp>
 #include <SFVG/Engine/Id.hpp>

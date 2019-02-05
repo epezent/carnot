@@ -103,6 +103,9 @@ private:
     /// Draws Widget Selector
     void showWidgetMenu();
 
+    /// Draws Play Menu
+    void showPlayMenu();
+
     /// Clear all drawables
     void clearDrawables();
 
