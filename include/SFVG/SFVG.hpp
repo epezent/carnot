@@ -24,6 +24,7 @@
 #include <SFVG/Engine/System.hpp>
 #include <SFVG/Engine/XboxController.hpp>
 
+#include <SFVG/Engine/Components/LineRenderer.hpp>
 #include <SFVG/Engine/Components/Renderer.hpp>
 #include <SFVG/Engine/Components/RigidBody.hpp>
 #include <SFVG/Engine/Components/ShapeRenderer.hpp>
@@ -49,7 +50,6 @@
 #include <SFVG/Geometry/Shape.hpp>
 #include <SFVG/Geometry/SquareShape.hpp>
 #include <SFVG/Geometry/StarShape.hpp>
-#include <SFVG/Geometry/Stroke.hpp>
 
 #include <SFVG/Graphics/Color.hpp>
 #include <SFVG/Graphics/Gradient.hpp>

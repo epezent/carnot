@@ -6,11 +6,6 @@
 
 namespace sfvg {
 
-template <typename T = int>
-struct X {
-    T t;
-};
-
 ShapeRenderer::ShapeRenderer(GameObject& _gameObject) :
     Renderer(_gameObject),
     m_texture(NULL),

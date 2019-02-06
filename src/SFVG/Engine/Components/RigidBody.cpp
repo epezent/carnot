@@ -38,11 +38,11 @@ RigidBody::RigidBody(GameObject& _gameObject, BodyType type, float mass, float m
     m_body = cpBodyNew((cpFloat)mass, (cpFloat)moment);
     setBodyType(type);
     // set initial position
-    syncTransform();
+    syncWithTransform();
     cpSpaceAddBody(engine.physics.m_space, m_body);
     g_rigidBodyCount++;
     // register with Transform
-    gameObject.transform.registerCallback(std::bind(&RigidBody::syncTransform, this));
+    gameObject.transform.registerCallback(std::bind(&RigidBody::syncWithTransform, this));
 }
 
 RigidBody::~RigidBody() {
@@ -309,7 +309,7 @@ void RigidBody::onDebugRender() {
 // PRIVATE
 //==============================================================================
 
-void RigidBody::syncTransform() {
+void RigidBody::syncWithTransform() {
     setPosition(gameObject.transform.getPosition());
     setRotation(gameObject.transform.getRotation());
 }

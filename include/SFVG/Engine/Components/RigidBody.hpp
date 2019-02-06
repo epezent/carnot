@@ -128,7 +128,7 @@ public:
 private:
 
     /// Syncs RigidBody position/rotation with Transform
-    void syncTransform();
+    void syncWithTransform();
     /// Updates GameObject transform
     void onPhysics() override;
     /// Draws Shapes and RigidBody info

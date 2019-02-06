@@ -10,7 +10,6 @@ target_sources(sfvg
       Shape.cpp
       SquareShape.cpp
       StarShape.cpp
-      Stroke.cpp
 )
 
 # add the subdirectories to get source files

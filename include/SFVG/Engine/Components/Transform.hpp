@@ -130,7 +130,7 @@ private:
     mutable bool      m_invLocalTransformDirty; ///< Does the transform need to be recomputed?
     mutable bool      m_invWorldTransformDirty; ///< Does the transform need to be recomputed?
 
-    std::vector<std::function<void(void)>> m_callbacks;
+    std::vector<std::function<void(void)>> m_callbacks;  ///< callbacks called when Transform changes
 
 };
 
