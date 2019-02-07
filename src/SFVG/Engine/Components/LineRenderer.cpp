@@ -157,6 +157,78 @@ namespace sfvg {
 
     void LineRenderer::updateVertexArray() const {
 
+        // clear vertex array
+        m_vertexArray.clear();
+
+        // can't draw a line with 0 or 1 points
+        if (m_points.size() < 2)
+            return;
+
+        // declare variables
+        sf::Vector2f A, B, C, M1, M2, X1, X2;
+        sf::Vector2f N, T, M;
+        sf::Vector2f v0, v1, v2;
+        float lM, lX;
+        float halfThickness = m_thickness * 0.5f;
+
+        // first point
+        N = unit(normal(m_points[1] - m_points[0]));
+        v0 = m_points[0] + N * halfThickness;
+        v1 = m_points[0] - N * halfThickness;
+
+        // inner points
+        for (std::size_t i = 1; i < m_points.size() - 1; ++i) {
+            A = m_points[i - 1];                 // previous point
+            B = m_points[i];                     // this point
+            C = m_points[i + 1];                 // next point
+            N = unit(normal(B - A));             // normal vector to AB
+            T = unit(unit(C - B) + unit(B - A)); // tangent vector at B
+            M = normal(T);                       // miter direction
+            lM = halfThickness / dot(M, N);      // half miter length
+            M1 = B + M * lM;                     // first miter point
+            M2 = B - M * lM;                     // second miter point
+
+            if (lM > m_miterLimit * halfThickness) {
+
+                lX = halfThickness / dot(T, N);
+                X1 = B + T * lX;
+                X2 = B - T * lX;
+
+                PUSH_BACK_TRIANGLE(v0, v1, X1);
+                PUSH_BACK_TRIANGLE(v1, X1, X2);
+                v0 = X2;
+                v1 = X1;
+            }
+            else {
+                PUSH_BACK_TRIANGLE(v0, v1, M1);
+                PUSH_BACK_TRIANGLE(v1, M1, M2);
+                v0 = M1; // M1
+                v1 = M2; // M2
+            }
+        }
+
+        // last point
+        std::size_t i = m_points.size() - 1;
+        N = unit(normal(m_points[i] - m_points[i - 1]));
+        v2 = m_points[i] + N * halfThickness;
+
+        PUSH_BACK_TRIANGLE(v0, v1, v2);
+        PUSH_BACK_TRIANGLE(v1, v2, m_points[i] - N * halfThickness);
+
+        // update each vertex color
+        for (auto& vertex : m_vertexArray)
+            vertex.color = m_color;
+
+    }
+
+    //==============================================================================
+    // TRANSPARENCY VERSION
+    //==============================================================================
+
+    /*
+
+    void LineRenderer::updateVertexArray() const {
+
         // can't draw a line with 0 or 1 points
         if (m_points.size() < 2)
             return;
@@ -237,53 +309,6 @@ namespace sfvg {
         PUSH_BACK_TRIANGLE(v1, v2, m_points[i] - N * halfThickness);
 
     }
-
-    /*
-    void LineRenderer::updateVertexArray() const {
-        if (m_points.size() < 2)
-            return;
-        // clear and reserve vertex array
-        m_vertexArray.clear();
-        m_vertexArray.reserve(m_points.size() * 2);
-        // declare variables
-        Point A, B, C, N, T, M;
-        float halfThickness = m_thickness * 0.5f;
-        // first point
-        N = unit(normal(m_points[1] - m_points[0]));
-        m_vertexArray.push_back(m_points[0] + N * halfThickness);
-        m_vertexArray.push_back(m_points[0] - N * halfThickness);
-        // inner points
-        std::size_t a = 0;
-        for (std::size_t i = 1; i < m_points.size()-1; ++i) {
-            A = m_points[a];   // previous point
-            B = m_points[i];   // this point
-            C = m_points[i+1]; // next point
-            N = unit(normal(B-A));           // normal vector to AB
-            T = unit(unit(C-B) + unit(B-A)); // tangent vector at B
-            M = normal(T);                   // miter direction
-            float dotMN = dot(M,N);
-            float offset = halfThickness / dotMN; // offset length along miter
-            // determine if angle is sharp!
-            if (std::abs(angle(B - A, B - C)) < 10.0f * DEG2RAD)
-                std::cout << "Sharp Angle!" << std::endl;
-
-
-            // make sure AB an BC aren't parallel
-            if (!approximately(dotMN, 1.0, SFVG_PRECISION))
-            {
-                Point M1 = B + M * offset;
-                Point M2 = B - M * offset;
-                m_vertexArray.push_back(M1);
-                m_vertexArray.push_back(M2);
-                a = i;
-            }
-        }
-        // last point
-        std::size_t i = m_points.size()-1;
-        N = unit(normal(m_points[i] - m_points[i-1]));
-        m_vertexArray.push_back(m_points[i] + N * halfThickness);
-        m_vertexArray.push_back(m_points[i] - N * halfThickness);
-    }
     */
 
     void LineRenderer::updateBounds() const {
@@ -336,7 +361,8 @@ namespace sfvg {
             m_states.texture = SFVG_WHITE_TEXTURE;
         if (!m_hasSolidFill)
             m_states.shader = m_gradient.getShader();
-        target.draw(&m_vertexArray[0], m_vertexArray.size(), sf::Triangles, m_states);
+        if (m_vertexArray.size() > 0)
+            target.draw(&m_vertexArray[0], m_vertexArray.size(), sf::Triangles, m_states);
     }
 
     void LineRenderer::onDebugRender() {

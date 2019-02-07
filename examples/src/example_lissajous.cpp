@@ -22,8 +22,8 @@ public:
     }
 
     void update() {
-        dotPos.x = 40.0f * std::cos(2*PI*f*engine.time());
-        dotPos.y = 40.0f * std::sin(2*PI*f*engine.time());
+        dotPos.x = 40.0f * std::cos(0.25f*f*engine.time());
+        dotPos.y = 40.0f * std::sin(0.25f*f*engine.time());
         guide->setPoint(0, dotPos);
         if (column)
             guide->setPoint(1,dotPos.x,800);
@@ -60,13 +60,15 @@ public:
         pos.y = r->transform.getPosition().y + r->dotPos.y;
         pos.x = c->transform.getPosition().x + c->dotPos.x;
         dot->shape.setPosition(pos);
-        path->addPoint(pos);
+        if (addPoint)
+            path->addPoint(pos);
+        addPoint = !addPoint;
     }
 
     Handle<LissaCircle> r, c;
     Handle<LineRenderer> path;
     Handle<ShapeRenderer> dot;
-
+    bool addPoint = true;
 };
 
 class LissaRoot : public GameObject {
@@ -74,12 +76,11 @@ public:
 
     LissaRoot(Engine& engine) :
         GameObject(engine),
-        cHeaders(7),
         rHeaders(7),
+        cHeaders(7),
         nodes(7)
     {
         // frequencies and colors
-        auto fs = linspace(0.1f, 0.50f, 7);
         std::vector<Color> colors = {
             Reds::FireBrick,
             Oranges::DarkOrange,
@@ -92,11 +93,10 @@ public:
 
         // make column/row headers
         for (auto& i : range(0,7)) {
-            rHeaders[i] = makeChild<LissaCircle>(colors[i], fs[i],false);
+            rHeaders[i] = makeChild<LissaCircle>(colors[i], i+1,false);
             rHeaders[i]->transform.setPosition(50.0f, i * 100.0f + 150.0f);
-            cHeaders[i] = makeChild<LissaCircle>(colors[i], fs[i],true);
+            cHeaders[i] = makeChild<LissaCircle>(colors[i], i+1,true);
             cHeaders[i]->transform.setPosition(i * 100.0f + 150.0f, 50.0f);
-
         }
 
         // make nodes
@@ -107,17 +107,33 @@ public:
             }
         }
 
+        lr = addComponent<LineRenderer>();
+        lr->setColor(Color::Black);
+        lr->addPoint(400,400);
+    }
+
+    void update() override {
+
+        if (input.getScroll() > 0)
+            engine.getView(0).zoom(1.1f);
+        else if (input.getScroll() < 0)
+            engine.getView(0).zoom(1.0f/1.1f);
+
+        auto drag = input.dragDeltaRaw(MouseButton::Left);
+        engine.getView(0).move(-drag.x, -drag.y);
     }
 
     std::vector<Handle<LissaCircle>> rHeaders;
     std::vector<Handle<LissaCircle>> cHeaders;
     std::vector<std::vector<Handle<LissaCircle>>> nodes;
-
+    Handle<LineRenderer> lr;
 };
+
 
 int main(int argc, char const *argv[])
 {
     Engine engine(800,800);
+    engine.window.setFramerateLimit(30);
     engine.makeRoot<LissaRoot>();
     engine.run();
     return 0;

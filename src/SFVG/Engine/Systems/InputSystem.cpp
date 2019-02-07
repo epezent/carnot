@@ -27,7 +27,9 @@ InputSystem::InputSystem(Engine& engine, const Name& name) :
     m_draggingTable.fill(false);
     m_dragStartTable.fill(Vector2f());
     m_dragLastTable.fill(Vector2f());
+    m_dragLastRawTable.fill(Vector2i());
     m_dragDeltaTable.fill(Vector2f());
+    m_dragDeltaRawTable.fill(Vector2i());
     m_dragTotalTable.fill(Vector2f());
 }
 
@@ -57,6 +59,7 @@ void InputSystem::processEvent(const Event& event) {
             m_draggingTable[event.mouseButton.button] = true;
             m_dragStartTable[event.mouseButton.button] = m_worldPosition;
             m_dragLastTable[event.mouseButton.button]  = m_worldPosition;
+            m_dragLastRawTable[event.mouseButton.button] = m_mousePosition;
             // double click
             float now = engine.time();
             if ((now - m_dblClkTimes[event.mouseButton.button]) < m_dblClkDelay) {
@@ -102,6 +105,7 @@ void InputSystem::clearState() {
         m_dragStartedTable[i] = false;
         m_dragEndedTable[i] = false;
         m_dragDeltaTable[i] = Vector2f();
+        m_dragDeltaRawTable[i] = Vector2i();
     }
     m_mouseScrollDetla = 0;
     m_textEntered = "";
@@ -119,9 +123,11 @@ void InputSystem::update() {
     // update draggings
     for (std::size_t i = 0; i < MouseButton::ButtonCount; ++i) {
         if (m_draggingTable[i]) {
-            m_dragDeltaTable[i] = m_worldPosition - m_dragLastTable[i];
-            m_dragTotalTable[i] = m_worldPosition - m_dragStartTable[i];
-            m_dragLastTable[i]  = m_worldPosition;
+            m_dragDeltaTable[i]    = m_worldPosition - m_dragLastTable[i];
+            m_dragDeltaRawTable[i] = m_mousePosition - m_dragLastRawTable[i];
+            m_dragTotalTable[i]    = m_worldPosition - m_dragStartTable[i];
+            m_dragLastTable[i]     = m_worldPosition;
+            m_dragLastRawTable[i]  = m_mousePosition;
         }
     }
 }
@@ -188,6 +194,10 @@ bool InputSystem::dragEnded(MouseButton button) {
 
 Vector2f InputSystem::dragDelta(MouseButton button) {
     return m_dragDeltaTable[button];
+}
+
+Vector2i InputSystem::dragDeltaRaw(MouseButton button) {
+    return m_dragDeltaRawTable[button];
 }
 
 float InputSystem::getScroll() {
