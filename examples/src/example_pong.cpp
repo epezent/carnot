@@ -1,178 +1,90 @@
-#include <SFVG/Engine/Object.hpp>
-#include <SFVG/Engine/Engine.hpp>
-#include <SFVG/Graphics.hpp>
+#include <SFVG/SFVG.hpp>
 
 using namespace sfvg;
 
-//=============================================================================
-// Player
-//=============================================================================
-
-class Player : public Object {
+class Wall : public GameObject {
 public:
-
-    // Constructor
-    Player() :
-        m_rectangle(50,10),
-        m_speed(200)
-    {
-        m_rectangle.setColor(Blues::DeepSkyBlue);
-        transform.setPosition(250, 450);
+    Wall(Engine& engine, float width, float height, float x, float y) : GameObject(engine) {
+        transform.setLocalPosition(x,y);
+        auto sr = addComponent<ShapeRenderer>();
+        sr->shape = RectangleShape(width,height);
+        sr->setColor(Color::White);
+        auto rb = addComponent<RigidBody>(RigidBody::Static);
+        rb->addBoxShape(width,height);
+        rb->setShapeElasticity(0, 1.0f);
     }
-
-    // Object Update
-    void update() override {
-        if (Input::getKey(Key::Left))
-            transform.move(-m_speed * Engine::deltaTime(), 0.0f);
-        if (Input::getKey(Key::Right))
-            transform.move(m_speed * Engine::deltaTime(), 0.0f);
-    }
-
-    // Object Draw (called once per frame after update)
-    void draw(sf::RenderTarget& target, sf::RenderStates states) const override {
-        target.draw(m_rectangle, states);
-    }
-
-private:
-    RectangleShape m_rectangle;
-    float m_speed;
 };
 
-//=============================================================================
-// Ball
-//=============================================================================
-
-class Ball : public Object {
+class Ball : public GameObject {
 public:
-
-    // Constructor
-    Ball() :
-        m_circle(10),
-        m_speed(400)
-    {
-        m_circle.setColor(Reds::FireBrick);
-        restart();
+    Ball(Engine& e) : GameObject(e) {
+        transform.setPosition(500,250);
+        auto sr = addComponent<ShapeRenderer>();
+        sr->shape = CircleShape(10);
+        sr->setColor(Reds::FireBrick);
+        rb = addComponent<RigidBody>();
+        rb->addCircleShape(10);
+        rb->setShapeMass(0, 10.0f);
+        rb->setShapeElasticity(0, 1.0f);
+        reset();
     }
 
-    // Object Update
-    void update() override {
-        transform.move(m_velocityVector * m_speed * Engine::deltaTime());
+    void update() {
+        if (input.getKeyDown(Key::R))
+            reset();
     }
 
-    // Object Draw (called once per frame after update)
-    void draw(sf::RenderTarget& target, sf::RenderStates states) const override {
-        target.draw(m_circle, states);
+    void reset() {
+        transform.setPosition(500,250);
+        rb->setVelocity(unit(Vector2f(random(-10.0f,10.0f),random(-2.0f,2.0f)))*750.0f);
     }
 
-    // restart ball
-    void restart() {
-        transform.setPosition(250, 250);
-        float vx = random(-0.5f,0.5f);
-        float vy = random(-1.0f,1.0f);
-        m_velocityVector = unit(Vector2f(vx,vy));
-    }
-
-    // reflect ball in X
-    void reflectX() {
-        m_velocityVector.x = -m_velocityVector.x;
-    }
-
-    // reflect ball in Y
-    void reflectY() {
-        m_velocityVector.y = -m_velocityVector.y;
-    }
-
-private:
-    CircleShape m_circle;
-    Vector2f m_velocityVector;
-    float m_speed;
+    Handle<RigidBody> rb;
 };
 
-
-//=============================================================================
-// PongGame
-//=============================================================================
-
-class PongGame : public Object {
+class Paddle : public GameObject {
 public:
-
-    // Constructor
-    PongGame() {
-        m_player = makeChild<Player>();
-        m_ball = makeChild<Ball>();
+    Paddle(Engine& e) : GameObject(e) {
+        auto sr = addComponent<ShapeRenderer>();
+        sr->setColor(Color::White);
+        sr->shape = RectangleShape(10,100);
+        transform.setPosition(125,250);
+        rb = addComponent<RigidBody>(RigidBody::Kinematic);
+        rb->addBoxShape(10, 100);
+        rb->setShapeElasticity(0, 1.0f);
     }
 
-    void start() {
-        m_text.setFont(engine().fonts.get("RobotoBold"));
-        m_text.setCharacterSize(30);
-        m_text.setPosition(10, 10);
-        m_text.setFillColor(Whites::White);
-    }
-
-    // Object Update
     void update() override {
-
-        // get position of player and ball
-        auto playPos = m_player->transform.getPosition();
-        auto ballPos = m_ball->transform.getPosition();
-
-        // check player collision with walls
-        if (playPos.x >= 475)
-            m_player->transform.setPosition(475, playPos.y);
-        else if (playPos.x <= 25)
-            m_player->transform.setPosition(25, playPos.y);
-
-        // check ball collision with walls
-        if (ballPos.x <= 10 || ballPos.x >= 490)
-            m_ball->reflectX();
-        if (ballPos.y <= 10)
-            m_ball->reflectY();
-
-        // check ball collision with player
-        if (ballPos.x - 10 < playPos.x + 25 &&
-            ballPos.x + 10 > playPos.x - 25 &&
-            ballPos.y - 10 < playPos.y + 5  &&
-            ballPos.y + 10 > playPos.y - 5)
-        {
-            m_ball->reflectY();
-            m_score++;
-        }
-
-        // check if ball lost
-        if (ballPos.y > 510) {
-            m_score = 0;
-            m_ball->restart();
-        }
-
-        // update score text
-        m_text.setString("Score: " + std::to_string(m_score));
+        if (input.getKey(Key::Up))
+            rb->setPosition(rb->getPosition() + Vector2f(0,-500) * engine.deltaTime());
+        else if (input.getKey(Key::Down))
+            rb->setPosition(rb->getPosition() + Vector2f(0,500) * engine.deltaTime());
     }
 
-    // Object Draw (called once per frame after update)
-    void draw(sf::RenderTarget& target, sf::RenderStates states) const override {
-        target.draw(m_text, states);
-    }
-
-private:
-    Handle<Player> m_player;
-    Handle<Ball> m_ball;
-
-    int m_score;
-    Text m_text;
+    Handle <RigidBody> rb;
 };
 
-//=============================================================================
-// Main
-//=============================================================================
+class Pong : public GameObject {
+public:
+    Pong(Engine& e) : GameObject(e) {
+        makeChild<Wall>(10,500,5,250);
+        makeChild<Wall>(10,500,995,250);
+        makeChild<Wall>(1000,10,500,5);
+        makeChild<Wall>(1000,10,500,495);
+        ball = makeChild<Ball>();
+        paddle = makeChild<Paddle>();
+    }
 
-int main()
+    Handle<Ball> ball;
+    Handle<Paddle> paddle;
+};
+
+int main(int argc, char const *argv[])
 {
-    sfvg::sfvgInit();
-    Engine engine(500,500);
-    engine.window.setTitle("Pong!");
-    auto game = Object::make<PongGame>();
-    game->setName("game");
-    engine.setRoot(game);
+    Engine engine(1000,500);
+    engine.makeRoot<Pong>();
+    engine.physics.setGravity(Vector2f(0,0));
+    engine.physics.setDamping(1);
     engine.run();
     return 0;
 }

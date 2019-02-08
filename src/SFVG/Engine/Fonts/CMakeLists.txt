@@ -1,5 +1,6 @@
 target_sources(sfvg
     PRIVATE
+        FontAwesome5.cpp
         RobotoRegular.cpp
         RobotoBold.cpp
         RobotoItalic.cpp

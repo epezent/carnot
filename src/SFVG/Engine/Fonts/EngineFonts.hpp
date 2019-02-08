@@ -31,6 +31,12 @@ extern unsigned int  RobotoMono_Bold_ttf_len;
 extern unsigned char RobotoMono_Italic_ttf[];
 extern unsigned int  RobotoMono_Italic_ttf_len;
 
+//==============================================================================
+// FONT AWESOME
+//==============================================================================
+
+extern unsigned char fa_solid_900_ttf[];
+extern unsigned int  fa_solid_900_ttf_len;
 
 } // namespace sfvg
 

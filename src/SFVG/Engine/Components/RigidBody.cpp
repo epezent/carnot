@@ -38,12 +38,11 @@ RigidBody::RigidBody(GameObject& _gameObject, BodyType type, float mass, float m
     m_body = cpBodyNew((cpFloat)mass, (cpFloat)moment);
     setBodyType(type);
     // set initial position
-    auto position = gameObject.transform.getPosition();
-    auto rotation = gameObject.transform.getRotation();
-    cpBodySetPosition(m_body, sf2cp(position));
-    cpBodySetAngle(m_body, (cpFloat)rotation);
+    syncWithTransform();
     cpSpaceAddBody(engine.physics.m_space, m_body);
     g_rigidBodyCount++;
+    // register with Transform
+    gameObject.transform.registerCallback(std::bind(&RigidBody::syncWithTransform, this));
 }
 
 RigidBody::~RigidBody() {
@@ -153,6 +152,31 @@ std::size_t RigidBody::getShapeCount() const {
     return m_shapes.size();
 }
 
+
+//==============================================================================
+// PROPERTIES
+//==============================================================================
+
+void RigidBody::setPosition(const Vector2f& position) {
+    cpBodySetPosition(m_body, sf2cp(position));
+}
+
+void RigidBody::setPosition(float x, float y) {
+    setPosition(Vector2f(x,y));
+}
+
+Vector2f RigidBody::getPosition() const {
+    return cp2sf(cpBodyGetPosition(m_body));
+}
+
+void RigidBody::setRotation(float angle) {
+    cpBodySetAngle(m_body, (cpFloat)angle);
+}
+
+float RigidBody::getRotation() const {
+    return (float)cpBodyGetAngle(m_body);
+}
+
 void RigidBody::setShapeMass(std::size_t index, float mass) {
     assert(index < m_shapes.size());
     cpShapeSetMass(m_shapes[index], (cpFloat)mass);
@@ -206,6 +230,10 @@ void RigidBody::setVelocity(const Vector2f& velocity) {
     cpBodySetVelocity(m_body, sf2cp(velocity));
 }
 
+void RigidBody::setVelocity(float vx, float vy) {
+    setVelocity(Vector2f(vx,vy));
+}
+
 Vector2f RigidBody::getVelocity() const {
     return cp2sf(cpBodyGetVelocity(m_body));
 }
@@ -216,7 +244,11 @@ Vector2f RigidBody::getVelocity() const {
 
 void RigidBody::applyForceToCenter(const Vector2f& force) {
     auto pos = cpBodyGetPosition(m_body);
-    cpBodyApplyForceAtWorldPoint(m_body, sf2cp(force), cpv(pos.x, pos.y));
+    cpBodyApplyForceAtWorldPoint(m_body, sf2cp(force), pos);
+}
+
+void RigidBody::applyForceToCenter(float fx, float fy) {
+    applyForceToCenter(Vector2f(fx,fx));
 }
 
 void RigidBody::applyTorqueToCenter(float torque) {
@@ -271,6 +303,15 @@ void RigidBody::onDebugRender() {
         engine.debug.drawPoint(cog - Vector2f(2,2), DEBUG_PHYSICS_COG_COLOR);
 
     }
+}
+
+//==============================================================================
+// PRIVATE
+//==============================================================================
+
+void RigidBody::syncWithTransform() {
+    setPosition(gameObject.transform.getPosition());
+    setRotation(gameObject.transform.getRotation());
 }
 
 } // namespace sfvg

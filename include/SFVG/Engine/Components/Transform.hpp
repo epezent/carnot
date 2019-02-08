@@ -1,6 +1,7 @@
 #pragma once
 
 #include <SFVG/Engine/Component.hpp>
+#include <functional>
 
 namespace sfvg {
 
@@ -94,8 +95,22 @@ public:
     /// Transform local rect to world rect
     FloatRect worldToLocal(const FloatRect& rect);
 
+    //==========================================================================
+    // Callbacks
+    //==========================================================================
+
+    /// Register a callback to be called when the Transform changes
+    void registerCallback(std::function<void(void)> callback);
+
 private:
 
+    /// Makes the transform dirty
+    void makeDirty();
+
+    /// Calls all callbacks
+    void callCallbacks();
+
+    /// Renders the Transform axis handles during Debug mode
     void onDebugRender() override;
 
 private:
@@ -115,7 +130,7 @@ private:
     mutable bool      m_invLocalTransformDirty; ///< Does the transform need to be recomputed?
     mutable bool      m_invWorldTransformDirty; ///< Does the transform need to be recomputed?
 
-
+    std::vector<std::function<void(void)>> m_callbacks;  ///< callbacks called when Transform changes
 
 };
 

@@ -14,6 +14,7 @@
 #include <SFVG/Engine/Component.hpp>
 #include <SFVG/Engine/Coroutine.hpp>
 #include <SFVG/Engine/Engine.hpp>
+#include <SFVG/Engine/FontAwesome5.hpp>
 #include <SFVG/Engine/GameObject.hpp>
 #include <SFVG/Engine/Handle.hpp>
 #include <SFVG/Engine/Id.hpp>
@@ -23,6 +24,7 @@
 #include <SFVG/Engine/System.hpp>
 #include <SFVG/Engine/XboxController.hpp>
 
+#include <SFVG/Engine/Components/LineRenderer.hpp>
 #include <SFVG/Engine/Components/Renderer.hpp>
 #include <SFVG/Engine/Components/RigidBody.hpp>
 #include <SFVG/Engine/Components/ShapeRenderer.hpp>
@@ -48,7 +50,6 @@
 #include <SFVG/Geometry/Shape.hpp>
 #include <SFVG/Geometry/SquareShape.hpp>
 #include <SFVG/Geometry/StarShape.hpp>
-#include <SFVG/Geometry/Stroke.hpp>
 
 #include <SFVG/Graphics/Color.hpp>
 #include <SFVG/Graphics/Gradient.hpp>

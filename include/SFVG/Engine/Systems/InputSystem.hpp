@@ -30,6 +30,7 @@ public:
     bool dragging(MouseButton button);
     bool dragEnded(MouseButton button);
     Vector2f dragDelta(MouseButton button);
+    Vector2i dragDeltaRaw(MouseButton button);
 
     Vector2i getRawMousePosition();
     Vector2f getMousePosition();
@@ -76,9 +77,11 @@ private:
     std::array<bool, MouseButton::ButtonCount>         m_dragEndedTable;
     std::array<bool, MouseButton::ButtonCount>         m_draggingTable;
 
-    std::array<Vector2f, MouseButton::ButtonCount>    m_dragStartTable;
+    std::array<Vector2f, MouseButton::ButtonCount>     m_dragStartTable;
     std::array<Vector2f, MouseButton::ButtonCount>     m_dragLastTable;
+    std::array<Vector2i, MouseButton::ButtonCount>     m_dragLastRawTable;
     std::array<Vector2f, MouseButton::ButtonCount>     m_dragDeltaTable;
+    std::array<Vector2i, MouseButton::ButtonCount>     m_dragDeltaRawTable;
     std::array<Vector2f, MouseButton::ButtonCount>     m_dragTotalTable;
 };
 

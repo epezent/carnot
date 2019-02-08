@@ -1,5 +1,6 @@
 target_sources(sfvg
 	PRIVATE
+        LineRenderer.cpp
         Renderer.cpp
         RigidBody.cpp
         ShapeRenderer.cpp

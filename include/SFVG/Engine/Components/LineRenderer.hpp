@@ -1,23 +1,18 @@
 #pragma once
 
-#include <SFML/Graphics/Drawable.hpp>
-#include <SFML/Graphics/Transformable.hpp>
-#include <SFML/Graphics/VertexArray.hpp>
-#include <SFVG/Geometry/Points.hpp>
+#include <SFVG/Engine/Components/Renderer.hpp>
 #include <SFVG/Graphics/Gradient.hpp>
+#include <SFVG/Geometry/Shape.hpp>
+#include <SFVG/Geometry/Points.hpp>
 
 namespace sfvg {
 
-class Shape;
-
-class Stroke : public sf::Drawable, public sf::Transformable {
+/// Renderer specialized for rendering Lines
+class LineRenderer : public Renderer {
 public:
 
-    /// Default constructor
-    Stroke(std::size_t pointCount = 0);
-
-    /// Default destructor
-    virtual ~Stroke();
+    /// Constructor
+    LineRenderer(GameObject& gameObject, std::size_t pointCount = 0);
 
     /// Sets the number of points in the Shape
     void setPointCount(std::size_t count);
@@ -46,6 +41,9 @@ public:
     /// Adds a new point and increments the point count
     void addPoint(float x, float y);
 
+    /// Sets points from Shape
+    void fromShape(const Shape& shape);
+
     /// Sets the thickness of the Stroke
     void setThicnkess(float thickness);
 
@@ -59,10 +57,10 @@ public:
     float getMiterLimit() const;
 
     /// Sets the fill of a shape to a solid Color
-    void setColor(const sf::Color& color);
+    void setColor(const Color& color);
 
     /// Gets the fill Color of a shape
-    const sf::Color& getColor() const;
+    const Color& getColor() const;
 
     /// Sets the fill Gradient of the Shape
     void setGradient(const Gradient& gradient);
@@ -71,22 +69,22 @@ public:
     Gradient getGradient() const;
 
     /// Sets the texture of the Shape
-    void setTexture(const sf::Texture* texture, bool resetRect = false);
+    void setTexture(const Texture* texture, bool resetRect = false);
 
     /// Gets the texture of the Shape
-    const sf::Texture* getTexture() const;
+    const Texture* getTexture() const;
 
     /// Sets the Texture Rect of the Shape
-    void setTextureRect(const sf::IntRect& rect);
+    void setTextureRect(const IntRect& rect);
 
     /// Gets the Texture Rect of the Shape
-    const sf::IntRect& getTextureRect() const;
+    const IntRect& getTextureRect() const;
 
     /// Gets the local bounding rectangle of the Shape
-    sf::FloatRect getLocalBounds() const;
+    FloatRect getLocalBounds() const;
 
     /// Gets the global bounding rectangle of the Shape
-    sf::FloatRect getGlobalBounds() const;
+    FloatRect getWorldBounds() const;
 
     /// Sets whether or not the Shape's wireframe is drawn
     void showWireFrame(bool show);
@@ -94,9 +92,12 @@ public:
     /// Sets whether or not the Shape's bounding box is drawn
     void showBoundsBox(bool show);
 
-public:
+protected:
 
-    static Stroke fromShape(const Shape& shape);
+    /// Renders the Shape to RenderTarget
+    virtual void render(RenderTarget& target) const override;
+    /// Renders shape bounding box and wireframe
+    virtual void onDebugRender() override;
 
 private:
 
@@ -104,21 +105,19 @@ private:
     void updateBounds() const;
     void updateTexCoords() const;
     void updateColor() const;
-    void update() const;
-    void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 
 private:
 
     Points m_points;
     float m_thickness;
     float m_miterLimit;
-    mutable std::vector<sf::Vertex> m_vertexArray;
-    const sf::Texture* m_texture;
-    sf::IntRect m_textureRect;
-    sf::Color m_color;
+    mutable std::vector<Vertex> m_vertexArray;
+    const Texture* m_texture;
+    IntRect m_textureRect;
+    Color m_color;
     Gradient m_gradient;
     bool m_hasSolidFill;
-    mutable sf::FloatRect m_bounds;
+    mutable FloatRect m_bounds;
     bool m_showWireFrame;
     bool m_showBoundsBox;
     mutable bool m_needsUpdate;
