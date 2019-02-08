@@ -15,12 +15,6 @@ add_library(SFVG::sfvg ALIAS sfvg)
 # add source files to target
 add_subdirectory(src/SFVG)
 
-target_sources(sfvg
-	PRIVATE
-		${SFVG_INCLUDE}
-		${SFVG_SRC}
-)
-
 # find SFML
 set(SFML_STATIC_LIBRARIES TRUE)
 find_package(SFML 2.5 REQUIRED COMPONENTS audio graphics window system network)
