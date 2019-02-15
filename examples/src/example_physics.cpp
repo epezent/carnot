@@ -47,7 +47,7 @@ public:
             auto localPos = transform.worldToLocal(input.getMousePosition());
             if (inBounds(localPos, sr->shape.getLocalBounds()) && input.getKeyDown(Key::D))
                 destroy();
-
+            
         }
     }
 
@@ -84,11 +84,7 @@ public:
             go->getComponent<RigidBody>()->setShapeDensity(0, 1.0f);
         }
     }
-
-
-
 };
-
 
 
 int main(int argc, char const *argv[]) {

@@ -5,7 +5,7 @@ project(SFVG VERSION 1.0.0 LANGUAGES CXX)
 
 list(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_SOURCE_DIR}/cmake)
 
-# enable C++11
+# enable C++17
 set(CMAKE_CXX_STANDARD 17)
 
 # create target and add an alias
@@ -14,12 +14,6 @@ add_library(SFVG::sfvg ALIAS sfvg)
 
 # add source files to target
 add_subdirectory(src/SFVG)
-
-target_sources(sfvg
-	PRIVATE
-		${SFVG_INCLUDE}
-		${SFVG_SRC}
-)
 
 # find SFML
 set(SFML_STATIC_LIBRARIES TRUE)
@@ -48,10 +42,6 @@ target_compile_definitions(sfvg
 		-D_WINSOCK_DEPRECATED_NO_WARNINGS
 )
 
-# target_compile_features(sfvg
-# 	PRIVATE cxx_std_11
-# )
-
 # set target properties
 target_include_directories(sfvg
 	PUBLIC
@@ -77,14 +67,14 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -fcoroutines-ts -stdlib=libc++") # COROUTINES
 endif()
 
-# set binary output location for executables
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
-# set binary output location for static libraries
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib)
-# set binary output location for shared libraries
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib)
+# # set binary output location for executables
+# set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
+# # set binary output location for static libraries
+# set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib)
+# # set binary output location for shared libraries
+# set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib)
 
-
+#[[
 # install the library
 include(GNUInstallDirs)
 set(INSTALL_CONFIGDIR ${CMAKE_INSTALL_LIBDIR}/cmake/SFVG)
@@ -138,6 +128,7 @@ export(EXPORT sfvg-targets
 
 # register package in user's package registry
 export(PACKAGE SFVG)
+#]]
 
 # build tests
 add_subdirectory(tests)

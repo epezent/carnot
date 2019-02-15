@@ -1,8 +1,0 @@
- ☐ make properties take variadic number of args
-
-% GameObject ctors should take parent?
-% remove animation or make a component
-% effects
-% line renderer join ends
-% audio system
-% camera system

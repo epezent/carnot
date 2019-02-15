@@ -42,7 +42,7 @@ RigidBody::RigidBody(GameObject& _gameObject, BodyType type, float mass, float m
     cpSpaceAddBody(engine.physics.m_space, m_body);
     g_rigidBodyCount++;
     // register with Transform
-    gameObject.transform.registerCallback(std::bind(&RigidBody::syncWithTransform, this));
+    //gameObject.transform.registerCallback(std::bind(&RigidBody::syncWithTransform, this));
 }
 
 RigidBody::~RigidBody() {

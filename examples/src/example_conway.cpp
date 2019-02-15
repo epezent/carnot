@@ -1,6 +1,5 @@
 #include <SFVG/SFVG.hpp>
 
-
 using namespace sfvg;
 
 // Any live cell with fewer than two live neighbors dies, as if by underpopulation.
