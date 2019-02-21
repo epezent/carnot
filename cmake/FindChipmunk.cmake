@@ -44,16 +44,16 @@ find_library(CHIPMUNK_LIBRARY
   /opt
 )
 
-# if(CHIPMUNK_LIBRARY)
-#   # include the math library for Unix
-#   if(UNIX AND NOT APPLE)
-#     find_library(CHIPMUNK_MATH_LIBRARY m)
-#     set(CHIPMUNK_LIBRARIES "${CHIPMUNK_LIBRARY};${CHIPMUNK_MATH_LIBRARY}" CACHE STRING "Chipmunk Libraries")
-#   # For Windows and Mac, don't need to explicitly include the math library
-#   else(UNIX AND NOT APPLE)
-#     set(CHIPMUNK_LIBRARIES "${CHIPMUNK_LIBRARY}" CACHE STRING "Chipmunk Libraries")
-#   endif(UNIX AND NOT APPLE)
-# endif(CHIPMUNK_LIBRARY)
+if(CHIPMUNK_LIBRARY)
+  # include the math library for Unix
+  if(UNIX AND NOT APPLE)
+    find_library(CHIPMUNK_MATH_LIBRARY m)
+    set(CHIPMUNK_LIBRARIES "${CHIPMUNK_LIBRARY};${CHIPMUNK_MATH_LIBRARY}" CACHE STRING "Chipmunk Libraries")
+  # For Windows and Mac, don't need to explicitly include the math library
+  else(UNIX AND NOT APPLE)
+    set(CHIPMUNK_LIBRARIES "${CHIPMUNK_LIBRARY}" CACHE STRING "Chipmunk Libraries")
+  endif(UNIX AND NOT APPLE)
+endif(CHIPMUNK_LIBRARY)
 
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(Chipmunk DEFAULT_MSG CHIPMUNK_LIBRARY CHIPMUNK_INCLUDE_DIR)

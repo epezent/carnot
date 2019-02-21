@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.13.0)
 # create project
 project(SFVG VERSION 1.0.0 LANGUAGES CXX)
 
+# add modules
 list(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_SOURCE_DIR}/cmake)
 
 # enable C++17
@@ -10,7 +11,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 # create target and add an alias
 add_library(sfvg "")
-add_library(SFVG::sfvg ALIAS sfvg)
+# add_library(SFVG::sfvg ALIAS sfvg)
 
 # add source files to target
 add_subdirectory(src/SFVG)
@@ -74,7 +75,6 @@ endif()
 # # set binary output location for shared libraries
 # set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib)
 
-#[[
 # install the library
 include(GNUInstallDirs)
 set(INSTALL_CONFIGDIR ${CMAKE_INSTALL_LIBDIR}/cmake/SFVG)
@@ -128,10 +128,15 @@ export(EXPORT sfvg-targets
 
 # register package in user's package registry
 export(PACKAGE SFVG)
-#]]
 
 # build tests
-add_subdirectory(tests)
+# add_subdirectory(tests)
 
 # build examples
-add_subdirectory(examples)
+# add_subdirectory(examples)
+
+add_executable(imgui examples/src/example_imgui.cpp)
+target_link_libraries(imgui sfvg)
+
+add_executable(hw examples/src/example_hello_world.cpp)
+target_link_libraries(hw sfvg)
