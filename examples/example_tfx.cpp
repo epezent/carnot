@@ -1,6 +1,11 @@
 #include <SFVG/SFVG.hpp>
 #include <deque>
 
+#ifdef _MSC_VER
+#    pragma comment(linker, "/subsystem:windows /ENTRY:mainCRTStartup")
+#endif
+
+
 using namespace sfvg;
 
 class TfxDemo : public GameObject {

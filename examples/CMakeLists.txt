@@ -1,10 +1,13 @@
+set(ICON sfvg.rc)
+
 macro(sfvg_example SFVG_EXAMPLE_NAME)
-    add_executable(${SFVG_EXAMPLE_NAME} src/example_${SFVG_EXAMPLE_NAME}.cpp)
+    add_executable(${SFVG_EXAMPLE_NAME} "example_${SFVG_EXAMPLE_NAME}.cpp" ${ICON})
     target_link_libraries(${SFVG_EXAMPLE_NAME} sfvg)
+    set_target_properties(${SFVG_EXAMPLE_NAME} PROPERTIES LINK_FLAGS "/ENTRY:mainCRTStartup")
 endmacro()
 
 # disable console
-# set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup")
 
 # sfvg_example(color)
 # sfvg_example(coroutine)
