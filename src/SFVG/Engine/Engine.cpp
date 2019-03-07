@@ -57,7 +57,7 @@ Engine::Engine(unsigned int width, unsigned int height, unsigned int style) :
     io.Fonts->Clear();
     unsigned char* fontCopy1 = new unsigned char[RobotoMono_Bold_ttf_len];
     std::memcpy(fontCopy1, &RobotoMono_Bold_ttf, RobotoMono_Bold_ttf_len);
-    io.Fonts->AddFontFromMemoryTTF(fontCopy1, RobotoMono_Bold_ttf_len, 14.0f);
+    io.Fonts->AddFontFromMemoryTTF(fontCopy1, RobotoMono_Bold_ttf_len, 15.0f);
     // merge in icons from font awesome
     static const ImWchar icons_ranges[] = { ICON_MIN_FA, ICON_MAX_FA, 0 };
     ImFontConfig icons_config;

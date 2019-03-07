@@ -8,7 +8,7 @@ public:
         sr = addComponent<ShapeRenderer>();
         sr->setColor(Whites::White);
         sr->shape = PolygonShape(6, PolygonShape::CircumscribedRadius, 100);
-        engine.textures.load("paper", "../../textures/paper.png");
+        // engine.textures.load("paper", "../../textures/paper.png");
         lr = addComponent<LineRenderer>(2);
         lr->fromShape(sr->shape);
         auto c = Reds::FireBrick;
@@ -18,7 +18,7 @@ public:
     }
 
     void update() {
-        lr->setPoint(1, input.getMousePosition());
+        //lr->setPoint(1, input.getMousePosition());
         ImGui::ShowDemoWindow(&my_tool_active);
     }
 
@@ -33,7 +33,7 @@ public:
 
 int main(int argc, char const *argv[])
 {
-    Engine engine;
+    Engine engine(750,750, WindowStyle::None);
     engine.getView(0).setCenter(0, 0);
     engine.makeRoot<MyGameObject>();
     engine.run();
