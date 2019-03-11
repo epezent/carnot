@@ -1,12 +1,11 @@
 #include <SFVG/SFVG.hpp>
 #include <deque>
 
-#include <windows.h>
-#include <winuser.h>
 
-#ifdef _MSC_VER
-#    pragma comment(linker, "/subsystem:windows /ENTRY:mainCRTStartup")
-#endif
+
+// #ifdef _MSC_VER
+// #    pragma comment(linker, "/subsystem:windows /ENTRY:mainCRTStartup")
+// #endif
 
 using namespace sfvg;
 
@@ -35,6 +34,7 @@ public:
     }
 
     void start() override {
+
         ImGuiStyle * style = &ImGui::GetStyle();
     
         // style->WindowPadding = ImVec2(15, 15);
@@ -206,15 +206,9 @@ int main(int argc, char const *argv[])
     Engine engine(480,360, WindowStyle::Close);
     engine.window.setTitle("TactorFX");
 
-    Image image;
-    image.loadFromFile("logo.png");
-
-    engine.window.setIcon(64,64,image.getPixelsPtr());
-
-    auto handle = engine.window.getSystemHandle();
-    auto dpi = GetDpiForWindow(handle);
-
-    print(dpi);
+    // Image image;
+    // image.loadFromFile("logo.png");
+    // engine.window.setIcon(64,64,image.getPixelsPtr());
 
     engine.makeRoot<TfxDemo>();
     engine.run();

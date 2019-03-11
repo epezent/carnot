@@ -1,5 +1,6 @@
 #include <SFVG/Engine/ImGui/imgui-SFML.h>
 #include <SFVG/Engine/ImGui/imgui.h>
+#include <SFVG/Common/Print.hpp>
 
 #include <SFML/OpenGL.hpp>
 #include <SFML/Graphics/Color.hpp>
@@ -167,15 +168,16 @@ namespace ImGui
 namespace SFML
 {
 
-void Init(sf::RenderWindow& window, bool loadDefaultFont)
+void Init(sf::RenderWindow& window, float dpiFactor, bool loadDefaultFont)
 {
-    Init(window, window, loadDefaultFont);
+    Init(window, window, dpiFactor, loadDefaultFont);
 }
 
-void Init(sf::Window& window, sf::RenderTarget& target, bool loadDefaultFont)
+void Init(sf::Window& window, sf::RenderTarget& target, float dpiFactor, bool loadDefaultFont)
 {
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
+    io.DisplayFramebufferScale = ImVec2(dpiFactor,dpiFactor);
 
     io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;
 
@@ -311,16 +313,21 @@ void Update(sf::RenderWindow& window, sf::Time dt)
 
 void Update(sf::Window& window, sf::RenderTarget& target, sf::Time dt)
 {
+    auto io = ImGui::GetIO();
+
     if (!s_mouseMoved) {
         if (sf::Touch::isDown(0))
             s_touchPos = sf::Touch::getPosition(0, window);
 
         Update(s_touchPos, static_cast<sf::Vector2f>(target.getSize()), dt);
     } else {
-        Update(sf::Mouse::getPosition(window), static_cast<sf::Vector2f>(target.getSize()), dt);
+        auto pos = sf::Mouse::getPosition(window);
+        pos.x = (int)((float)pos.x / io.DisplayFramebufferScale.x);
+        pos.y = (int)((float)pos.y / io.DisplayFramebufferScale.y);
+        Update(pos, static_cast<sf::Vector2f>(target.getSize()), dt);
     }
 
-    if (ImGui::GetIO().MouseDrawCursor) {
+    if (io.MouseDrawCursor) {
         // Hide OS mouse cursor if imgui is drawing it
         window.setMouseCursorVisible(false);
     }
@@ -329,7 +336,8 @@ void Update(sf::Window& window, sf::RenderTarget& target, sf::Time dt)
 void Update(const sf::Vector2i& mousePos, const sf::Vector2f& displaySize, sf::Time dt)
 {
     ImGuiIO& io = ImGui::GetIO();
-    io.DisplaySize = displaySize;
+    io.DisplaySize.x = displaySize.x / io.DisplayFramebufferScale.x;
+    io.DisplaySize.y = displaySize.y / io.DisplayFramebufferScale.y;
     io.DeltaTime = dt.asSeconds();
 
     if (s_windowHasFocus) {

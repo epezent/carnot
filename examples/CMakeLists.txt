@@ -9,7 +9,7 @@ endmacro()
 # disable console
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup")
 
-# sfvg_example(color)
+sfvg_example(color)
 # sfvg_example(coroutine)
 sfvg_example(engine)
 # sfvg_example(online)

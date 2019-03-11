@@ -7,6 +7,9 @@
 #include <SFVG/Engine/ImGui/imgui.h>
 #include <SFVG/Engine/ImGui/imgui-SFML.h>
 #include <SFVG/Engine/FontAwesome5.hpp>
+#include <windows.h>
+#include <winuser.h>
+#include <ShellScalingAPI.h>
 
 namespace sfvg {
 
@@ -38,6 +41,7 @@ Engine::Engine(unsigned int width, unsigned int height, unsigned int style) :
     m_running(false),
     m_views(1),
     m_renderQue(1),
+    m_dpiFactor(1.0f),
     m_timeValue(0.0f),
     m_deltaTimeValue(0.0f),
     m_frame(0)
@@ -45,19 +49,38 @@ Engine::Engine(unsigned int width, unsigned int height, unsigned int style) :
     assert(!g_engineLoaded);
     // load resources
     loadBuiltInResources();
+
+#ifdef _WIN32   
+    SetProcessDpiAwareness(PROCESS_PER_MONITOR_DPI_AWARE);
+    const POINT ptZero = { 0, 0 };
+    auto monitor = MonitorFromPoint(ptZero, MONITOR_DEFAULTTOPRIMARY);
+    UINT dpiX, dpiY;
+    auto result  = GetDpiForMonitor(monitor, MDT_EFFECTIVE_DPI, &dpiX, &dpiY);
+    m_dpiFactor = (float)dpiX / (float)USER_DEFAULT_SCREEN_DPI;
+#else
+    m_dpiFactor = 1.0f;
+#endif
+
+
     // create Window and set settings
     sf::ContextSettings settings;
     settings.antialiasingLevel = 8;
-    window.create(sf::VideoMode(width, height), "", style, settings);
+    window.create(sf::VideoMode((unsigned int)(width * m_dpiFactor), (unsigned int)(height * m_dpiFactor)), "", style, settings);
     window.setFramerateLimit(60);
 
+    // set Window view
+    m_views[0] = window.getDefaultView();
+    m_views[0].setCenter(m_views[0].getCenter() / m_dpiFactor);
+    m_views[0].setSize(m_views[0].getSize() / m_dpiFactor);
+
     // initialize imgui
-    ImGui::SFML::Init(window);
+    ImGui::SFML::Init(window, m_dpiFactor);
     ImGuiIO& io = ImGui::GetIO();
     io.Fonts->Clear();
     unsigned char* fontCopy1 = new unsigned char[RobotoMono_Bold_ttf_len];
     std::memcpy(fontCopy1, &RobotoMono_Bold_ttf, RobotoMono_Bold_ttf_len);
-    io.Fonts->AddFontFromMemoryTTF(fontCopy1, RobotoMono_Bold_ttf_len, 15.0f);
+    io.Fonts->AddFontFromMemoryTTF(fontCopy1, RobotoMono_Bold_ttf_len, 15.0f * m_dpiFactor);
+
     // merge in icons from font awesome
     static const ImWchar icons_ranges[] = { ICON_MIN_FA, ICON_MAX_FA, 0 };
     ImFontConfig icons_config;
@@ -66,13 +89,9 @@ Engine::Engine(unsigned int width, unsigned int height, unsigned int style) :
     icons_config.GlyphMinAdvanceX = 14.0f;
     unsigned char* fontCopy2 = new unsigned char[fa_solid_900_ttf_len];
     std::memcpy(fontCopy2, &fa_solid_900_ttf, fa_solid_900_ttf_len);
-    io.Fonts->AddFontFromMemoryTTF(fontCopy2, fa_solid_900_ttf_len, 10.0f, &icons_config, icons_ranges );
-
+    io.Fonts->AddFontFromMemoryTTF(fontCopy2, fa_solid_900_ttf_len, 10.0f * m_dpiFactor, &icons_config, icons_ranges );
+    io.FontGlobalScale = 1.0f / m_dpiFactor;  
     ImGui::SFML::UpdateFontTexture();
-    //ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[0]);
-    // set Window view
-    m_views[0] = window.getDefaultView();
-    // m_views[0].setCenter(width * 0.5f, height * 0.5f);
     // loaded
     g_engineLoaded = true;
     window.requestFocus();
@@ -180,6 +199,10 @@ std::size_t Engine::getLayerCount() const {
     return m_renderQue.size();
 }
 
+float Engine::getDpiFactor() const {
+    return m_dpiFactor;
+}
+
 //==============================================================================
 // ROOT OBJECT
 //==============================================================================
@@ -211,7 +234,7 @@ void Engine::processEvents() {
                 break;
             }
             case Event::Resized: {
-                FloatRect size(0.0f, 0.0f, (float)event.size.width, (float)event.size.height);
+                // FloatRect size(0.0f, 0.0f, (float)event.size.width, (float)event.size.height);
                 break;
             }
             default:

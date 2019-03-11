@@ -4,16 +4,15 @@
 #include <SFVG/Graphics/Gradient.hpp>
 #include <SFVG/Geometry/Shape.hpp>
 #include <SFVG/Geometry/Points.hpp>
-#include <SFVG/Common/Sequence.hpp>
 
 namespace sfvg {
 
-/// Renderer specialized for rendering one pixel wide polylines
-class LineRenderer : public Renderer {
+/// Renderer specialized for rendering thick polylines
+class StrokeRenderer : public Renderer {
 public:
 
     /// Constructor
-    LineRenderer(GameObject& gameObject, std::size_t pointCount = 0);
+    StrokeRenderer(GameObject& gameObject, std::size_t pointCount = 0);
 
     /// Sets the number of points in the Shape
     void setPointCount(std::size_t count);
@@ -39,17 +38,20 @@ public:
     /// Sets points from Shape
     void fromShape(const Shape& shape);
 
+    /// Sets the thickness of the Stroke
+    void setThickness(float thickness);
+
+    /// Gets the thickness of the Stroke
+    float getThickness() const;
+
     /// Sets the fill of a shape to a solid Color
     void setColor(const Color& color);
 
     /// Gets the fill Color of a shape
     const Color& getColor() const;
 
-    /// Sets the fill Gradient of the Shape
-    void setGradient(const Sequence<Color>& gradient);
-
-    /// Gets the fill Gradient of the Shape
-    Sequence<Color> getGradient() const;
+    /// Sets the texture of the Shape
+    void setTexture(const Texture* texture, bool resetRect = false);
 
     /// Gets the local bounding rectangle of the Shape
     FloatRect getLocalBounds() const;
@@ -67,11 +69,13 @@ protected:
 private:
 
     void updateBounds() const;
-    void updateColor() const;
 
 private:
 
-    mutable std::vector<Vertex> m_vertexArray;
+    std::vector<Vector2d> m_points;
+    mutable std::vector<RGB>      m_colors;
+    mutable std::vector<double>   m_thicknesses;
+    float m_thickness;
     Color m_color;
     mutable FloatRect m_bounds;
     mutable bool m_needsUpdate;

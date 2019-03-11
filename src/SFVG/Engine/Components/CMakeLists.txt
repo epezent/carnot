@@ -5,8 +5,7 @@ target_sources(sfvg
         RigidBody.cpp
         ShapeRenderer.cpp
         SpriteRenderer.cpp
+        StrokeRenderer.cpp
         TextRenderer.cpp
 		Transform.cpp
 )
-
-add_subdirectory(Detail)

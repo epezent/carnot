@@ -13,8 +13,14 @@ set(CMAKE_CXX_STANDARD 17)
 add_library(sfvg "")
 add_library(SFVG::sfvg ALIAS sfvg)
 
+file(GLOB_RECURSE SFVG_INCLUDE "include/SFVG/*.hpp" "include/SFVG/*.inl")
+
+
 # add source files to target
-add_subdirectory(src/SFVG)
+add_subdirectory(src)
+
+file(GLOB_RECURSE SFVG_INCLUDE "include/SFVG/*.hpp" "include/SFVG/*.inl")
+target_sources(sfvg PRIVATE ${SFVG_INCLUDE})
 
 # find SFML
 set(SFML_STATIC_LIBRARIES TRUE)
@@ -31,6 +37,7 @@ target_link_libraries(sfvg
 		Pdh
 		Psapi
 		XInput
+		Shcore
 		sfml-audio sfml-graphics sfml-window sfml-system sfml-network
 		${CHIPMUNK_LIBRARIES}
 	PRIVATE
@@ -87,9 +94,6 @@ install(TARGETS sfvg
 set_target_properties(sfvg PROPERTIES EXPORT_NAME SFVG)
 set_target_properties(sfvg PROPERTIES FOLDER "SFVG")
 
-message(${CMAKE_INSTALL_LIBDIR})
-message(${CMAKE_INSTALL_LIBDIR})
-
 install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 # export the targets to a script
@@ -127,9 +131,6 @@ install(FILES
 export(EXPORT sfvg-targets
 	   NAMESPACE SFVG::
 	   FILE ${CMAKE_CURRENT_BINARY_DIR}/SFVGTargets.cmake)
-
-# register package in user's package registry
-export(PACKAGE SFVG)
 
 # build tests
 # add_subdirectory(tests)

@@ -1,8 +1,28 @@
 #include <SFVG/Engine/Components/ShapeRenderer.hpp>
 #include <SFVG/Engine/GameObject.hpp>
 #include <SFVG/Engine/Engine.hpp>
-#include "Detail\earcut_custom.hpp"
 #include "../SharedResources.hpp"
+
+#include "earcut/earcut.hpp"
+
+// Custom earcut point types for SFVG/SFML types
+namespace mapbox {
+namespace util {
+template <>
+struct nth<0, sfvg::Vector2f> {
+    inline static float get(const sfvg::Vector2f &t) {
+        return t.x;
+    };
+};
+template <>
+struct nth<1, sfvg::Vector2f> {
+    inline static float get(const sfvg::Vector2f &t) {
+        return t.y;
+    };
+};
+
+} // namespace util
+} // namespace mapbox
 
 namespace sfvg {
 

@@ -4,7 +4,7 @@
 #include <SFVG/Common/Math.hpp>
 #include <iostream>
 #include <limits>
-#include "Detail/clipper.hpp"
+#include "clipper/clipper.hpp"
 
 #define CLIPPER_PRECISION 10.0f
 

@@ -16,4 +16,13 @@ SFVG is an extension to SFML providing functionality to draw and animate vector 
 - Over 35 tweening functions
 - Various graphics related math functions and utilities
 
+TODO:
+
+- static classes?
+- camera objects
+- nanosvg
+- audio listener/source
+- Effect class (gradients etc)
+- physics/transform reconciliation
+- 
 

@@ -29,6 +29,7 @@
 #include <SFVG/Engine/Components/RigidBody.hpp>
 #include <SFVG/Engine/Components/ShapeRenderer.hpp>
 #include <SFVG/Engine/Components/SpriteRenderer.hpp>
+#include <SFVG/Engine/Components/StrokeRenderer.hpp>
 #include <SFVG/Engine/Components/TextRenderer.hpp>
 #include <SFVG/Engine/Components/Transform.hpp>
 

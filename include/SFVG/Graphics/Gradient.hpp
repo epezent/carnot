@@ -31,7 +31,7 @@ public:
 private:
 
     friend class ShapeRenderer;
-    friend class LineRenderer;
+    friend class StrokeRenderer;
 
     sf::Shader* getShader() const;
 

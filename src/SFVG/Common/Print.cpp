@@ -26,17 +26,12 @@ std::ostream & operator << (std::ostream &out, const Color& color) {
 }
 
 std::ostream & operator << (std::ostream &out, const RGB& rgb) {
-    out << "(R:" << (int)rgb.r << ",G:" << (int)rgb.g << ",B:" << (int)rgb.b << ",A:" << (int)rgb.a << ")";
+    out << "(R:" << rgb.r << ",G:" << rgb.g << ",B:" << rgb.b << ",A:" << rgb.a << ")";
     return out;
 }
 
 std::ostream & operator << (std::ostream &out, const HSV& hsv) {
     out << "(H:" << hsv.h << ",S:" << hsv.s << ",V:" << hsv.v  << ",A:" << hsv.a << ")";
-    return out;
-}
-
-std::ostream & operator << (std::ostream &out, const CMYK& cmyk) {
-    out << "(C:" << cmyk.c << ",M:" << cmyk.y << ",Y:" << cmyk.y << ",K:" << cmyk.k  << ",A:" << cmyk.a << ")";
     return out;
 }
 

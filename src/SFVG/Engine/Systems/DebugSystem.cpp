@@ -232,7 +232,7 @@ void DebugSystem::showPlayMenu() {
     ImVec2 window_pos = ImVec2(io.DisplaySize.x * 0.5f, DISTANCE);
     ImVec2 window_piv = ImVec2(0.5f, 0.0f);
     ImGui::SetNextWindowPos(window_pos, ImGuiCond_Always, window_piv);
-    ImGui::SetNextWindowBgAlpha(0.3f); // Transparent background
+    ImGui::SetNextWindowBgAlpha(0.9f); // Transparent background
     if (ImGui::Begin("Play Menu", &m_widgetFrameActive, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize /*| ImGuiWindowFlags_AlwaysAutoResize*/ | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav))
     {
 
@@ -240,13 +240,13 @@ void DebugSystem::showPlayMenu() {
             if (ImGui::Button(ICON_FA_PAUSE))
                 m_paused = true;
             if (ImGui::IsItemHovered())
-                ImGui::SetTooltip("Pause Game (F2)");
+                ImGui::SetTooltip("Pause (F2)");
         }
         else {
             if (ImGui::Button(ICON_FA_PLAY))
                 m_paused = false;
             if (ImGui::IsItemHovered())
-                ImGui::SetTooltip("Play Game (F2)");
+                ImGui::SetTooltip("Play (F2)");
         }
         ImGui::SameLine();
         if (ImGui::Button(ICON_FA_STEP_FORWARD)) {
@@ -269,7 +269,7 @@ void DebugSystem::showInfo() {
     ImVec2 window_piv = ImVec2((corner & 1) ? 1.0f : 0.0f, (corner & 2) ? 1.0f : 0.0f);
     if (corner != -1)
         ImGui::SetNextWindowPos(window_pos, ImGuiCond_Always, window_piv);
-    ImGui::SetNextWindowBgAlpha(0.3f); // Transparent background
+    ImGui::SetNextWindowBgAlpha(0.9f); // Transparent background
     if (ImGui::Begin("Debug Info", &m_widgetFrameActive, (corner != -1 ? ImGuiWindowFlags_NoMove : 0) | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize /*| ImGuiWindowFlags_AlwaysAutoResize*/ | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav))
     {
         ImGui::Text("CLK: %.2f s", engine.time());
@@ -321,7 +321,7 @@ void DebugSystem::showWidgetMenu() {
     ImVec2 window_piv = ImVec2((corner & 1) ? 1.0f : 0.0f, (corner & 2) ? 1.0f : 0.0f);
     if (corner != -1)
         ImGui::SetNextWindowPos(window_pos, ImGuiCond_Always, window_piv);
-    ImGui::SetNextWindowBgAlpha(0.3f); // Transparent background
+    ImGui::SetNextWindowBgAlpha(0.9f); // Transparent background
     if (ImGui::Begin("Debug Widgets", &m_widgetFrameActive, (corner != -1 ? ImGuiWindowFlags_NoMove : 0) | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav))
     {
         for (std::size_t i = 0; i < WidgetCount; ++i)

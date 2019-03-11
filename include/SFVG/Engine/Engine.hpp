@@ -50,6 +50,8 @@ public:
     void setLayerCount(std::size_t count);
     /// Get the number of layers drawn by the Engine (default 1)
     std::size_t getLayerCount() const;
+    /// Get the DPI scaling factor
+    float getDpiFactor() const;
 
     //=========================================================================
     // ROOT OBJECT
@@ -90,6 +92,7 @@ private:
     std::vector<View> m_views;
     RenderQue m_renderQue;
     Color m_backgroundColor;
+    float m_dpiFactor;
     Clock m_clock;
     float m_timeValue;
     float m_deltaTimeValue;

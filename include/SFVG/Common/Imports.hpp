@@ -71,4 +71,6 @@ using sf::microseconds;
 
 namespace WindowStyle = sf::Style;
 
+typedef sf::Vector2<double> Vector2d;
+
 } // namespace sfvg

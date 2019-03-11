@@ -12,5 +12,3 @@ target_sources(sfvg
       StarShape.cpp
 )
 
-# add the subdirectories to get source files
-add_subdirectory(Detail)

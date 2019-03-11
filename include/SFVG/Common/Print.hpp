@@ -23,7 +23,6 @@ std::string numToStr(double number);
 std::ostream & operator << (std::ostream &out, const Color& color);
 std::ostream & operator << (std::ostream &out, const RGB& rgb);
 std::ostream & operator << (std::ostream &out, const HSV& hsv);
-std::ostream & operator << (std::ostream &out, const CMYK& cmyk);
 std::ostream & operator << (std::ostream &out, const sf::String& str);
 
 template <typename T>

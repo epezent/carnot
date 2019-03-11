@@ -11,7 +11,7 @@ public:
         f(_f)
     {
         guide = addComponent<LineRenderer>();
-        guide->setColor(Grays::Gray10);
+        guide->setColor(Grays::Gray20);
         guide->setPointCount(2);
         path = addComponent<LineRenderer>();
         path->setColor(color);
@@ -60,15 +60,14 @@ public:
         pos.y = r->transform.getPosition().y + r->dotPos.y;
         pos.x = c->transform.getPosition().x + c->dotPos.x;
         dot->shape.setPosition(pos);
-        if (addPoint)
-            path->addPoint(pos);
-        addPoint = !addPoint;
+        path->addPoint(pos);
+        if (input.getKeyDown(Key::Space))
+            path->setPointCount(0);
     }
 
     Handle<LissaCircle> r, c;
     Handle<LineRenderer> path;
     Handle<ShapeRenderer> dot;
-    bool addPoint = true;
 };
 
 class LissaRoot : public GameObject {
@@ -125,7 +124,7 @@ public:
 
     std::vector<Handle<LissaCircle>> rHeaders;
     std::vector<Handle<LissaCircle>> cHeaders;
-    std::vector<std::vector<Handle<LissaCircle>>> nodes;
+    std::vector<std::vector<Handle<LissaPath>>> nodes;
     Handle<LineRenderer> lr;
 };
 
@@ -133,7 +132,7 @@ public:
 int main(int argc, char const *argv[])
 {
     Engine engine(800,800);
-    engine.window.setFramerateLimit(30);
+    engine.window.setTitle("Lissajous");
     engine.makeRoot<LissaRoot>();
     engine.run();
     return 0;
