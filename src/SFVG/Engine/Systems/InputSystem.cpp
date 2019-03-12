@@ -1,91 +1,254 @@
 #include <SFVG/Engine/Systems/InputSystem.hpp>
 #include <SFVG/Common/Print.hpp>
 #include <SFVG/Engine/Engine.hpp>
+#include <array>
 
 namespace sfvg {
 
-InputSystem::InputSystem(Engine& engine, const Name& name) :
-    System(engine, name),
-    m_mouseScrollDetla(0.0f),
-    m_dblClkDelay(0.25f),
-    m_anyKeyDownBool(false),
-    m_anyKeyUpBool(false),
-    m_anyMouseDownBool(false),
-    m_anyMouseUpBool(false),
-    m_anyInputBool(false),
-    m_textEntered(""),
-    m_keyDownTable({false})
-{
-    m_keyDownTable.fill(false);
-    m_keyUpTable.fill(false);
-    m_mouseDownTable.fill(false);
-    m_mouseUpTable.fill(false);
-    m_dblClkTable.fill(false);
-    m_dblClkTimes.fill(0.0f);
-    m_dragStartedTable.fill(false);
-    m_dragEndedTable.fill(false);
-    m_draggingTable.fill(false);
-    m_dragStartTable.fill(Vector2f());
-    m_dragLastTable.fill(Vector2f());
-    m_dragLastRawTable.fill(Vector2i());
-    m_dragDeltaTable.fill(Vector2f());
-    m_dragDeltaRawTable.fill(Vector2i());
-    m_dragTotalTable.fill(Vector2f());
+//==============================================================================
+// GLOBALS
+//==============================================================================
+
+namespace {
+
+Vector2i g_mousePosition;
+Vector2f g_worldPosition;
+
+float g_mouseScrollDetla;
+float g_dblClkDelay;
+
+bool g_anyKeyDownBool;
+bool g_anyKeyUpBool;
+bool g_anyMouseDownBool;
+bool g_anyMouseUpBool;
+bool g_anyInputBool;
+
+sf::String g_textEntered;
+
+std::array<bool, Key::KeyCount>                    g_keyDownTable;
+std::array<bool, Key::KeyCount>                    g_keyUpTable;
+
+std::array<bool, MouseButton::ButtonCount>         g_mouseDownTable;
+std::array<bool, MouseButton::ButtonCount>         g_mouseUpTable;
+std::array<bool, MouseButton::ButtonCount>         g_dblClkTable;
+
+std::array<float, MouseButton::ButtonCount>        g_dblClkTimes;
+
+std::array<bool, MouseButton::ButtonCount>         g_dragStartedTable;
+std::array<bool, MouseButton::ButtonCount>         g_dragEndedTable;
+std::array<bool, MouseButton::ButtonCount>         g_draggingTable;
+
+std::array<Vector2f, MouseButton::ButtonCount>     g_dragStartTable;
+std::array<Vector2f, MouseButton::ButtonCount>     g_dragLastTable;
+std::array<Vector2i, MouseButton::ButtonCount>     g_dragLastRawTable;
+std::array<Vector2f, MouseButton::ButtonCount>     g_dragDeltaTable;
+std::array<Vector2i, MouseButton::ButtonCount>     g_dragDeltaRawTable;
+std::array<Vector2f, MouseButton::ButtonCount>     g_dragTotalTable;
+
+} // private namespace
+
+//==============================================================================
+// USER API
+//==============================================================================
+
+namespace Input {
+
+bool getKey(Key key) {
+    return sf::Keyboard::isKeyPressed(key);
 }
 
-void InputSystem::processEvent(const Event& event) {
+bool getKeyDown(Key key) {
+    return g_keyDownTable[key];
+}
+
+bool getKeyUp(Key key) {
+    return g_keyUpTable[key];
+}
+
+bool anyKeyDown() {
+    return g_anyKeyDownBool;
+}
+
+bool anyKeyUp() {
+    return g_anyKeyUpBool;
+}
+
+bool getMouse(MouseButton button) {
+    return sf::Mouse::isButtonPressed(button);
+}
+
+bool getMouseDown(MouseButton button) {
+    return g_mouseDownTable[button];
+}
+
+bool getMouseUp(MouseButton button) {
+    return g_mouseUpTable[button];
+}
+
+bool anyMouseDown() {
+    return g_anyMouseDownBool;
+}
+
+bool anyMouseUp() {
+    return g_anyMouseUpBool;
+}
+
+bool getDoubleClick(MouseButton button) {
+    return g_dblClkTable[button];
+}
+
+bool dragStarted(MouseButton button) {
+    return g_dragStartedTable[button];
+}
+
+bool dragging(MouseButton button) {
+    return g_draggingTable[button];
+}
+
+bool dragEnded(MouseButton button) {
+    return g_dragEndedTable[button];
+}
+
+Vector2f dragDelta(MouseButton button) {
+    return g_dragDeltaTable[button];
+}
+
+Vector2i dragDeltaRaw(MouseButton button) {
+    return g_dragDeltaRawTable[button];
+}
+
+float getScroll() {
+    return g_mouseScrollDetla;
+}
+
+Vector2i getRawMousePosition() {
+    return g_mousePosition;
+}
+
+Vector2f getMousePosition() {
+    return g_worldPosition;
+}
+
+Vector2f getMousePosition(const View& view) {
+    return Engine::window->mapPixelToCoords(g_mousePosition, view);
+}
+
+const sf::String& getTextEntered() {
+    return g_textEntered;
+}
+
+bool anyInput() {
+    return g_anyInputBool;
+}
+
+void clearState() {
+    for (std::size_t i = 0; i < Key::KeyCount; ++i) {
+        g_keyDownTable[i] = false;
+        g_keyUpTable[i] = false;
+    }
+    for (std::size_t i = 0; i < MouseButton::ButtonCount; ++i) {
+        g_mouseDownTable[i] = false;
+        g_mouseUpTable[i] = false;
+        g_dblClkTable[i] = false;
+        g_dragStartedTable[i] = false;
+        g_dragEndedTable[i] = false;
+        g_dragDeltaTable[i] = Vector2f();
+        g_dragDeltaRawTable[i] = Vector2i();
+    }
+    g_mouseScrollDetla = 0;
+    g_textEntered = "";
+    g_anyInputBool = false;
+    g_anyKeyDownBool = false;
+    g_anyKeyUpBool = false;
+    g_anyMouseDownBool = false;
+    g_anyMouseUpBool = false;
+}
+
+//==============================================================================
+// DETAIL
+//==============================================================================
+
+namespace detail {
+
+void init() {
+    g_mouseScrollDetla = 0.0f;
+    g_dblClkDelay = 0.30f;
+    g_anyKeyDownBool = false;
+    g_anyKeyUpBool = false;
+    g_anyMouseDownBool = false;
+    g_anyMouseUpBool = false;
+    g_anyInputBool = false;
+    g_textEntered = "";
+    g_keyDownTable.fill(false);
+    g_keyUpTable.fill(false);
+    g_mouseDownTable.fill(false);
+    g_mouseUpTable.fill(false);
+    g_dblClkTable.fill(false);
+    g_dblClkTimes.fill(0.0f);
+    g_dragStartedTable.fill(false);
+    g_dragEndedTable.fill(false);
+    g_draggingTable.fill(false);
+    g_dragStartTable.fill(Vector2f());
+    g_dragLastTable.fill(Vector2f());
+    g_dragLastRawTable.fill(Vector2i());
+    g_dragDeltaTable.fill(Vector2f());
+    g_dragDeltaRawTable.fill(Vector2i());
+    g_dragTotalTable.fill(Vector2f());
+}
+
+void processEvent(const Event& event) {
     switch (event.type) {
         case Event::KeyPressed: {
             auto code = event.key.code;
             if (code > -1 && code < Key::KeyCount)
-                m_keyDownTable[code] = true;
-            m_anyInputBool = true;
-            m_anyKeyDownBool = true;
+                g_keyDownTable[code] = true;
+            g_anyInputBool = true;
+            g_anyKeyDownBool = true;
             break;
         }
         case Event::KeyReleased: {
             auto code = event.key.code;
             if (code > -1 && code < Key::KeyCount)
-                m_keyUpTable[code]   = true;
-            m_anyKeyUpBool = true;
+                g_keyUpTable[code]   = true;
+            g_anyKeyUpBool = true;
             break;
         }
         case Event::MouseButtonPressed: {
-            m_mouseDownTable[event.mouseButton.button] = true;
-            m_anyInputBool = true;
-            m_anyMouseDownBool = true;
+            g_mouseDownTable[event.mouseButton.button] = true;
+            g_anyInputBool = true;
+            g_anyMouseDownBool = true;
             // drag
-            m_dragStartedTable[event.mouseButton.button] = true;
-            m_draggingTable[event.mouseButton.button] = true;
-            m_dragStartTable[event.mouseButton.button] = m_worldPosition;
-            m_dragLastTable[event.mouseButton.button]  = m_worldPosition;
-            m_dragLastRawTable[event.mouseButton.button] = m_mousePosition;
+            g_dragStartedTable[event.mouseButton.button] = true;
+            g_draggingTable[event.mouseButton.button] = true;
+            g_dragStartTable[event.mouseButton.button] = g_worldPosition;
+            g_dragLastTable[event.mouseButton.button]  = g_worldPosition;
+            g_dragLastRawTable[event.mouseButton.button] = g_mousePosition;
             // double click
-            float now = engine.time();
-            if ((now - m_dblClkTimes[event.mouseButton.button]) < m_dblClkDelay) {
-                m_dblClkTable[event.mouseButton.button] = true;
-                m_dragStartedTable[event.mouseButton.button] = false;
-                m_draggingTable[event.mouseButton.button] = false;
+            float now = Engine::time();
+            if ((now - g_dblClkTimes[event.mouseButton.button]) < g_dblClkDelay) {
+                g_dblClkTable[event.mouseButton.button] = true;
+                g_dragStartedTable[event.mouseButton.button] = false;
+                g_draggingTable[event.mouseButton.button] = false;
             }
-            m_dblClkTimes[event.mouseButton.button] = now;
+            g_dblClkTimes[event.mouseButton.button] = now;
             break;
         }
         case Event::MouseButtonReleased: {
-            m_mouseUpTable[event.mouseButton.button] = true;
-            m_anyMouseUpBool = true;
+            g_mouseUpTable[event.mouseButton.button] = true;
+            g_anyMouseUpBool = true;
             // drag
-            m_dragEndedTable[event.mouseButton.button] = true;
-            m_draggingTable[event.mouseButton.button]  = false;
+            g_dragEndedTable[event.mouseButton.button] = true;
+            g_draggingTable[event.mouseButton.button]  = false;
             break;
         }
         case Event::MouseWheelScrolled: {
-            m_mouseScrollDetla += event.mouseWheelScroll.delta;
-            m_anyInputBool = true;
+            g_mouseScrollDetla += event.mouseWheelScroll.delta;
+            g_anyInputBool = true;
             break;
         }
         case Event::TextEntered: {
             if (event.text.unicode > 31 && event.text.unicode < 128)
-                m_textEntered += event.text.unicode;
+                g_textEntered += event.text.unicode;
             break;
         }
         default:
@@ -93,135 +256,22 @@ void InputSystem::processEvent(const Event& event) {
     }
 }
 
-void InputSystem::clearState() {
-    for (std::size_t i = 0; i < Key::KeyCount; ++i) {
-        m_keyDownTable[i] = false;
-        m_keyUpTable[i] = false;
-    }
-    for (std::size_t i = 0; i < MouseButton::ButtonCount; ++i) {
-        m_mouseDownTable[i] = false;
-        m_mouseUpTable[i] = false;
-        m_dblClkTable[i] = false;
-        m_dragStartedTable[i] = false;
-        m_dragEndedTable[i] = false;
-        m_dragDeltaTable[i] = Vector2f();
-        m_dragDeltaRawTable[i] = Vector2i();
-    }
-    m_mouseScrollDetla = 0;
-    m_textEntered = "";
-    m_anyInputBool = false;
-    m_anyKeyDownBool = false;
-    m_anyKeyUpBool = false;
-    m_anyMouseDownBool = false;
-    m_anyMouseUpBool = false;
-}
-
-void InputSystem::update() {
+void update() {
     clearState();
-    m_mousePosition = sf::Mouse::getPosition(engine.window);
-    m_worldPosition = engine.window.mapPixelToCoords(m_mousePosition, engine.getView(0));
+    g_mousePosition = sf::Mouse::getPosition(*Engine::window);
+    g_worldPosition = Engine::window->mapPixelToCoords(g_mousePosition, Engine::getView(0));
     // update draggings
     for (std::size_t i = 0; i < MouseButton::ButtonCount; ++i) {
-        if (m_draggingTable[i]) {
-            m_dragDeltaTable[i]    = m_worldPosition - m_dragLastTable[i];
-            m_dragDeltaRawTable[i] = m_mousePosition - m_dragLastRawTable[i];
-            m_dragTotalTable[i]    = m_worldPosition - m_dragStartTable[i];
-            m_dragLastTable[i]     = m_worldPosition;
-            m_dragLastRawTable[i]  = m_mousePosition;
+        if (g_draggingTable[i]) {
+            g_dragDeltaTable[i]    = g_worldPosition - g_dragLastTable[i];
+            g_dragDeltaRawTable[i] = g_mousePosition - g_dragLastRawTable[i];
+            g_dragTotalTable[i]    = g_worldPosition - g_dragStartTable[i];
+            g_dragLastTable[i]     = g_worldPosition;
+            g_dragLastRawTable[i]  = g_mousePosition;
         }
     }
 }
 
-//==============================================================================
-// PUBLIC STATIC FUNCTIONS
-//==============================================================================
-
-bool InputSystem::getKey(Key key) {
-    return sf::Keyboard::isKeyPressed(key);
-}
-
-bool InputSystem::getKeyDown(Key key) {
-    return m_keyDownTable[key];
-}
-
-bool InputSystem::getKeyUp(Key key) {
-    return m_keyUpTable[key];
-}
-
-bool InputSystem::anyKeyDown() {
-    return m_anyKeyDownBool;
-}
-
-bool InputSystem::anyKeyUp() {
-    return m_anyKeyUpBool;
-}
-
-bool InputSystem::getMouse(MouseButton button) {
-    return sf::Mouse::isButtonPressed(button);
-}
-
-bool InputSystem::getMouseDown(MouseButton button) {
-    return m_mouseDownTable[button];
-}
-
-bool InputSystem::getMouseUp(MouseButton button) {
-    return m_mouseUpTable[button];
-}
-
-bool InputSystem::anyMouseDown() {
-    return m_anyMouseDownBool;
-}
-
-bool InputSystem::anyMouseUp() {
-    return m_anyMouseUpBool;
-}
-
-bool InputSystem::getDoubleClick(MouseButton button) {
-    return m_dblClkTable[button];
-}
-
-bool InputSystem::dragStarted(MouseButton button) {
-    return m_dragStartedTable[button];
-}
-
-bool InputSystem::dragging(MouseButton button) {
-    return m_draggingTable[button];
-}
-
-bool InputSystem::dragEnded(MouseButton button) {
-    return m_dragEndedTable[button];
-}
-
-Vector2f InputSystem::dragDelta(MouseButton button) {
-    return m_dragDeltaTable[button];
-}
-
-Vector2i InputSystem::dragDeltaRaw(MouseButton button) {
-    return m_dragDeltaRawTable[button];
-}
-
-float InputSystem::getScroll() {
-    return m_mouseScrollDetla;
-}
-
-Vector2i InputSystem::getRawMousePosition() {
-    return m_mousePosition;
-}
-
-Vector2f InputSystem::getMousePosition() {
-    return m_worldPosition;
-}
-
-Vector2f InputSystem::getMousePosition(const View& view) {
-    return engine.window.mapPixelToCoords(m_mousePosition, view);
-}
-
-const sf::String& InputSystem::getTextEntered() {
-    return m_textEntered;
-}
-
-bool InputSystem::anyInput() {
-    return m_anyInputBool;
-}
-
+} // namespace detail
+} // namespace Input
 } // namespace sfvg

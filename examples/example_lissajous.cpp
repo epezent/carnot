@@ -1,11 +1,12 @@
 #include <SFVG/SFVG.hpp>
 
+SFVG_USE_DISCRETE_GPU
+
 using namespace sfvg;
 
 class LissaCircle : public GameObject {
 public:
-    LissaCircle(Engine& engine, Color _color, float _f, bool col) :
-        GameObject(engine),
+    LissaCircle(Color _color, float _f, bool col) :
         column(col),
         color(_color),
         f(_f)
@@ -22,8 +23,8 @@ public:
     }
 
     void update() {
-        dotPos.x = 40.0f * std::cos(0.25f*f*engine.time());
-        dotPos.y = 40.0f * std::sin(0.25f*f*engine.time());
+        dotPos.x = 40.0f * std::cos(0.25f*f*Engine::time());
+        dotPos.y = 40.0f * std::sin(0.25f*f*Engine::time());
         guide->setPoint(0, dotPos);
         if (column)
             guide->setPoint(1,dotPos.x,800);
@@ -43,8 +44,7 @@ public:
 
 class LissaPath : public GameObject {
 public:
-    LissaPath(Engine& engine, Handle<LissaCircle> _r, Handle<LissaCircle> _c) :
-        GameObject(engine),
+    LissaPath(Handle<LissaCircle> _r, Handle<LissaCircle> _c) :
         r(_r), c(_c)
     {
         path = addComponent<LineRenderer>();
@@ -61,7 +61,7 @@ public:
         pos.x = c->transform.getPosition().x + c->dotPos.x;
         dot->shape.setPosition(pos);
         path->addPoint(pos);
-        if (input.getKeyDown(Key::Space))
+        if (Input::getKeyDown(Key::Space))
             path->setPointCount(0);
     }
 
@@ -73,8 +73,7 @@ public:
 class LissaRoot : public GameObject {
 public:
 
-    LissaRoot(Engine& engine) :
-        GameObject(engine),
+    LissaRoot() :
         rHeaders(7),
         cHeaders(7),
         nodes(7)
@@ -113,13 +112,13 @@ public:
 
     void update() override {
 
-        if (input.getScroll() > 0)
-            engine.getView(0).zoom(1.1f);
-        else if (input.getScroll() < 0)
-            engine.getView(0).zoom(1.0f/1.1f);
+        if (Input::getScroll() > 0)
+            Engine::getView(0).zoom(1.1f);
+        else if (Input::getScroll() < 0)
+            Engine::getView(0).zoom(1.0f/1.1f);
 
-        auto drag = input.dragDeltaRaw(MouseButton::Left);
-        engine.getView(0).move(-drag.x, -drag.y);
+        auto drag = Input::dragDeltaRaw(MouseButton::Left);
+        Engine::getView(0).move(-drag.x, -drag.y);
     }
 
     std::vector<Handle<LissaCircle>> rHeaders;
@@ -131,9 +130,10 @@ public:
 
 int main(int argc, char const *argv[])
 {
-    Engine engine(800,800);
-    engine.window.setTitle("Lissajous");
-    engine.makeRoot<LissaRoot>();
-    engine.run();
+    Engine::init(800,800, WindowStyle::Default);
+    Engine::window->setTitle("Lissajous");
+    Engine::makeRoot<LissaRoot>();
+    Engine::run();
+    
     return 0;
 }

@@ -4,7 +4,7 @@ using namespace sfvg;
 
 class Wall : public GameObject {
 public:
-    Wall(Engine& engine, float width, float height, float x, float y) : GameObject(engine) {
+    Wall(float width, float height, float x, float y) {
         transform.setLocalPosition(x,y);
         auto sr = addComponent<ShapeRenderer>();
         sr->shape = RectangleShape(width,height);
@@ -17,7 +17,7 @@ public:
 
 class Ball : public GameObject {
 public:
-    Ball(Engine& e) : GameObject(e) {
+    Ball() {
         transform.setPosition(500,250);
         auto sr = addComponent<ShapeRenderer>();
         sr->shape = CircleShape(10);
@@ -30,7 +30,7 @@ public:
     }
 
     void update() {
-        if (input.getKeyDown(Key::R))
+        if (Input::getKeyDown(Key::R))
             reset();
     }
 
@@ -44,7 +44,7 @@ public:
 
 class Paddle : public GameObject {
 public:
-    Paddle(Engine& e) : GameObject(e) {
+    Paddle() {
         auto sr = addComponent<ShapeRenderer>();
         sr->setColor(Color::White);
         sr->shape = RectangleShape(10,100);
@@ -55,10 +55,10 @@ public:
     }
 
     void update() override {
-        if (input.getKey(Key::Up))
-            rb->setPosition(rb->getPosition() + Vector2f(0,-500) * engine.deltaTime());
-        else if (input.getKey(Key::Down))
-            rb->setPosition(rb->getPosition() + Vector2f(0,500) * engine.deltaTime());
+        if (Input::getKey(Key::Up))
+            rb->setPosition(rb->getPosition() + Vector2f(0,-500) * Engine::deltaTime());
+        else if (Input::getKey(Key::Down))
+            rb->setPosition(rb->getPosition() + Vector2f(0,500) * Engine::deltaTime());
     }
 
     Handle <RigidBody> rb;
@@ -66,7 +66,7 @@ public:
 
 class Pong : public GameObject {
 public:
-    Pong(Engine& e) : GameObject(e) {
+    Pong() {
         makeChild<Wall>(10,500,5,250);
         makeChild<Wall>(10,500,995,250);
         makeChild<Wall>(1000,10,500,5);
@@ -81,10 +81,11 @@ public:
 
 int main(int argc, char const *argv[])
 {
-    Engine engine(1000,500);
-    engine.makeRoot<Pong>();
-    engine.physics.setGravity(Vector2f(0,0));
-    engine.physics.setDamping(1);
-    engine.run();
+    Engine::init(1000,500);
+    Engine::makeRoot<Pong>();
+    Physics::setGravity(Vector2f(0,0));
+    Physics::setDamping(1);
+    Engine::run();
+    
     return 0;
 }

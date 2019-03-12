@@ -181,25 +181,25 @@ void ShapeRenderer::onDebugRender() {
         return;
     // shape local bounds
     Matrix3x3 T = gameObject.transform.getWorldMatrix() * shape.getTransform();
-    if (engine.debug.widgets[DebugSystem::Widget::LocalBounds]) {
+    if (Debug::detail::gizmoActive(Debug::Gizmo::LocalBounds)) {
         auto bounds = shape.getLocalBounds();
         auto a = T.transformPoint(bounds.left,bounds.top);
         auto b = T.transformPoint(bounds.left+bounds.width,bounds.top);
         auto c = T.transformPoint(bounds.left+bounds.width,bounds.top+bounds.height);
         auto d = T.transformPoint(bounds.left,bounds.top+bounds.height);
-        engine.debug.drawPolyline({a,b,c,d,a},Blues::Blue);
+        Debug::drawPolyline({a,b,c,d,a},Blues::Blue);
     }
     // draw world bounds
-    if (engine.debug.widgets[DebugSystem::Widget::WorldBounds]) {
+    if (Debug::detail::gizmoActive(Debug::Gizmo::WorldBounds)) {
         auto bounds = getWorldBounds();
         auto a = Vector2f(bounds.left,bounds.top);
         auto b = Vector2f(bounds.left+bounds.width,bounds.top);
         auto c = Vector2f(bounds.left+bounds.width,bounds.top+bounds.height);
         auto d = Vector2f(bounds.left,bounds.top+bounds.height);
-        engine.debug.drawPolyline({a,b,c,d,a},Cyans::Cyan);
+        Debug::drawPolyline({a,b,c,d,a},Cyans::Cyan);
     }
     // wireframe
-    if (engine.debug.widgets[DebugSystem::Widget::Wireframe]) {
+    if (Debug::detail::gizmoActive(Debug::Gizmo::Wireframe)) {
         std::vector<Vector2f> wireframe;
         wireframe.reserve(2 * m_vertexArray.size());
         for (std::size_t i = 0; i < m_vertexArray.size(); i = i + 3) {
@@ -210,7 +210,7 @@ void ShapeRenderer::onDebugRender() {
             wireframe.push_back(T.transformPoint(m_vertexArray[i + 2].position));
             wireframe.push_back(T.transformPoint(m_vertexArray[i].position    ));
         }
-        engine.debug.drawLines(wireframe,Yellows::Yellow);
+        Debug::drawLines(wireframe,Yellows::Yellow);
     }
 }
 

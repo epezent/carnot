@@ -21,7 +21,7 @@ Renderer::~Renderer() {
 }
 
 void Renderer::setLayer(std::size_t layer) {
-    assert(layer < engine.getLayerCount());
+    assert(layer < Engine::getLayerCount());
     m_layer = layer;
 }
 
@@ -30,7 +30,7 @@ std::size_t Renderer::getLayer() const {
 }
 
 void Renderer::incrementLayer() {
-    if (m_layer < (engine.getLayerCount() - 1))
+    if (m_layer < (Engine::getLayerCount() - 1))
         m_layer++;
 }
 
@@ -44,7 +44,7 @@ void Renderer::sendToBack() {
 }
 
 void Renderer::sendToFront() {
-    m_layer = engine.getLayerCount() - 1;
+    m_layer = Engine::getLayerCount() - 1;
 }
 
 std::size_t Renderer::getRendererCount() {

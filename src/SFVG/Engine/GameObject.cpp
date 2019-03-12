@@ -9,8 +9,8 @@
 
 namespace sfvg {
 
-GameObject::GameObject(Engine& _engine, const Name& name) :
-    Object(_engine, name),
+GameObject::GameObject(const Name& name) :
+    Object(name),
     m_iteratingChildren(false),
     m_startCalled(false),
     m_iteratingComponents(false),
@@ -18,12 +18,10 @@ GameObject::GameObject(Engine& _engine, const Name& name) :
     m_index(0),
     m_isRoot(false),
     transform(*attachComponent(std::make_shared<Transform>(*this)).as<Transform>().get())
-{
+{ }
 
-}
-
-GameObject::GameObject(Engine& _engine) :
-    Object(_engine),
+GameObject::GameObject() :
+    Object(),
     m_iteratingChildren(false),
     m_startCalled(false),
     m_iteratingComponents(false),
@@ -39,7 +37,7 @@ GameObject::GameObject(Engine& _engine) :
 
 Handle<GameObject> GameObject::getHandle() const {
     if (isRoot())
-        return engine.getRoot();
+        return Engine::getRoot();
     assert(hasParent());
     return m_parent->getChild(getIndex());
 }
@@ -220,11 +218,6 @@ Handle<Component> GameObject::attachComponent(Ptr<Component> component) {
     }
     return h;
 }
-
-// void GameObject::draw(RenderTarget& target, RenderStates states) const {
-//     // do nothing by default
-// }
-
 
 //==============================================================================
 // Private Functions

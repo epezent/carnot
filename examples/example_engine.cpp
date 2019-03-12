@@ -5,11 +5,27 @@ using namespace sfvg;
 class TestObject : public GameObject {
 public:
 
-    TestObject(Engine& engine) :
-        GameObject(engine)
+    TestObject()
     {
+        // init background
+        bg = makeChild<GameObject>();
+        std::size_t n = 50;
+        float s = 500.0f/n;
+        SquareShape sqr(s);        
+        for (std::size_t i = 0; i < n/2; ++i) {
+            for (std::size_t j = 0; j < n; ++j) {
+                sqr.setPosition(s*(j%2) + s/2.0f  + 2*i * s, s/2  + j * s);
+                auto check = bg->addComponent<ShapeRenderer>();
+                check->shape = sqr;
+                check->setColor(Grays::Gray50);
+                check->setLayer(0);
+            }
+        }
+
         stroke = addComponent<StrokeRenderer>();
+        stroke->setLayer(1);
         sr = addComponent<ShapeRenderer>();
+        sr->setLayer(1);
         sr->shape = SquareShape(50);
         sr->setColor(Grays::Gray50);
         sr->shape.setPosition(250,250);
@@ -17,28 +33,28 @@ public:
         auto b = Blues::DeepSkyBlue;
         b.a = 128;
         sr->setGradient(Gradient(b, Greens::Chartreuse));
-        // stroke->addPoint(0,0);
-        // stroke->addPoint(250,250);
-        stroke->setColor(b);
-        stroke->setThickness(10);
-        stroke->setPointCount(2);
+        stroke->addVertex(250,250,randomColor(), 5.0f);
     }
 
     void update() override {
 
-        if (input.getKey(Key::R)) {
-            if (input.getKey(Key::LControl))
-                transform.rotate(90*engine.deltaTime());
+        if (Input::getKey(Key::R)) {
+            if (Input::getKey(Key::LControl))
+                transform.rotate(90*Engine::deltaTime());
             else
-                transform.rotate(-90*engine.deltaTime());
+                transform.rotate(-90*Engine::deltaTime());
         }     
 
-        stroke->setPoint(1, input.getMousePosition());
+        if (Input::getMouseDown(MouseButton::Left))
+            stroke->addVertex(Input::getMousePosition(),randomColor(), 5.0f);
 
-        if (input.getKeyDown(Key::Up))
+        if (Input::getKeyDown(Key::Up))
             transform.scale(0.5f,0.5f);
-        else if (input.getKeyDown(Key::Down))
+        else if (Input::getKeyDown(Key::Down))
             transform.scale(2.0f,2.0f);
+
+        if (Input::getKeyDown(Key::Space))
+            bg->setEnabled(!bg->isEnabled());
 
     }
 
@@ -46,12 +62,16 @@ private:
 
     Handle<StrokeRenderer> stroke;
     Handle<ShapeRenderer> sr;
+    Handle<GameObject> bg;
 };
 
 int main(int argc, char const *argv[]) {
-    Engine engine(500, 500);
-    engine.makeRoot<TestObject>();
-    engine.window.setTitle("Evan's Engine");
-    engine.run();
+    Engine::init(500, 500);
+    Engine::setLayerCount(2);
+    Engine::makeRoot<TestObject>();
+    Engine::setBackgroundColor(Whites::White);
+    Engine::window->setTitle("Evan's Engine");
+    Engine::run();
+    
     return 0;
 }

@@ -4,7 +4,7 @@ using namespace sfvg;
 
 class Wall : public GameObject {
 public:
-    Wall(Engine& engine, float width, float height, float x, float y) : GameObject(engine) {
+    Wall(float width, float height, float x, float y) {
         transform.setLocalPosition(x,y);
         auto sr = addComponent<ShapeRenderer>();
         sr->shape = RectangleShape(width,height);
@@ -16,14 +16,14 @@ public:
 
 class RectObject : public GameObject {
 public:
-    RectObject(Engine& engine) : GameObject(engine) {
+    RectObject() {
         sr = addComponent<ShapeRenderer>();
         sr->setColor(color = randomColor());
-        start = input.getMousePosition();
+        start = Input::getMousePosition();
     }
 
     void update() {
-        if (!confirmed && input.getMouseUp(MouseButton::Right)) {
+        if (!confirmed && Input::getMouseUp(MouseButton::Right)) {
             if (absVec(start - end) == Vector2f(0,0)) {
                 destroy();
             }
@@ -36,16 +36,16 @@ public:
                 rb->setShapeElasticity(0, 0.0f);
             }
         }
-        if (!confirmed && input.getMouse(MouseButton::Right)) {
-            end = input.getMousePosition();
+        if (!confirmed && Input::getMouse(MouseButton::Right)) {
+            end = Input::getMousePosition();
             auto size = absVec(start - end);
             sr->shape = RectangleShape(size.x, size.y);
             transform.setPosition(start + 0.5f * (end - start));
         }
         if (rb) {
-            engine.debug.drawText(str("mass = ",rb->getMass()), transform.getPosition());
-            auto localPos = transform.worldToLocal(input.getMousePosition());
-            if (inBounds(localPos, sr->shape.getLocalBounds()) && input.getKeyDown(Key::D))
+            Debug::drawText(str("mass = ",rb->getMass()), transform.getPosition());
+            auto localPos = transform.worldToLocal(Input::getMousePosition());
+            if (inBounds(localPos, sr->shape.getLocalBounds()) && Input::getKeyDown(Key::D))
                 destroy();
             
         }
@@ -60,7 +60,7 @@ public:
 
 class Player : public GameObject {
 public:
-    Player(Engine& engine) : GameObject(engine) {
+    Player() {
         makeChild<Wall>(750,50,0,375);
         makeChild<Wall>(750,50,0,-375);
         makeChild<Wall>(50,750,-375,0);
@@ -68,13 +68,13 @@ public:
     }
 
     void update() {
-        if (input.getKeyDown(Key::G))
-            engine.physics.setGravity(Vector2f(0,1000) - engine.physics.getGravity());
-        if (input.getMouseDown(MouseButton::Right))
+        if (Input::getKeyDown(Key::G))
+            Physics::setGravity(Vector2f(0,1000) - Physics::getGravity());
+        if (Input::getMouseDown(MouseButton::Right))
             makeChild<RectObject>();
-        if (input.getMouseDown(MouseButton::Middle)) {
+        if (Input::getMouseDown(MouseButton::Middle)) {
             auto go = makeChild<GameObject>();
-            go->transform.setPosition(input.getMousePosition());
+            go->transform.setPosition(Input::getMousePosition());
             go->addComponent<ShapeRenderer>();
             go->getComponent<ShapeRenderer>()->setColor(randomColor());
             go->getComponent<ShapeRenderer>()->shape = CircleShape(30);
@@ -86,16 +86,16 @@ public:
     }
 };
 
-
 int main(int argc, char const *argv[]) {
-    Engine engine(750,750);
-    engine.getView(0).setCenter(0, 0);
-    engine.setLayerCount(2);
-    engine.debug.show(true);
-    engine.setBackgroundColor(Grays::Gray10);
-    engine.window.setKeyRepeatEnabled(false);
-    auto root = engine.makeRoot<Player>();
-    engine.window.setTitle("Evan's Engine");
-    engine.run();
+    Engine::init(750,750);
+    Engine::getView(0).setCenter(0, 0);
+    Engine::setLayerCount(2);
+    Debug::show(true);
+    Engine::setBackgroundColor(Grays::Gray10);
+    Engine::window->setKeyRepeatEnabled(false);
+    Engine::makeRoot<Player>();
+    Engine::window->setTitle("Evan's Engine");
+    Engine::run();
+    
     return 0;
 }

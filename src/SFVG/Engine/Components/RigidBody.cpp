@@ -39,7 +39,7 @@ RigidBody::RigidBody(GameObject& _gameObject, BodyType type, float mass, float m
     setBodyType(type);
     // set initial position
     syncWithTransform();
-    cpSpaceAddBody(engine.physics.m_space, m_body);
+    cpSpaceAddBody(Physics::detail::space(), m_body);
     g_rigidBodyCount++;
     // register with Transform
     //gameObject.transform.registerCallback(std::bind(&RigidBody::syncWithTransform, this));
@@ -47,10 +47,10 @@ RigidBody::RigidBody(GameObject& _gameObject, BodyType type, float mass, float m
 
 RigidBody::~RigidBody() {
     for (auto& shape : m_shapes) {
-        cpSpaceRemoveShape(engine.physics.m_space, shape);
+        cpSpaceRemoveShape(Physics::detail::space(), shape);
         cpShapeFree(shape);
     }
-    cpSpaceRemoveBody(gameObject.engine.physics.m_space, m_body);
+    cpSpaceRemoveBody(Physics::detail::space(), m_body);
     cpBodyFree(m_body);
     g_rigidBodyCount--;
 }
@@ -112,7 +112,7 @@ Vector2f RigidBody::getCOG() const {
 
 void RigidBody::addBoxShape(float width, float height, const Vector2f& offset, float skin) {
     cpShape* shape = cpBoxShapeNew(m_body, (cpFloat)width, (cpFloat)height, (cpFloat)skin);
-    cpSpaceAddShape(engine.physics.m_space, shape);
+    cpSpaceAddShape(Physics::detail::space(), shape);
     cpShapeSetFriction(shape, 0.5f);
     cpShapeSetMass(shape, getMass());
     m_shapes.push_back(shape);
@@ -121,7 +121,7 @@ void RigidBody::addBoxShape(float width, float height, const Vector2f& offset, f
 
 void RigidBody::addCircleShape(float radius, const Vector2f& offset) {
     cpShape* shape = cpCircleShapeNew(m_body, (cpFloat)radius, cpv(0,0));
-    cpSpaceAddShape(engine.physics.m_space, shape);
+    cpSpaceAddShape(Physics::detail::space(), shape);
     cpShapeSetFriction(shape, 0.5f);
     cpShapeSetMass(shape, getMass());
     m_shapes.push_back(shape);
@@ -141,7 +141,7 @@ void RigidBody::addShape(const Shape& _shape, float skin) {
     for (std::size_t i = 0; i < N; ++i)
         cpVerts.push_back(sf2cp(_shape.getTransform().transformPoint(verts[i])));
     cpShape* shape = cpPolyShapeNewRaw(m_body, N, &cpVerts[0], (cpFloat)skin);
-    cpSpaceAddShape(engine.physics.m_space, shape);
+    cpSpaceAddShape(Physics::detail::space(), shape);
     cpShapeSetFriction(shape, 0.5f);
     cpShapeSetMass(shape, getMass());
     m_shapes.push_back(shape);
@@ -274,7 +274,7 @@ void RigidBody::onPhysics() {
 
 void RigidBody::onDebugRender() {
     // draw shapes
-    if (engine.debug.widgets[DebugSystem::PhysicsShapes]) {
+    if (Debug::detail::gizmoActive(Debug::Gizmo::PhysicsShapes)) {
         for (std::size_t i = 0; i < getShapeCount(); ++i) {
             cpBody* body = cpShapeGetBody(m_shapes[i]);
             if (m_mask[i] == RBShapeTypePolygon) {
@@ -282,13 +282,13 @@ void RigidBody::onDebugRender() {
                 for (int j = 0; j < n; ++j) {
                     Point a = cp2sf(cpBodyLocalToWorld(body,cpPolyShapeGetVert(m_shapes[i], j)));
                     Point b = cp2sf(cpBodyLocalToWorld(body,cpPolyShapeGetVert(m_shapes[i], ((j+1)%n))));
-                    engine.debug.drawLine(a, b, DEBUG_PHYSICS_SHAPE_COLOR);
+                    Debug::drawLine(a, b, DEBUG_PHYSICS_SHAPE_COLOR);
                 }
             }
             else if (m_mask[i] == RBShapeTypeCircle) {
                 float r = (float)cpCircleShapeGetRadius(m_shapes[i]);
                 Point pos = cp2sf(cpBodyLocalToWorld(body,cpCircleShapeGetOffset(m_shapes[i])));
-                engine.debug.drawCircle(pos, r, DEBUG_PHYSICS_SHAPE_COLOR);
+                Debug::drawCircle(pos, r, DEBUG_PHYSICS_SHAPE_COLOR);
             }
             else if (m_mask[i] == RBShapeTypeSegment) {
 
@@ -296,11 +296,11 @@ void RigidBody::onDebugRender() {
         }
     }
     // draw center of gravity
-    if (engine.debug.widgets[DebugSystem::PhysicsCOG]) {
+    if (Debug::detail::gizmoActive(Debug::Gizmo::PhysicsCOG)) {
         Vector2f cog = getCOG();
-        engine.debug.drawCircle(cog, 5, DEBUG_PHYSICS_COG_COLOR);
-        engine.debug.drawPoint(cog + Vector2f(2,2), DEBUG_PHYSICS_COG_COLOR);
-        engine.debug.drawPoint(cog - Vector2f(2,2), DEBUG_PHYSICS_COG_COLOR);
+        Debug::drawCircle(cog, 5, DEBUG_PHYSICS_COG_COLOR);
+        Debug::drawPoint(cog + Vector2f(2,2), DEBUG_PHYSICS_COG_COLOR);
+        Debug::drawPoint(cog - Vector2f(2,2), DEBUG_PHYSICS_COG_COLOR);
 
     }
 }

@@ -10,8 +10,7 @@ using namespace sfvg;
 class Cell : public GameObject {
 public:
 
-    Cell(Engine& engine, float size) :
-        GameObject(engine) {
+    Cell(float size) {
         sr = addComponent<ShapeRenderer>();
         sr->setColor(Whites::White);
         sr->shape = SquareShape(size);
@@ -61,8 +60,7 @@ public:
 
 class God : public GameObject {
 public:
-    God(Engine& engine, float _width, float _height, float _size) :
-        GameObject(engine),
+    God(float _width, float _height, float _size) :
         width(_width), height(_height), size(_size)
     {
         auto R = (std::size_t)(height/size);
@@ -136,9 +134,9 @@ public:
 
 int main(int argc, char const *argv[])
 {
-    Engine engine;
-    engine.window.setFramerateLimit(10);
-    engine.makeRoot<God>(1920,1080,10);
-    engine.run();
+    Engine::init();
+    Engine::window->setFramerateLimit(10);
+    Engine::makeRoot<God>(1920,1080,10);
+    Engine::run();
     return 0;
 }

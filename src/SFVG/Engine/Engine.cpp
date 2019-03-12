@@ -14,72 +14,163 @@
 namespace sfvg {
 
 //==============================================================================
-// PUBLIC MEMBER VARIABLES
+// GLOBAL VARIABLES / PRIVATE FUNCTIONS
 //==============================================================================
 
-namespace {
-bool g_engineLoaded = false;
-} // private namespace
+Image*   SFVG_WHITE_IMAGE;
+Texture* SFVG_WHITE_TEXTURE;
+Shader*  SFVG_SOLID_SHADER;
+Shader*  SFVG_GRADIENT_SHADER;
 
-//==============================================================================
-// GENERAL
-//==============================================================================
+namespace {   
 
-Engine::Engine() :
-    Engine(sf::VideoMode::getDesktopMode().width,
-           sf::VideoMode::getDesktopMode().height,
-           WindowStyle::Fullscreen)
-{
+bool              g_initialized = false;
+bool              g_running     = false; 
+float             g_time        = 0.0f;
+float             g_delta       = 0.0f;
+std::size_t       g_frame       = 0;
+float             g_dpiFactor   = 1.0f;
+std::vector<View> g_views       = std::vector<View>(1);
+RenderQue         g_renderQue   = RenderQue(1);
+Color             g_bgColor     = Color();
+Clock             g_clock       = Clock();
+Ptr<GameObject>   g_root;
 
+const std::string g_solidShaderGlsl = \
+    "uniform vec4 u_color;" \
+    "uniform sampler2D u_texture;" \
+    "void main() {" \
+    "    vec4 pixel = texture2D(u_texture, gl_TexCoord[0].xy);" \
+    "    gl_FragColor = u_color * pixel;" \
+    "}";
+
+const std::string g_gradientShaderGlsl = \
+    "uniform vec4 u_color1;" \
+    "uniform vec4 u_color2;" \
+    "uniform float u_angle;" \
+    "uniform sampler2D u_texture;" \
+    "void main() {" \
+    "    vec4 pixel = texture2D(u_texture, gl_TexCoord[0].xy);" \
+    "    vec2 center = gl_TexCoord[0].xy - 0.5;" \
+    "    float radians = -0.0174532925199433 * u_angle;" \
+    "    float t = center.x * sin(radians) + center.y * cos(radians) + 0.5;" \
+    "    gl_FragColor = mix(u_color1, u_color2, t) * pixel;" \
+    "}";
+
+unsigned char white_pixel[] = {
+    0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00, 0x00, 0x0d,
+    0x49, 0x48, 0x44, 0x52, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01,
+    0x01, 0x03, 0x00, 0x00, 0x00, 0x25, 0xdb, 0x56, 0xca, 0x00, 0x00, 0x00,
+    0x03, 0x50, 0x4c, 0x54, 0x45, 0xff, 0xff, 0xff, 0xa7, 0xc4, 0x1b, 0xc8,
+    0x00, 0x00, 0x00, 0x0a, 0x49, 0x44, 0x41, 0x54, 0x08, 0xd7, 0x63, 0x60,
+    0x00, 0x00, 0x00, 0x02, 0x00, 0x01, 0xe2, 0x21, 0xbc, 0x33, 0x00, 0x00,
+    0x00, 0x00, 0x49, 0x45, 0x4e, 0x44, 0xae, 0x42, 0x60, 0x82
+};
+
+unsigned int white_pixel_len = 82;
+
+void loadResources() {
+
+    Engine::window = std::make_shared<RenderWindow>();
+
+    Engine::fonts.load("Roboto",           &Roboto_Regular_ttf,      Roboto_Regular_ttf_len);
+    Engine::fonts.load("RobotoBold",       &Roboto_Bold_ttf,         Roboto_Bold_ttf_len);
+    Engine::fonts.load("RobotoItalic",     &Roboto_Italic_ttf,       Roboto_Italic_ttf_len);
+    Engine::fonts.load("RobotoMono",       &RobotoMono_Regular_ttf,  RobotoMono_Regular_ttf_len);
+    Engine::fonts.load("RobotoMonoBold",   &RobotoMono_Bold_ttf,     RobotoMono_Bold_ttf_len);
+    Engine::fonts.load("RobotoMonoItalic", &RobotoMono_Italic_ttf,   RobotoMono_Italic_ttf_len);
+    Engine::fonts.load("FontAwesome5",     &fa_solid_900_ttf,        fa_solid_900_ttf_len);
+
+    Engine::shaders.load("Solid"   ,g_solidShaderGlsl,    sf::Shader::Fragment);
+    Engine::shaders.load("Gradient",g_gradientShaderGlsl, sf::Shader::Fragment);
+    
+    Engine::textures.load("__white__", white_pixel, white_pixel_len);
+
+    SFVG_WHITE_IMAGE     = new sf::Image();
+    SFVG_WHITE_TEXTURE   = new sf::Texture();
+    SFVG_SOLID_SHADER    = new sf::Shader();
+    SFVG_GRADIENT_SHADER = new sf::Shader();
+    // load resources
+    SFVG_WHITE_IMAGE->create(1, 1, sf::Color::White);
+    SFVG_WHITE_TEXTURE->loadFromImage(*SFVG_WHITE_IMAGE);
+    SFVG_SOLID_SHADER->loadFromMemory(g_solidShaderGlsl, sf::Shader::Fragment);
+    SFVG_SOLID_SHADER->setUniform("u_texture", sf::Shader::CurrentTexture);
+    SFVG_GRADIENT_SHADER->loadFromMemory(g_gradientShaderGlsl, sf::Shader::Fragment);
+    SFVG_GRADIENT_SHADER->setUniform("u_texture", sf::Shader::CurrentTexture);
 }
 
-Engine::Engine(unsigned int width, unsigned int height, unsigned int style) :
-    window(),
-    input(*this,"__input__"),
-    physics(*this, "__physics__"),
-    debug(*this, "__debug__"),
-    m_running(false),
-    m_views(1),
-    m_renderQue(1),
-    m_dpiFactor(1.0f),
-    m_timeValue(0.0f),
-    m_deltaTimeValue(0.0f),
-    m_frame(0)
-{
-    assert(!g_engineLoaded);
-    // load resources
-    loadBuiltInResources();
+void freeResources() {
+    // free resources
+    Engine::textures.unloadAll();
+    Engine::fonts.unloadAll();
+    Engine::sounds.unloadAll();
+    Engine::shaders.unloadAll();
+    delete SFVG_WHITE_IMAGE;
+    delete SFVG_WHITE_TEXTURE;
+    delete SFVG_SOLID_SHADER;
+    delete SFVG_GRADIENT_SHADER;
+    // free window
+    Engine::window.reset();
+}
 
+void determineDpi() {
 #ifdef _WIN32   
     SetProcessDpiAwareness(PROCESS_PER_MONITOR_DPI_AWARE);
     const POINT ptZero = { 0, 0 };
     auto monitor = MonitorFromPoint(ptZero, MONITOR_DEFAULTTOPRIMARY);
     UINT dpiX, dpiY;
     auto result  = GetDpiForMonitor(monitor, MDT_EFFECTIVE_DPI, &dpiX, &dpiY);
-    m_dpiFactor = (float)dpiX / (float)USER_DEFAULT_SCREEN_DPI;
+    g_dpiFactor = (float)dpiX / (float)USER_DEFAULT_SCREEN_DPI;
 #else
-    m_dpiFactor = 1.0f;
+    g_dpiFactor = 1.0f;
 #endif
+}
 
+} // private namespace
+
+//==============================================================================
+// USER API
+//==============================================================================
+
+Ptr<RenderWindow> Engine::window;
+
+ResourceManager<Texture, std::string>     Engine::textures = ResourceManager<Texture, std::string>();
+ResourceManager<Font, std::string>        Engine::fonts    = ResourceManager<Font, std::string>();
+ResourceManager<SoundBuffer, std::string> Engine::sounds   = ResourceManager<SoundBuffer, std::string>();
+ResourceManager<Shader, std::string>      Engine::shaders  = ResourceManager<Shader, std::string>();
+
+void Engine::init() {
+    init(sf::VideoMode::getDesktopMode().width, sf::VideoMode::getDesktopMode().height, WindowStyle::Fullscreen);
+}
+
+void Engine::init(unsigned int width, unsigned int height, unsigned int style) {
+    // asserts
+    assert(!g_initialized);
+    assert(!g_running);
+    
+    // load resources
+    loadResources();
+    // determine DPI
+    determineDpi();
 
     // create Window and set settings
     sf::ContextSettings settings;
     settings.antialiasingLevel = 8;
-    window.create(sf::VideoMode((unsigned int)(width * m_dpiFactor), (unsigned int)(height * m_dpiFactor)), "", style, settings);
-    window.setFramerateLimit(60);
+    window->create(sf::VideoMode((unsigned int)(width * g_dpiFactor), (unsigned int)(height * g_dpiFactor)), "", style, settings);
+    window->setFramerateLimit(60);
 
     // set Window view
-    m_views[0] = window.getDefaultView();
-    m_views[0].setCenter(m_views[0].getCenter() / m_dpiFactor);
-    m_views[0].setSize(m_views[0].getSize() / m_dpiFactor);
+    g_views[0] = window->getDefaultView();
+    g_views[0].setCenter(g_views[0].getCenter() / g_dpiFactor);
+    g_views[0].setSize(g_views[0].getSize() / g_dpiFactor);
 
     // initialize imgui
-    ImGui::SFML::Init(window, m_dpiFactor);
+    ImGui::SFML::Init(*window, g_dpiFactor);
     ImGuiIO& io = ImGui::GetIO();
     io.Fonts->Clear();
     unsigned char* fontCopy1 = new unsigned char[RobotoMono_Bold_ttf_len];
     std::memcpy(fontCopy1, &RobotoMono_Bold_ttf, RobotoMono_Bold_ttf_len);
-    io.Fonts->AddFontFromMemoryTTF(fontCopy1, RobotoMono_Bold_ttf_len, 15.0f * m_dpiFactor);
+    io.Fonts->AddFontFromMemoryTTF(fontCopy1, RobotoMono_Bold_ttf_len, 15.0f * g_dpiFactor);
 
     // merge in icons from font awesome
     static const ImWchar icons_ranges[] = { ICON_MIN_FA, ICON_MAX_FA, 0 };
@@ -89,82 +180,150 @@ Engine::Engine(unsigned int width, unsigned int height, unsigned int style) :
     icons_config.GlyphMinAdvanceX = 14.0f;
     unsigned char* fontCopy2 = new unsigned char[fa_solid_900_ttf_len];
     std::memcpy(fontCopy2, &fa_solid_900_ttf, fa_solid_900_ttf_len);
-    io.Fonts->AddFontFromMemoryTTF(fontCopy2, fa_solid_900_ttf_len, 10.0f * m_dpiFactor, &icons_config, icons_ranges );
-    io.FontGlobalScale = 1.0f / m_dpiFactor;  
+    io.Fonts->AddFontFromMemoryTTF(fontCopy2, fa_solid_900_ttf_len, 10.0f * g_dpiFactor, &icons_config, icons_ranges );
+    io.FontGlobalScale = 1.0f / g_dpiFactor;  
     ImGui::SFML::UpdateFontTexture();
-    // loaded
-    g_engineLoaded = true;
-    window.requestFocus();
-}
 
-Engine::~Engine() {
-    g_engineLoaded = false;
-    sfvgFree();
-    ImGui::SFML::Shutdown();
+    // stype ImGui
+    ImGuiStyle * imStyle = &ImGui::GetStyle();
+
+    imStyle->WindowRounding = 2.0f;
+    imStyle->FrameRounding = 2.0f;
+    imStyle->IndentSpacing = 25.0f;
+    imStyle->ScrollbarSize = 15.0f;
+    imStyle->ScrollbarRounding = 9.0f;
+    imStyle->GrabMinSize = 5.0f;
+    imStyle->GrabRounding = 2.0f;
+
+    ImVec4* colors = ImGui::GetStyle().Colors;
+    colors[ImGuiCol_Text]                   = ImVec4(0.80f, 0.80f, 0.83f, 1.00f);
+    colors[ImGuiCol_TextDisabled]           = ImVec4(0.24f, 0.23f, 0.29f, 1.00f);
+    colors[ImGuiCol_WindowBg]               = ImVec4(0.06f, 0.05f, 0.07f, 0.95f);
+    colors[ImGuiCol_ChildBg]                = ImVec4(0.07f, 0.07f, 0.09f, 0.95f);
+    colors[ImGuiCol_PopupBg]                = ImVec4(0.07f, 0.07f, 0.09f, 0.95f);
+    colors[ImGuiCol_Border]                 = ImVec4(0.80f, 0.80f, 0.83f, 0.88f);
+    colors[ImGuiCol_BorderShadow]           = ImVec4(0.92f, 0.91f, 0.88f, 0.00f);
+    colors[ImGuiCol_FrameBg]                = ImVec4(0.10f, 0.09f, 0.12f, 1.00f);
+    colors[ImGuiCol_FrameBgHovered]         = ImVec4(0.24f, 0.23f, 0.29f, 1.00f);
+    colors[ImGuiCol_FrameBgActive]          = ImVec4(0.56f, 0.56f, 0.58f, 1.00f);
+    colors[ImGuiCol_TitleBg]                = ImVec4(0.10f, 0.09f, 0.12f, 1.00f);
+    colors[ImGuiCol_TitleBgActive]          = ImVec4(0.07f, 0.07f, 0.09f, 1.00f);
+    colors[ImGuiCol_TitleBgCollapsed]       = ImVec4(1.00f, 0.98f, 0.95f, 0.75f);
+    colors[ImGuiCol_MenuBarBg]              = ImVec4(0.10f, 0.09f, 0.12f, 1.00f);
+    colors[ImGuiCol_ScrollbarBg]            = ImVec4(0.10f, 0.09f, 0.12f, 1.00f);
+    colors[ImGuiCol_ScrollbarGrab]          = ImVec4(0.80f, 0.80f, 0.83f, 0.31f);
+    colors[ImGuiCol_ScrollbarGrabHovered]   = ImVec4(0.56f, 0.56f, 0.58f, 1.00f);
+    colors[ImGuiCol_ScrollbarGrabActive]    = ImVec4(0.06f, 0.05f, 0.07f, 1.00f);
+    colors[ImGuiCol_CheckMark]              = ImVec4(0.80f, 0.80f, 0.83f, 0.31f);
+    colors[ImGuiCol_SliderGrab]             = ImVec4(0.80f, 0.80f, 0.83f, 0.31f);
+    colors[ImGuiCol_SliderGrabActive]       = ImVec4(0.06f, 0.05f, 0.07f, 1.00f);
+    colors[ImGuiCol_Button]                 = ImVec4(0.10f, 0.09f, 0.12f, 1.00f);
+    colors[ImGuiCol_ButtonHovered]          = ImVec4(0.24f, 0.23f, 0.29f, 1.00f);
+    colors[ImGuiCol_ButtonActive]           = ImVec4(0.56f, 0.56f, 0.58f, 1.00f);
+    colors[ImGuiCol_Header]                 = ImVec4(0.10f, 0.09f, 0.12f, 1.00f);
+    colors[ImGuiCol_HeaderHovered]          = ImVec4(0.56f, 0.56f, 0.58f, 1.00f);
+    colors[ImGuiCol_HeaderActive]           = ImVec4(0.06f, 0.05f, 0.07f, 1.00f);
+    colors[ImGuiCol_Separator]              = ImVec4(0.56f, 0.56f, 0.58f, 1.00f);
+    colors[ImGuiCol_SeparatorHovered]       = ImVec4(0.24f, 0.23f, 0.29f, 1.00f);
+    colors[ImGuiCol_SeparatorActive]        = ImVec4(0.56f, 0.56f, 0.58f, 1.00f);
+    colors[ImGuiCol_ResizeGrip]             = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
+    colors[ImGuiCol_ResizeGripHovered]      = ImVec4(0.56f, 0.56f, 0.58f, 1.00f);
+    colors[ImGuiCol_ResizeGripActive]       = ImVec4(0.06f, 0.05f, 0.07f, 1.00f);
+    colors[ImGuiCol_Tab]                    = ImVec4(0.10f, 0.09f, 0.12f, 1.00f);
+    colors[ImGuiCol_TabHovered]             = ImVec4(0.24f, 0.23f, 0.29f, 1.00f);
+    colors[ImGuiCol_TabActive]              = ImVec4(0.56f, 0.56f, 0.58f, 1.00f);
+    colors[ImGuiCol_TabUnfocused]           = ImVec4(0.10f, 0.09f, 0.12f, 1.00f);
+    colors[ImGuiCol_TabUnfocusedActive]     = ImVec4(0.24f, 0.23f, 0.29f, 1.00f);
+    colors[ImGuiCol_PlotLines]              = ImVec4(0.80f, 0.80f, 0.83f, 1.00f);
+    colors[ImGuiCol_PlotLinesHovered]       = ImVec4(0.80f, 0.80f, 0.83f, 1.00f);
+    colors[ImGuiCol_PlotHistogram]          = ImVec4(0.80f, 0.80f, 0.83f, 1.00f);
+    colors[ImGuiCol_PlotHistogramHovered]   = ImVec4(0.56f, 0.56f, 0.58f, 1.00f);
+    colors[ImGuiCol_TextSelectedBg]         = ImVec4(0.56f, 0.56f, 0.58f, 1.00f);
+    colors[ImGuiCol_DragDropTarget]         = ImVec4(0.56f, 0.56f, 0.58f, 1.00f);
+    colors[ImGuiCol_NavHighlight]           = ImVec4(1.00f, 1.00f, 1.00f, 0.70f);
+    colors[ImGuiCol_NavWindowingHighlight]  = ImVec4(1.00f, 1.00f, 1.00f, 0.70f);
+    colors[ImGuiCol_NavWindowingDimBg]      = ImVec4(0.80f, 0.80f, 0.80f, 0.20f);
+    colors[ImGuiCol_ModalWindowDimBg]       = ImVec4(1.00f, 0.98f, 0.95f, 0.73f);   
+
+    // start systems
+    Input::detail::init();
+    Debug::detail::init(); 
+    Physics::detail::init();
+
+    // loaded
+    g_initialized = true;
+    window->requestFocus();
 }
 
 void Engine::run() {
-    assert(m_root != nullptr);
-    assert(!m_running);
-    m_running = true;
-    // start systems
-    debug.start();
-    m_clock.restart();
+    assert(g_root != nullptr);
+    assert(!g_running);
+    g_running = true;
+    g_clock.restart();
     // run game
-    while (window.isOpen() && m_running) {
+    while (window->isOpen() && g_running) {
         // input update
-        input.update();
+        Input::detail::update();
         processEvents();
         // update delta time
-        auto deltaTimeTime = m_clock.restart();
-        m_deltaTimeValue = deltaTimeTime.asSeconds();
+        auto deltaTimeTime = g_clock.restart();
+        g_delta = deltaTimeTime.asSeconds();
         // upate imgui
-        ImGui::SFML::Update(window, deltaTimeTime);
+        ImGui::SFML::Update(*window, deltaTimeTime);
         // game update
-        if (debug.proceed()) {
+        if (Debug::detail::proceed()) {
             // update continous time
-            m_timeValue += m_deltaTimeValue;
+            g_time += g_delta;
             // physics update
-            physics.update();
-            m_root->onPhysics();
+            Physics::detail::update();
+            g_root->onPhysics();
             // update all objects
-            m_root->updateAll();
+            g_root->updateAll();
             // late update all object
-            m_root->lateUpdateAll();
+            g_root->lateUpdateAll();
             // increment frame
-            m_frame++;
+            g_frame++;
         }
 
         // clear window
-        window.clear(m_backgroundColor);
+        window->clear(g_bgColor);
         // render
         render();
         // update debug
-        if (debug.isShown())
-            m_root->onDebugRender();
-        debug.update();
-        window.setView(window.getDefaultView());
+        if (Debug::isShown())
+            g_root->onDebugRender();
+        Debug::detail::update();
+        window->setView(window->getDefaultView());
         // draw imgui
-        ImGui::SFML::Render(window);
+        ImGui::SFML::Render(*window);
         // display window
-        window.display();
+        window->display();
     }
+    // free resources
+    freeResources();
+    // delete root GameObject
+    g_root.reset();
+    // shutdown systems
+    ImGui::SFML::Shutdown();
+    Physics::detail::shutdown();
+    g_initialized = false;    
 }
 
 void Engine::stop() {
-    m_running = false;
+    assert(g_running);
+    g_running = false;
 }
 
-float Engine::time() const {
-    return m_timeValue;
+float Engine::time() {
+    return g_time;
 }
 
-float Engine::deltaTime() const {
-    return m_deltaTimeValue;
+float Engine::deltaTime() {
+    return g_delta;
 }
 
-std::size_t Engine::frame() const {
-    return m_frame;
+std::size_t Engine::frame() {
+    return g_frame;
 }
 
 //==============================================================================
@@ -173,68 +332,83 @@ std::size_t Engine::frame() const {
 
 
 View& Engine::getView(std::size_t index) {
-    return m_views[index];
+    return g_views[index];
 }
 
 void Engine::addView() {
-    View view = window.getDefaultView();
-    m_views.push_back(view);
+    View view = window->getDefaultView();
+    g_views.push_back(view);
 }
 
 
-sf::Vector2f Engine::getWorldSize() const {
-    return window.mapPixelToCoords(sf::Vector2i(window.getSize()), m_views[0]);
+sf::Vector2f Engine::getWorldSize() {
+    return window->mapPixelToCoords(sf::Vector2i(window->getSize()), g_views[0]);
 }
 
 void Engine::setBackgroundColor(const Color &color) {
-    m_backgroundColor = color;
+    g_bgColor = color;
 }
 
 void Engine::setLayerCount(std::size_t count) {
     assert(count > 0);
-    m_renderQue.resize(count);
+    g_renderQue.resize(count);
 }
 
-std::size_t Engine::getLayerCount() const {
-    return m_renderQue.size();
+std::size_t Engine::getLayerCount() {
+    return g_renderQue.size();
 }
 
-float Engine::getDpiFactor() const {
-    return m_dpiFactor;
+float Engine::getDpiFactor() {
+    return g_dpiFactor;
 }
-
-//==============================================================================
-// ROOT OBJECT
-//==============================================================================
 
 void Engine::setRoot(Ptr<GameObject> root) {
-    m_root = root;
-    m_root->m_isRoot = true;
+    g_root = root;
+    g_root->m_isRoot = true;
 }
 
-Handle<GameObject> Engine::getRoot() const {
-    return Handle<GameObject>(m_root);
+Handle<GameObject> Engine::getRoot() {
+    return Handle<GameObject>(g_root);
 }
 
-
-//==============================================================================
-// PRIVATE
-//==============================================================================
-
-
+void Engine::render() {
+    // clear each layer in the RenderQue and reserve capacity for max number of Objects
+    for (auto& layer : g_renderQue) {
+        layer.clear();
+        layer.reserve(Renderer::getRendererCount());
+    }
+    // que Objects for rendering
+    g_root->onRender(g_renderQue);
+    // iterate over views
+    for (auto& view : g_views) {
+        // set view
+        window->setView(view);
+        // iterate over layers and draw
+        for (auto& layer : g_renderQue) {
+            for (auto& renderer : layer) {
+                renderer->render(*window);
+            }
+        }
+    }
+}
 
 void Engine::processEvents() {
     Event event;
-    while (window.pollEvent(event)) {
-        input.processEvent(event);
+    while (window->pollEvent(event)) {
+        Input::detail::processEvent(event);
         ImGui::SFML::ProcessEvent(event);
         switch (event.type) {
             case Event::Closed: {
-                window.close();
+                window->close();
                 break;
             }
             case Event::Resized: {
+                
                 // FloatRect size(0.0f, 0.0f, (float)event.size.width, (float)event.size.height);
+
+                // g_views[0].setCenter(g_views[0].getCenter() / g_dpiFactor);
+                g_views[0].setSize((float)event.size.width / g_dpiFactor, (float)event.size.height / g_dpiFactor);
+                // g_views[0].setSize(g_views[0].getSize() / g_dpiFactor);
                 break;
             }
             default:
@@ -242,86 +416,5 @@ void Engine::processEvents() {
         }
     }
 }
-
-void Engine::render() {
-    // clear each layer in the RenderQue and reserve capacity for max number of Objects
-    for (auto& layer : m_renderQue) {
-        layer.clear();
-        layer.reserve(Renderer::getRendererCount());
-    }
-    // que Objects for rendering
-    m_root->onRender(m_renderQue);
-    // iterate over views
-    for (auto& view : m_views) {
-        // set view
-        window.setView(view);
-        // iterate over layers and draw
-        for (auto& layer : m_renderQue) {
-            for (auto& renderer : layer) {
-                renderer->render(window);
-            }
-        }
-    }
-}
-
-//==============================================================================
-// RESOURCES
-//==============================================================================
-
-namespace {
-    const std::string g_solidShaderGlsl = \
-        "uniform vec4 u_color;" \
-        "uniform sampler2D u_texture;" \
-        "void main() {" \
-        "    vec4 pixel = texture2D(u_texture, gl_TexCoord[0].xy);" \
-        "    gl_FragColor = u_color * pixel;" \
-        "}";
-
-    const std::string g_gradientShaderGlsl = \
-        "uniform vec4 u_color1;" \
-        "uniform vec4 u_color2;" \
-        "uniform float u_angle;" \
-        "uniform sampler2D u_texture;" \
-        "void main() {" \
-        "    vec4 pixel = texture2D(u_texture, gl_TexCoord[0].xy);" \
-        "    vec2 center = gl_TexCoord[0].xy - 0.5;" \
-        "    float radians = -0.0174532925199433 * u_angle;" \
-        "    float t = center.x * sin(radians) + center.y * cos(radians) + 0.5;" \
-        "    gl_FragColor = mix(u_color1, u_color2, t) * pixel;" \
-        "}";
-
-        unsigned char white_pixel[] = {
-          0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00, 0x00, 0x0d,
-          0x49, 0x48, 0x44, 0x52, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01,
-          0x01, 0x03, 0x00, 0x00, 0x00, 0x25, 0xdb, 0x56, 0xca, 0x00, 0x00, 0x00,
-          0x03, 0x50, 0x4c, 0x54, 0x45, 0xff, 0xff, 0xff, 0xa7, 0xc4, 0x1b, 0xc8,
-          0x00, 0x00, 0x00, 0x0a, 0x49, 0x44, 0x41, 0x54, 0x08, 0xd7, 0x63, 0x60,
-          0x00, 0x00, 0x00, 0x02, 0x00, 0x01, 0xe2, 0x21, 0xbc, 0x33, 0x00, 0x00,
-          0x00, 0x00, 0x49, 0x45, 0x4e, 0x44, 0xae, 0x42, 0x60, 0x82
-        };
-        unsigned int white_pixel_len = 82;
-
-} // namespace name
-
-void Engine::loadBuiltInResources() {
-    // fonts
-    fonts.load("Roboto",           &Roboto_Regular_ttf,      Roboto_Regular_ttf_len);
-    fonts.load("RobotoBold",       &Roboto_Bold_ttf,         Roboto_Bold_ttf_len);
-    fonts.load("RobotoItalic",     &Roboto_Italic_ttf,       Roboto_Italic_ttf_len);
-    fonts.load("RobotoMono",       &RobotoMono_Regular_ttf,  RobotoMono_Regular_ttf_len);
-    fonts.load("RobotoMonoBold",   &RobotoMono_Bold_ttf,     RobotoMono_Bold_ttf_len);
-    fonts.load("RobotoMonoItalic", &RobotoMono_Italic_ttf,   RobotoMono_Italic_ttf_len);
-    fonts.load("FontAwesome5",     &fa_solid_900_ttf,        fa_solid_900_ttf_len);
-    // shaders
-    shaders.load("Solid"   ,g_solidShaderGlsl,    sf::Shader::Fragment);
-    shaders.load("Gradient",g_gradientShaderGlsl, sf::Shader::Fragment);
-    // textures
-    textures.load("__white__", white_pixel, white_pixel_len);
-
-
-    sfvgInit();
-
-}
-
 
 } // namespace sfvg

@@ -3,6 +3,10 @@
 
 namespace sfvg {
 
+//==============================================================================
+// GLOBALS
+//==============================================================================
+
 namespace {
 
 inline cpVect sf2cp(const Vector2f& in) {
@@ -19,47 +23,66 @@ inline Vector2f cp2sf(const cpVect& in) {
     return out;
 }
 
+cpSpace* g_space;  /// Chipmunk space
+double    g_dt;
+
 } // namespace
 
-PhysicsSystem::PhysicsSystem(Engine& engine, const Name& name) :
-    System(engine, name),
-    m_dt(1.0/60.0)
+//==============================================================================
+// USER API
+//==============================================================================
+
+namespace Physics {
+
+void setDeltaTime(float dt) {
+    g_dt = static_cast<double>(dt);
+}
+
+void setGravity(const Vector2f &g) {
+    cpSpaceSetGravity(g_space, sf2cp(g));
+}
+
+Vector2f getGravity() {
+    return cp2sf(cpSpaceGetGravity(g_space));
+}
+
+void setDamping(float damping) {
+    cpSpaceSetDamping(g_space, (cpFloat)damping);
+}
+
+float getDamping() {
+    return (float)cpSpaceGetDamping(g_space);
+}
+
+//==============================================================================
+// DETAIL
+//==============================================================================
+
+namespace detail {
+
+void init()
 {
-    m_space = cpSpaceNew();
-    cpSpaceSetIterations(m_space, 10);
-    // cpSpaceSetSleepTimeThreshold(m_space, 0.5f);
-    // cpSpaceSetCollisionSlop(m_space, 0.5f);
+    g_dt = 1.0 / 60.0;
+    g_space = cpSpaceNew();
+    cpSpaceSetIterations(g_space, 10);
+    // cpSpaceSetSleepTimeThreshold(g_space, 0.5f);
+    // cpSpaceSetCollisionSlop(g_space, 0.5f);
     setGravity(Vector2f(0,1000));
     setDamping(0.9f);
 }
 
-PhysicsSystem::~PhysicsSystem() {
-    cpSpaceFree(m_space);
+void update() {
+    cpSpaceStep(g_space, g_dt);
 }
 
-void PhysicsSystem::setDeltaTime(float dt) {
-    m_dt = static_cast<double>(dt);
+void shutdown() {
+    cpSpaceFree(g_space);
 }
 
-void PhysicsSystem::setGravity(const Vector2f &g) {
-    cpSpaceSetGravity(m_space, sf2cp(g));
+cpSpace* space() {
+    return g_space;
 }
 
-void PhysicsSystem::setDamping(float damping) {
-    cpSpaceSetDamping(m_space, (cpFloat)damping);
-}
-
-float PhysicsSystem::getDamping() const {
-    return (float)cpSpaceGetDamping(m_space);
-}
-
-Vector2f PhysicsSystem::getGravity() const {
-    return cp2sf(cpSpaceGetGravity(m_space));
-}
-
-void PhysicsSystem::update() {
-    cpSpaceStep(m_space, m_dt);
-}
-
-
+} // namespace detail
+} // namespace Physics
 } // namespace sfvg

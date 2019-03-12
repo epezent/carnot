@@ -17,17 +17,15 @@ std::size_t g_nameIndex = 0;
 std::size_t g_objectCount = 0;
 }
 
-Object::Object(Engine& _engine, const Name& name) :
-    engine(_engine),
-    input(engine.input),
+Object::Object(const Name& name) :
     m_id(ID::makeId(name)),
     m_enabled(true)
 {
     g_objectCount++;
 }
 
-Object::Object(Engine& _engine) :
-    Object(_engine, "Obj" + std::to_string(g_nameIndex++))
+Object::Object() :
+    Object("Obj" + std::to_string(g_nameIndex++))
 { }
 
 Object::~Object() {
@@ -53,8 +51,6 @@ const Name& Object::getName() const {
 Id Object::getId() const {
     return m_id;
 }
-
-
 
 void Object::setEnabled(bool enabled) {
     m_enabled = enabled;

@@ -8,95 +8,75 @@
 #include <SFVG/Engine/Systems/PhysicsSystem.hpp>
 
 namespace sfvg {
+class Engine { 
+public:   
 
-class Engine : private NonCopyable {
-public:
+//=============================================================================
+// GENERAL
+//=============================================================================
 
-    //=========================================================================
-    // GENERAL
-    //=========================================================================
+/// Initialize Engine (Fullscreen)
+static void init();
+/// Initialize Engine (Windowed Mode)
+static void init(unsigned int windowWidth, unsigned int windowHeight, unsigned int style = WindowStyle::Default);
 
-    /// Construct (Fullscreen)
-    Engine();
-    /// Constructor (Windowed Mode)
-    Engine(unsigned int windowWidth, unsigned int windowHeight, unsigned int style = WindowStyle::Close);
-    /// Destructor
-    ~Engine();
+/// Starts running the Engine
+static void run();
+/// Stops running the Engine
+static void stop();
+/// Returns the current Engine time
+static float time();
+/// Returns the elapsed time since the last frame update
+static float deltaTime();
+/// Returns the current frame number
+static std::size_t frame();
 
-    /// Starts running the Engine
-    void run();
-    /// Stops running the Engine
-    void stop();
-    /// Returns the current Engine time
-    float time() const;
-    /// Returns the elapsed time since the last frame update
-    float deltaTime() const;
-    /// Returns the current frame number
-    std::size_t frame() const;
+//=============================================================================
+// RENDERING
+//=============================================================================
 
-    //=========================================================================
-    // RENDERING
-    //=========================================================================
+/// Gets an Engine view (i.e. a camera)
+static View& getView(std::size_t index);
+/// Add a new view to the Engine
+static void addView();
+/// Returns the current size of the Window in world units
+static Vector2f getWorldSize();
+/// Set color Window is cleared with
+static void setBackgroundColor(const Color& color);
+/// Set the number of layers drawn by the Engine (default 1)
+static void setLayerCount(std::size_t count);
+/// Get the number of layers drawn by the Engine (default 1)
+static std::size_t getLayerCount();
+/// Get the DPI scaling factor
+static float getDpiFactor();
 
-    /// Gets an Engine view (i.e. a camera)
-    View& getView(std::size_t index);
-    /// Add a new view to the Engine
-    void addView();
-    /// Returns the current size of the Window in world units
-    Vector2f getWorldSize() const;
-    /// Set color Window is cleared with
-    void setBackgroundColor(const Color& color);
-    /// Set the number of layers drawn by the Engine (default 1)
-    void setLayerCount(std::size_t count);
-    /// Get the number of layers drawn by the Engine (default 1)
-    std::size_t getLayerCount() const;
-    /// Get the DPI scaling factor
-    float getDpiFactor() const;
+//=============================================================================
+// ROOT OBJECT
+//=============================================================================
 
-    //=========================================================================
-    // ROOT OBJECT
-    //=========================================================================
+/// Makes a root Object of a specifc type and returns a handle to it
+template <typename T, typename ...Args> static Handle<T> makeRoot(Args... args);
+/// Sets the root Object of the Engine
+static void setRoot(Ptr<GameObject> root);
+/// Gets a Handle to the root Object of the Engine
+static Handle<GameObject> getRoot();
 
-    /// Makes a root Object of a specifc type and returns a handle to it
-    template <typename T, typename ...Args> Handle<T> makeRoot(Args... args);
-    /// Sets the root Object of the Engine
-    void setRoot(Ptr<GameObject> root);
-    /// Gets a Handle to the root Object of the Engine
-    Handle<GameObject> getRoot() const;
+//=============================================================================
+// GLOBAL RESOURCES
+//=============================================================================
 
-public:
+static Ptr<RenderWindow> window;  ///< Engine render window
 
-    //==============================================================================
-    // Resources
-    //==============================================================================
-
-    ResourceManager<Texture, std::string> textures;
-    ResourceManager<Font, std::string> fonts;
-    ResourceManager<SoundBuffer, std::string> sounds;
-    ResourceManager<Shader, std::string> shaders;
-
-    RenderWindow window;
-    InputSystem input;
-    PhysicsSystem physics;
-    DebugSystem debug;
-
-private:
-    void loadBuiltInResources();
-    void processEvents();
-    void render();
+static ResourceManager<Texture, std::string>     textures; ///< 2D textures
+static ResourceManager<Font, std::string>        fonts;    ///< fonts
+static ResourceManager<SoundBuffer, std::string> sounds;   ///< SFX/music
+static ResourceManager<Shader, std::string>      shaders;  ///< shaders
 
 private:
 
-    bool m_running;
-    Ptr<GameObject> m_root;
-    std::vector<View> m_views;
-    RenderQue m_renderQue;
-    Color m_backgroundColor;
-    float m_dpiFactor;
-    Clock m_clock;
-    float m_timeValue;
-    float m_deltaTimeValue;
-    std::size_t m_frame;
+    static void render();
+    static void processEvents();
+
 };
 
 //==============================================================================
@@ -105,12 +85,23 @@ private:
 
 template <typename T, typename ...Args>
 Handle<T> Engine::makeRoot(Args... args) {
-    auto root = Object::make<T>(*this, args...);
+    auto root = Object::make<T>(args...);
     setRoot(root);
     return getRoot().as<T>();
 }
 
-extern void sfvgInit();
-extern void sfvgFree();
-
 } // namespace sfvg
+
+//==============================================================================
+// MACROS
+//==============================================================================
+
+/// Macro to request high performance GPU in systems (usually laptops) with both
+/// dedicated and discrete GPUs
+#ifdef _WIN32
+    #define SFVG_USE_DISCRETE_GPU \
+        extern "C" __declspec(dllexport) unsigned long NvOptimusEnablement = 1; \
+        extern "C" __declspec(dllexport) unsigned long AmdPowerXpressRequestHighPerformance = 1;
+#else
+    #define SFVG_USE_DISCRETE_GPU
+#endif

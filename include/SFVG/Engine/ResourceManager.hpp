@@ -18,6 +18,9 @@ public:
     void load(Identifier id, const std::string& filename, const Parameter& secondParam);
     void load(Identifier id, const void* data, std::size_t size);
 
+    void unload(Identifier id);
+    void unloadAll();
+
     Resource& get(Identifier id);
     const Resource& get(Identifier id) const;
 

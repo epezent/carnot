@@ -4,8 +4,6 @@ using namespace sfvg;
 
 class MyGameObject : public GameObject {
 public:
-    MyGameObject(Engine& engine) : GameObject(engine) {
-    }
 
     void update() {
         ImGui::ShowDemoWindow(&my_tool_active);
@@ -19,8 +17,9 @@ public:
 
 int main(int argc, char const *argv[])
 {
-    Engine engine(1000,1000);
-    engine.makeRoot<MyGameObject>();
-    engine.run();
+    Engine::init();
+    Engine::makeRoot<MyGameObject>();
+    Engine::run();
+    
     return 0;
 }

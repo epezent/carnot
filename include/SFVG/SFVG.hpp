@@ -21,7 +21,6 @@
 #include <SFVG/Engine/Object.hpp>
 #include <SFVG/Engine/ProcessInfo.hpp>
 #include <SFVG/Engine/ResourceManager.hpp>
-#include <SFVG/Engine/System.hpp>
 #include <SFVG/Engine/XboxController.hpp>
 
 #include <SFVG/Engine/Components/LineRenderer.hpp>

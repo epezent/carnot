@@ -11,6 +11,22 @@ namespace sfvg {
 class StrokeRenderer : public Renderer {
 public:
 
+    /// Stroke cap types
+    enum CapType {
+        CapButt,
+        CapSquare,
+        CapRound
+    };
+
+    /// Stroke joint type
+    enum JointType {
+        JointMiter,
+        JointBevel,
+        JointRound
+    };
+
+public:
+
     /// Constructor
     StrokeRenderer(GameObject& gameObject, std::size_t pointCount = 0);
 
@@ -30,28 +46,25 @@ public:
     Vector2f getPoint(std::size_t index) const;
 
     /// Adds a new point and increments the point count
-    void addPoint(Vector2f position);
+    void addVertex(Vector2f position, const Color& color = Color(), float thickness = 1.0f);
 
     /// Adds a new point and increments the point count
-    void addPoint(float x, float y);
+    void addVertex(float x, float y, const Color& color = Color(), float thickness = 1.0f);
+
+    /// Sets the thickness of the Stroke
+    void setThickness(std::size_t index, float thickness);
+
+    /// Gets the thickness of the Stroke
+    float getThickness(std::size_t index) const;
+
+    /// Sets the fill of a shape to a solid Color
+    void setColor(std::size_t index, const Color& color);
+
+    /// Gets the fill Color of a shape
+    Color getColor(std::size_t index) const;
 
     /// Sets points from Shape
     void fromShape(const Shape& shape);
-
-    /// Sets the thickness of the Stroke
-    void setThickness(float thickness);
-
-    /// Gets the thickness of the Stroke
-    float getThickness() const;
-
-    /// Sets the fill of a shape to a solid Color
-    void setColor(const Color& color);
-
-    /// Gets the fill Color of a shape
-    const Color& getColor() const;
-
-    /// Sets the texture of the Shape
-    void setTexture(const Texture* texture, bool resetRect = false);
 
     /// Gets the local bounding rectangle of the Shape
     FloatRect getLocalBounds() const;
@@ -63,7 +76,8 @@ protected:
 
     /// Renders the Shape to RenderTarget
     virtual void render(RenderTarget& target) const override;
-    /// Renders shape bounding box and wireframe
+
+    /// Renders stroke bounding box and skeleton
     virtual void onDebugRender() override;
 
 private:
@@ -73,10 +87,9 @@ private:
 private:
 
     std::vector<Vector2d> m_points;
-    mutable std::vector<RGB>      m_colors;
-    mutable std::vector<double>   m_thicknesses;
-    float m_thickness;
-    Color m_color;
+    std::vector<RGB>      m_colors;
+    std::vector<double>   m_thicknesses;
+
     mutable FloatRect m_bounds;
     mutable bool m_needsUpdate;
 

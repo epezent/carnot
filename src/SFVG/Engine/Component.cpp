@@ -12,7 +12,7 @@ namespace {
 } // namespace
 
 Component::Component(GameObject& _gameObject) :
-    Object(_gameObject.engine),
+    Object(),
     gameObject(_gameObject),
     m_startCalled(false),
     m_index(0)

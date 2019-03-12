@@ -56,6 +56,18 @@ const Resource& ResourceManager<Resource, Identifier>::get(Identifier id) const
 }
 
 template <typename Resource, typename Identifier>
+void ResourceManager<Resource, Identifier>::unload(Identifier id) {
+    auto found = mResourceMap.find(id);
+    assert(found != mResourceMap.end());
+    mResourceMap.erase(found);
+}
+
+template <typename Resource, typename Identifier>
+void ResourceManager<Resource, Identifier>::unloadAll() {
+    mResourceMap.clear();
+}
+
+template <typename Resource, typename Identifier>
 void ResourceManager<Resource, Identifier>::insertResource(Identifier id, std::unique_ptr<Resource> resource)
 {
     // Insert and check success

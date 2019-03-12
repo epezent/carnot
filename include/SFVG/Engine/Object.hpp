@@ -36,9 +36,9 @@ public:
     //==========================================================================
 
     /// Constructs an Object with a default name (i.e. "obj0", "obj1", ...)
-    Object(Engine& engine);
+    Object();
     /// Constructs an Object with a defined name
-    Object(Engine& engine, const Name& name);
+    Object(const Name& name);
     /// Virtual Destructor
     virtual ~Object();
 
@@ -82,15 +82,9 @@ public:
     static std::size_t getObjectCount();
 
     /// Makes a new unparented Object
-    template <typename T, typename ...Args> static Ptr<T> make(Engine& engine, Args ...);
-
-public:
-
-    Engine& engine;      ///< reference to Engine Object is managed by
+    template <typename T, typename ...Args> static Ptr<T> make(Args ...);
 
 protected:
-
-    InputSystem& input;  ///< reference to Engine InputSystem
 
     friend class Engine;
 
@@ -133,8 +127,8 @@ private:
 };
 
 template <typename T, typename ...Args>
-Ptr<T> Object::make(Engine& engine, Args... args) {
-    return std::make_shared<T>(engine, std::forward<Args>(args)...);
+Ptr<T> Object::make(Args... args) {
+    return std::make_shared<T>(std::forward<Args>(args)...);
 }
 
 } // namespace sfvg

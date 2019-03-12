@@ -1,48 +1,31 @@
 #pragma once
 
-#include <SFVG/Engine/System.hpp>
+#include <SFVG/Common/Imports.hpp>
 
 struct cpSpace;
 
 namespace sfvg {
+namespace Physics {
 
-class RigidBody;
+/// Set PhysicsSystem step time (default = 1/60);
+void setDeltaTime(float dt);
 
-class PhysicsSystem : private System {
-public:
+/// Sets the global gravity vector (default = <0, 1000>)
+void setGravity(const Vector2f& g);
+/// Gets the global gravity vector
+Vector2f getGravity();
 
-    /// Constructor
-    PhysicsSystem(Engine& engine, const Name& name);
-    /// Destructor
-    ~PhysicsSystem();
+/// Set global damping for 0 to 1 (default = 0.9)
+void setDamping(float damping);
+/// Get global damping
+float getDamping();
 
-    /// Set PhysicsSystem step time (default = 1/60);
-    void setDeltaTime(float dt);
-
-    /// Sets the global gravity vector (default = <0, 1000>)
-    void setGravity(const Vector2f& g);
-    /// Gets the global gravity vector
-    Vector2f getGravity() const;
-
-    /// Set global damping for 0 to 1 (default = 0.9)
-    void setDamping(float damping);
-    /// Get global damping
-    float getDamping() const;
-
-private:
-
-    friend class Engine;
-    friend class RigidBody;
-
-    /// Steps the PhysicsSystem
-    void update() override;
-
-private:
-
-    cpSpace* m_space;  /// Chipmunk space
-    double m_dt;       /// delta time
-
-};
-
-
+// Implementation details [internal use only]
+namespace detail {
+void init();
+void update();
+void shutdown();
+cpSpace* space();
+} // namespace detail
+} // namespace Physics
 } // namespace sfvg

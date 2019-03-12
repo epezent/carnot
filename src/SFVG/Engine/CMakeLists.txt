@@ -7,8 +7,6 @@ target_sources(sfvg
 		Id.cpp
 		Object.cpp
 		ProcessInfo.cpp
-		SharedResources.cpp
-        System.cpp
 		XboxController.cpp
 )
 

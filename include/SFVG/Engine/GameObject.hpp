@@ -5,7 +5,6 @@
 
 namespace sfvg {
 
-
 class GameObject : public Object {
 public:
 
@@ -14,9 +13,9 @@ public:
     //==========================================================================
 
     /// Constructs an GameObject with a default name (i.e. "obj0", "obj1", ...)
-    GameObject(Engine& engine);
+    GameObject();
     /// Constructs an GameObject with a defined name
-    GameObject(Engine& engine, const Name& name);
+    GameObject(const Name& name);
 
     //==========================================================================
     // General Functions
@@ -169,7 +168,7 @@ std::size_t GameObject::getChildCount() {
 
 template <typename T, typename ...Args>
 Handle<T> GameObject::makeChild(Args... args) {
-    auto child = std::make_shared<T>(engine, std::forward<Args>(args)...);
+    auto child = std::make_shared<T>(std::forward<Args>(args)...);
     attachChild(child);
     return Handle<T>(child);
 }

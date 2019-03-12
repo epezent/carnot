@@ -235,14 +235,14 @@ FloatRect Transform::worldToLocal(const FloatRect& rect) {
 void Transform::onDebugRender() {
     if (!isEnabled())
         return;
-    if (engine.debug.widgets[DebugSystem::Widget::Transform]) {
+    if (Debug::detail::gizmoActive(Debug::Gizmo::Transform)) {
         auto x = localToWorld(Vector2f(20.0f,0.0f));
         auto y = localToWorld(Vector2f(0.0f,20.0f));
-        engine.debug.drawPoint(getPosition(), DEBUG_TRANSFORM_COLOR);
-        engine.debug.drawPoint(x, DEBUG_XAXIS_COLOR);
-        engine.debug.drawPoint(y, DEBUG_YAXIS_COLOR);
-        engine.debug.drawLine(getPosition(), x, DEBUG_XAXIS_COLOR);
-        engine.debug.drawLine(getPosition(), y, DEBUG_YAXIS_COLOR);
+        Debug::drawPoint(getPosition(), DEBUG_TRANSFORM_COLOR);
+        Debug::drawPoint(x, DEBUG_XAXIS_COLOR);
+        Debug::drawPoint(y, DEBUG_YAXIS_COLOR);
+        Debug::drawLine(getPosition(), x, DEBUG_XAXIS_COLOR);
+        Debug::drawLine(getPosition(), y, DEBUG_YAXIS_COLOR);
     }
 }
 

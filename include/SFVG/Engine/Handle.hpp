@@ -13,10 +13,15 @@ using Ptr = std::shared_ptr<T>;
 template <typename T>
 using WkPtr = std::weak_ptr<T>;
 
+//==============================================================================
+// HANDLE
+//==============================================================================
+
 /// Handle class
 template <typename T>
 class Handle {
 public:
+
 
     /// Constructs an invalid Handle
     Handle();
