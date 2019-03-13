@@ -64,6 +64,7 @@ bld/
 [Oo]bj/
 [Ll]og/
 [Bb]uild-*/
+[Bb]uild/
 cmake-build-release/
 cmake-build-debug/
 
