@@ -126,6 +126,16 @@ void determineDpi() {
 #endif
 }
 
+void setUserIcon(sf::WindowHandle handle) {
+#ifdef _WIN32
+    HANDLE hIcon = LoadIconW(GetModuleHandleW(NULL), L"SFVG_ICON");
+    if (hIcon) {
+        ::SendMessage(handle, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
+        ::SendMessage(handle, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
+    }
+#endif
+}
+
 } // private namespace
 
 //==============================================================================
@@ -158,6 +168,9 @@ void Engine::init(unsigned int width, unsigned int height, unsigned int style) {
     settings.antialiasingLevel = 8;
     window->create(sf::VideoMode((unsigned int)(width * g_dpiFactor), (unsigned int)(height * g_dpiFactor)), "", style, settings);
     window->setFramerateLimit(60);
+
+    // set user icon from RC file
+    setUserIcon(window->getSystemHandle());
 
     // set Window view
     g_views[0] = window->getDefaultView();

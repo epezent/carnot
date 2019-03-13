@@ -41,6 +41,9 @@ HSV toHsv(const RGB& color);
 /// Creates an HSV from a hex code
 HSV toHsv(std::string hex);
 
+/// Creats a Color from a hex code
+Color hexCode(std::string hex);
+
 //==============================================================================
 // Named Colors
 //==============================================================================

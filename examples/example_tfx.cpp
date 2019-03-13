@@ -113,8 +113,12 @@ public:
                 sinwave.push_back(v);
             }
             ImGui::PushItemWidth(375+80);
+            ImGui::PushStyleColor(ImGuiCol_PlotLines, hexCode("cf94c2"));
+            ImGui::PushStyleColor(ImGuiCol_PlotLinesHovered, hexCode("cf94c2"));
             auto title = str(durMs, "ms /", samples, " samples");
             ImGui::PlotLines("", &sinwave[0], (int)sinwave.size(),  0, title.c_str(), -1.0f, 1.0f, ImVec2(0,94));
+            ImGui::PopStyleColor();
+            ImGui::PopStyleColor();
             ImGui::PopItemWidth();
         ImGui::End();
     }

@@ -158,6 +158,10 @@ HSV toHsv(std::string hex) {
     return toHsv(toRgb(hex));
 }
 
+Color hexCode(std::string hex) {
+    return static_cast<Color>(toRgb(hex));
+}
+
 //==============================================================================
 // Named Colors
 //==============================================================================
