@@ -120,7 +120,7 @@ public:
         Exclusion     ///< region where either subject or clip is filled, but not where both are filled
     };
 
-    static Shape offsetShape(const Shape& shape, float offset, OffsetType type = Round);
+    static Shape offsetShape(const Shape& shape, float offset, OffsetType type = Miter);
     static std::vector<Shape> clipShapes(const Shape& subject, const Shape& clip, ClipType type);
 
 protected:

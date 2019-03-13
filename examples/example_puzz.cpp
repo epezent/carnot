@@ -51,6 +51,7 @@ public:
         if (sr->shape->isInside(localPos)) {
             sr->setColor(Blues::LightBlue);
             transform.move(Input::dragDelta(MouseButton::Left));
+            getParent()->makeChildLast(getIndex());
         }
         else {
             auto c = Blues::DeepSkyBlue;
@@ -60,8 +61,6 @@ public:
 
         auto points = sr->shape->getPoints();
         for (std::size_t i = 0; i < points.size(); ++i) {
-            if (i > 0 && points[i] == points[i-1])
-                print("Shit!");
             Debug::drawText(str(i),transform.localToWorld(points[i]),Whites::White);
         }
 
@@ -76,7 +75,9 @@ public:
 
     Puzz() {
         makeChild<Piece>()->transform.setPosition(0,0);
-        makeChild<Piece>()->transform.setPosition(0, 2*GRID_SIZE);        
+        makeChild<Piece>()->transform.setPosition(0, 2*GRID_SIZE);       
+        makeChild<Piece>()->transform.setPosition(3*GRID_SIZE, GRID_SIZE);        
+
     }
 
 };
