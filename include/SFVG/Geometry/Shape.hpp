@@ -100,6 +100,9 @@ public:
     /// Gets the global bounding rectangle of the Shape
     FloatRect getGlobalBounds() const;
 
+    /// Tests if a point is inside of a Shape
+    bool isInside(const Vector2f& point) const;
+
 public:
 
     /// Offset type options

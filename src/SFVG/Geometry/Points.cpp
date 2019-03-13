@@ -73,7 +73,6 @@ float Points::getArea() const {
 
 bool Points::isInside(const Point& point) const {
     return insidePolygon(m_points, point);
-    return true;
 }
 
 //==============================================================================

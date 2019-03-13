@@ -188,6 +188,18 @@ FloatRect Shape::getGlobalBounds() const {
     return getTransform().transformRect(m_bounds);
 }
 
+bool Shape::isInside(const Vector2f& point) const {
+    // if (m_needsUpdate)
+    //     update();
+
+    // test holes
+    for (auto& hole : m_holes) {
+        if (hole.isInside(point))
+            return false;
+    }
+    return m_vertices.isInside(point);
+}
+
 //==============================================================================
 // PRIVATE FUNCTIONS
 //==============================================================================

@@ -321,10 +321,10 @@ void toolbarMenu() {
             Engine::stop();
         }
         if (ImGui::IsItemHovered())
-            ImGui::SetTooltip("Stop (F10)");
+            ImGui::SetTooltip("Stop (F4)");
         ImGui::SameLine();
         if (g_panTool)
-            ImGui::PushStyleColor(ImGuiCol_Text, Whites::White);
+            ImGui::PushStyleColor(ImGuiCol_Text, Blues::LightSkyBlue);
         if (ImGui::Button(ICON_FA_ARROWS_ALT)) {
             if (g_panTool)
                 ImGui::PopStyleColor();
@@ -384,8 +384,11 @@ void update() {
         else
             g_advance = true;
     }
-    if (Input::getKeyDown(Key::F10))
+    if (Input::getKeyDown(Key::F4))
         Engine::stop();
+    if (Input::getKeyDown(Key::F5))
+        g_panTool = !g_panTool;
+    // pan tool
     if (g_panTool) {
         float scroll = Input::getScroll();
         if (scroll > 0) {

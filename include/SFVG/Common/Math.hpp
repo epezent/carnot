@@ -139,8 +139,7 @@ inline bool insideTriangle(const sf::Vector2f& a, const sf::Vector2f& b,
                            const sf::Vector2f& c, const sf::Vector2f& p);
 
 /// Returns true if a point is inside a set of polygon points
-inline bool insidePolygon(const std::vector<sf::Vector2f>& polygon,
-                          const sf::Vector2f& p);
+inline bool insidePolygon(const std::vector<sf::Vector2f>& polygon, const sf::Vector2f& p);
 
 /// Computes the area of polygon defined by vector of outer vertices
 inline float polygonArea(const std::vector<sf::Vector2f>& polygon);

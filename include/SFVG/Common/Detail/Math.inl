@@ -270,29 +270,18 @@ inline bool insideTriangle(const sf::Vector2f& A, const sf::Vector2f& B,
     return s > 0 && t > 0 && (s + t) <= area;
 }
 
-inline bool insidePolygon(const std::vector<sf::Vector2f>& polygon,
+inline bool insidePolygon(const std::vector<sf::Vector2f>& poly,
                           const sf::Vector2f& point)
 {
-    std::size_t N = polygon.size();
-    if (N < 3)
-        return false;
-    sf::Vector2f infPoint(INF, point.y);
-    std::size_t crosses = 0;
-    for (std::size_t i = 0; i < N; ++i) {
-        std::size_t j = (i + 1) % N;
-        if ((polygon[i].x < point.x) && (polygon[j].x < point.x))
-            continue;  // line ij is behind point
-        if ((polygon[i].y < point.y) && (polygon[j].y < point.y))
-            continue;  // line ij is above point
-        if ((polygon[i].y > point.y) && (polygon[j].y > point.y))
-            continue;  // line ij is below point
-        if (polygon[i].y == polygon[j].y)
-            continue;  // line ij is parallel to ray
-        if (intersect(point, infPoint, polygon[i], polygon[j]))
-            crosses++;
+    std::size_t i, j;
+    std::size_t N = poly.size();
+    bool c = false;
+    for (i = 0, j = N-1; i < N; j = i++) {
+    if ( ((poly[i].y>point.y) != (poly[j].y>point.y)) &&
+        (point.x < (poly[j].x-poly[i].x) * (point.y-poly[i].y) / (poly[j].y-poly[i].y) + poly[i].x) )
+        c = !c;
     }
-    // inside if infinite line cross polygon odd times
-    return (crosses % 2 == 1);
+    return c;
 }
 
 inline float polygonArea(const std::vector<sf::Vector2f>& polygon) {

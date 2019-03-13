@@ -69,8 +69,12 @@ void StrokeRenderer::fromShape(const sfvg::Shape &shape)
 {
     setPointCount(shape.getVerticesCount());
     for (std::size_t i = 0; i < shape.getVerticesCount(); ++i)
-        m_points[i] = static_cast<Vector2d>(shape.getPoint(i));
+        setPoint(i,shape.getPoint(i));
     addVertex(getPoint(0));
+}
+
+void StrokeRenderer::setThickness(float thickness) {
+    std::fill(m_thicknesses.begin(), m_thicknesses.end(), thickness);
 }
 
 void StrokeRenderer::setThickness(std::size_t index, float thickness)
@@ -81,6 +85,10 @@ void StrokeRenderer::setThickness(std::size_t index, float thickness)
 float StrokeRenderer::getThickness(std::size_t index) const
 {
     return static_cast<float>(m_thicknesses[index]);
+}
+
+void StrokeRenderer::setColor(const Color& color) {
+    std::fill(m_colors.begin(), m_colors.end(), toRgb(color));
 }
 
 void StrokeRenderer::setColor(std::size_t index, const sf::Color &color)

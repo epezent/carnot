@@ -51,11 +51,17 @@ public:
     /// Adds a new point and increments the point count
     void addVertex(float x, float y, const Color& color = Color(), float thickness = 1.0f);
 
-    /// Sets the thickness of the Stroke
+    /// Sets the thickness of all Stroke vertices
+    void setThickness(float thickness);
+
+    /// Sets the thickness of the Stroke vertex
     void setThickness(std::size_t index, float thickness);
 
-    /// Gets the thickness of the Stroke
+    /// Gets the thickness of the Stroke vertex
     float getThickness(std::size_t index) const;
+
+    /// Sets the Color of all Stroke vertices
+    void setColor(const Color& color);
 
     /// Sets the fill of a shape to a solid Color
     void setColor(std::size_t index, const Color& color);
