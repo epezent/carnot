@@ -91,17 +91,3 @@ Handle<T> Engine::makeRoot(Args... args) {
 }
 
 } // namespace sfvg
-
-//==============================================================================
-// MACROS
-//==============================================================================
-
-/// Macro to request high performance GPU in systems (usually laptops) with both
-/// dedicated and discrete GPUs
-#ifdef _WIN32
-    #define SFVG_USE_DISCRETE_GPU \
-        extern "C" __declspec(dllexport) unsigned long NvOptimusEnablement = 1; \
-        extern "C" __declspec(dllexport) unsigned long AmdPowerXpressRequestHighPerformance = 1;
-#else
-    #define SFVG_USE_DISCRETE_GPU
-#endif

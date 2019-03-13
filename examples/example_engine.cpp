@@ -65,12 +65,52 @@ private:
 };
 
 
+class MyObject : public GameObject {
+public:
+
+
+    void start() {
+        sr = addComponent<ShapeRenderer>();
+        sr->shape = make<CircleShape>(50.0f);
+        sr->setColor(Blues::Blue);
+        col.resize(4);
+        sr->shape->setPosition(250,250);
+    }
+
+    void update() override {
+
+        ImGui::Begin("My Window");
+        if (ImGui::Button("Yes"))
+            print("Yes");
+        ImGui::SameLine();
+        if (ImGui::Button("No"))
+            print("No");
+
+        ImGui::ColorEdit4("Color", &col[0]);
+        RGB rbg;
+        rbg.r = col[0];
+        rbg.g = col[1];
+        rbg.b = col[2];
+        rbg.a = col[3];
+
+        sr->setColor(rbg);
+        ImGui::End();
+    }
+
+    Handle<ShapeRenderer> sr;
+    std::vector<float> col;
+    Color color;
+
+};
+
+
 int main(int argc, char const *argv[]) {
     Engine::init(500, 500);
-    Engine::setLayerCount(2);
-    auto root = Engine::makeRoot<TestObject>();
-    Engine::setBackgroundColor(Whites::White);
-    Engine::window->setTitle("Evan's Engine");
+    // Engine::setLayerCount(2);
+    // auto root = Engine::makeRoot<TestObject>();
+    // Engine::setBackgroundColor(Whites::White);
+    // Engine::window->setTitle("Evan's Engine");
+    Engine::makeRoot<MyObject>();
     Engine::run();    
     return 0;
 }

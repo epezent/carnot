@@ -195,6 +195,7 @@ void Engine::init(unsigned int width, unsigned int height, unsigned int style) {
     std::memcpy(fontCopy2, &fa_solid_900_ttf, fa_solid_900_ttf_len);
     io.Fonts->AddFontFromMemoryTTF(fontCopy2, fa_solid_900_ttf_len, 10.0f * g_dpiFactor, &icons_config, icons_ranges );
     io.FontGlobalScale = 1.0f / g_dpiFactor;  
+    io.IniFilename = 0;
     ImGui::SFML::UpdateFontTexture();
 
     // stype ImGui
