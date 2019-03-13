@@ -2,6 +2,7 @@
 #include <SFVG/Engine/GameObject.hpp>
 #include <SFVG/Engine/Engine.hpp>
 #include <SFVG/Common/Math.hpp>
+#include <SFVG/Engine/ImGui/imgui.h>
 
 namespace sfvg {
 
@@ -237,6 +238,10 @@ void Transform::onGizmo() {
     if (Debug::gizmoActive(transformId)) {
         auto x = localToWorld(Vector2f(20.0f,0.0f));
         auto y = localToWorld(Vector2f(0.0f,20.0f));
+
+        if (magnitude(Input::getMousePosition() - getPosition()) < 20.0f)
+            Debug::drawText(gameObject.getName(), Input::getMousePosition() - Vector2f(5,5), Debug::gizmoColor(transformId));
+
         Debug::drawPoint(getPosition(), Debug::gizmoColor(transformId));
         Debug::drawPoint(x, Reds::FireBrick);
         Debug::drawPoint(y, Greens::LightGreen);
