@@ -13,6 +13,17 @@
 #include <SFVG/Engine/FontAwesome5.hpp>
 #include <sstream>
 #include <array>
+#include <map>
+
+#define DEBUG_COLOR               Greens::Chartreuse
+#define DEBUG_XAXIS_COLOR         Reds::Red
+#define DEBUG_YAXIS_COLOR         Greens::Chartreuse
+#define DEBUG_TRANSFORM_COLOR     Whites::White
+#define DEBUG_LOCAL_BOUNDS_COLOR  Blues::Blue
+#define DEBUG_WORLD_BOUNDS_COLOR  Cyans::Cyan
+#define DEBUG_WIREFRAME_COLOR     Yellows::Yellow
+#define DEBUG_PHYSICS_COG_COLOR   Purples::Magenta
+#define DEBUG_PHYSICS_SHAPE_COLOR Purples::Magenta
 
 namespace sfvg {
     
@@ -21,26 +32,21 @@ namespace sfvg {
 //==============================================================================
 
 namespace {
-    static const std::array<std::string, Debug::GizmoCount> g_gizmoNames {
-        "Transform",
-        "Local Bounds",
-        "World Bounds",
-        "Wireframe",
-        "Physics COG",
-        "Physics Shapes"
-    };
-    static std::array<Color, Debug::GizmoCount> g_gizmoColors;
+
+    std::vector<Id>           g_gizmoIds;
+    std::map<Id, std::string> g_gizmoNames;
+    std::map<Id, Color>       g_gizmoColors;
+    std::map<Id, bool>        g_gizmoActives;
 
     bool g_show;
     bool g_paused;
     bool g_advance;
     bool g_gizmoFrameActive;
+    bool g_panTool;
 
     std::vector<Vertex> g_triangles;
     std::vector<Vertex> g_lines;
-    std::vector<Text> g_text;
-
-    std::array<bool, Debug::GizmoCount> g_activeGizmos;
+    std::vector<Text>   g_text;
 
     struct DebugInfo {
         float       elapsedTime = 0.0f;
@@ -69,6 +75,28 @@ void show(bool _show) {
 
 bool isShown() {
     return g_show;
+}
+
+void addGizmo(const std::string& name, const Color& color) {
+    Name intern = "__" + name + "__";
+    Id id = ID::makeId(intern);
+    g_gizmoIds.push_back(id);
+    g_gizmoNames[id] = name;
+    g_gizmoColors[id] = color;
+    g_gizmoActives[id] = false;
+}
+
+bool gizmoActive(Id id) {
+    return g_gizmoActives[id];
+}
+
+Id gizmoId(const std::string& name) {
+    Name intern = "__" + name + "__";
+    return ID::getId(intern);
+}
+
+const Color& gizmoColor(Id id) {
+    return g_gizmoColors[id];
 }
 
 void drawPoint(const Vector2f& position, const Color& color) {
@@ -181,7 +209,7 @@ void showContextMenu(int& corner) {
     }
 }
 
-void showInfo() {
+void infoMenu() {
     const float DISTANCE = 10.0f;
     static int corner = 0;
     ImGuiIO& io = ImGui::GetIO();
@@ -191,7 +219,7 @@ void showInfo() {
         ImGui::SetNextWindowPos(window_pos, ImGuiCond_Always, window_piv);
     ImGui::SetNextWindowBgAlpha(0.9f); // Transparent background
     ImGui::SetNextWindowFocus();
-    if (ImGui::Begin("Debug Info", &g_gizmoFrameActive, (corner != -1 ? ImGuiWindowFlags_NoMove : 0) | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize /*| ImGuiWindowFlags_AlwaysAutoResize*/ | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav))
+    if (ImGui::Begin("Info", &g_gizmoFrameActive, (corner != -1 ? ImGuiWindowFlags_NoMove : 0) | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize /*| ImGuiWindowFlags_AlwaysAutoResize*/ | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav))
     {
         ImGui::Text("CLK: %.2f s", Engine::time());
         if (ImGui::IsItemHovered()) ImGui::SetTooltip("Current time");
@@ -232,7 +260,7 @@ void showInfo() {
     ImGui::End();
 }
 
-void showWidgetMenu() {
+void gizmoMenu() {
     const float DISTANCE = 10.0f;
     static int corner = 1;
     ImGuiIO& io = ImGui::GetIO();
@@ -242,16 +270,21 @@ void showWidgetMenu() {
         ImGui::SetNextWindowPos(window_pos, ImGuiCond_Always, window_piv);
     ImGui::SetNextWindowBgAlpha(0.9f); // Transparent background
     ImGui::SetNextWindowFocus();
-    if (ImGui::Begin("Debug Widgets", &g_gizmoFrameActive, (corner != -1 ? ImGuiWindowFlags_NoMove : 0) | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav))
+    if (ImGui::Begin("Gizmos", &g_gizmoFrameActive, (corner != -1 ? ImGuiWindowFlags_NoMove : 0) | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav))
     {
-        for (std::size_t i = 0; i < GizmoCount; ++i)
-            ImGui::Selectable(g_gizmoNames[i].c_str(), &g_activeGizmos[i]);
+        for (auto& id : g_gizmoIds) {
+            auto color = g_gizmoColors[id];
+            color.a /= 2;
+            ImGui::PushStyleColor(ImGuiCol_Header, color);
+            ImGui::Selectable(g_gizmoNames[id].c_str(), &g_gizmoActives[id]);
+            ImGui::PopStyleColor();
+        }
         showContextMenu(corner);
     }
     ImGui::End();
 }
 
-void showPlayMenu() {
+void toolbarMenu() {
     const float DISTANCE = 10.0f;
     ImGuiIO& io = ImGui::GetIO();
     ImVec2 window_pos = ImVec2(io.DisplaySize.x * 0.5f, DISTANCE);
@@ -290,11 +323,19 @@ void showPlayMenu() {
         if (ImGui::IsItemHovered())
             ImGui::SetTooltip("Stop (F10)");
         ImGui::SameLine();
+        if (g_panTool)
+            ImGui::PushStyleColor(ImGuiCol_Text, Whites::White);
         if (ImGui::Button(ICON_FA_ARROWS_ALT)) {
-
+            if (g_panTool)
+                ImGui::PopStyleColor();
+            g_panTool = !g_panTool;
+        }
+        else {
+            if (g_panTool)
+                ImGui::PopStyleColor();
         }
         if (ImGui::IsItemHovered())
-            ImGui::SetTooltip("Pan");
+            ImGui::SetTooltip("Pan Tool (F5)");
     }
     ImGui::End();
 }
@@ -313,13 +354,22 @@ void init()
     g_paused = false;
     g_advance = false;
     g_info = DebugInfo();
-    g_activeGizmos.fill(false);
-    g_gizmoColors[Gizmo::Transform]     = DEBUG_TRANSFORM_COLOR;
-    g_gizmoColors[Gizmo::LocalBounds]   =  DEBUG_LOCAL_BOUNDS_COLOR;
-    g_gizmoColors[Gizmo::WorldBounds]   =  DEBUG_WORLD_BOUNDS_COLOR;
-    g_gizmoColors[Gizmo::Wireframe]     =  DEBUG_WIREFRAME_COLOR;
-    g_gizmoColors[Gizmo::PhysicsCOG]    =  DEBUG_PHYSICS_COG_COLOR;
-    g_gizmoColors[Gizmo::PhysicsShapes] =  DEBUG_PHYSICS_SHAPE_COLOR;
+    g_panTool = false;
+
+    g_gizmoIds.clear();
+    g_gizmoNames.clear();
+    g_gizmoColors.clear();
+    g_gizmoActives.clear();
+    g_triangles.clear();
+    g_lines.clear();
+    g_text.clear();    
+
+    addGizmo("Transform", DEBUG_TRANSFORM_COLOR);
+    addGizmo("Local Bounds", DEBUG_LOCAL_BOUNDS_COLOR);
+    addGizmo("World Bounds", DEBUG_WORLD_BOUNDS_COLOR);
+    addGizmo("Wireframe", DEBUG_WIREFRAME_COLOR);
+    addGizmo("Physics COG", DEBUG_PHYSICS_COG_COLOR);
+    addGizmo("Physics Shape", DEBUG_PHYSICS_SHAPE_COLOR);
 }
 
 void update() {
@@ -336,14 +386,25 @@ void update() {
     }
     if (Input::getKeyDown(Key::F10))
         Engine::stop();
+    if (g_panTool) {
+        float scroll = Input::getScroll();
+        if (scroll > 0) {
+            Engine::getView(0).zoom(1.1f);
+        }
+        else if (Input::getScroll() < 0) {
+            Engine::getView(0).zoom(1.0f/1.1f);
+        }
+        auto drag = Input::dragDeltaRaw(MouseButton::Left);
+        Engine::getView(0).move(-drag.x, -drag.y); // TODO: doesn't work when paused
+    }    
     // udate info
     updateInfo();
     // draw debug
     if (g_show) {
         // imgui
-        showInfo();
-        showWidgetMenu();
-        showPlayMenu();
+        infoMenu();
+        gizmoMenu();
+        toolbarMenu();
         // draw drawables
         if (g_triangles.size() > 0)
             Engine::window->draw(&g_triangles[0], g_triangles.size(), sf::Triangles);
@@ -363,10 +424,6 @@ bool proceed() {
     bool ret = !g_paused || g_advance;
     g_advance = false;
     return ret;
-}
-
-bool gizmoActive(Gizmo gizmo) {
-    return g_activeGizmos[gizmo];
 }
 
 } // namespace detail

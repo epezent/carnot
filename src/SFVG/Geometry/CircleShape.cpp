@@ -4,9 +4,9 @@
 namespace sfvg {
 
 CircleShape::CircleShape(float radius, std::size_t smoothness) :
+    m_circleRadius(radius),
     m_smoothness(smoothness)
 {
-    m_circleRadius = radius;
     updateCircleShape();
 }
 

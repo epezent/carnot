@@ -175,33 +175,9 @@ void StrokeRenderer::render(sf::RenderTarget &target) const
     target.resetGLStates();
 }
 
-void StrokeRenderer::onDebugRender()
+void StrokeRenderer::onGizmo()
 {
-    if (!isEnabled())
-        return;
-    // shape local bounds
-    Matrix3x3 T = gameObject.transform.getWorldMatrix(); // * shape.getTransform();
-    if (Debug::detail::gizmoActive(Debug::Gizmo::LocalBounds))
-    {
-        auto bounds = getLocalBounds();
-        auto a = T.transformPoint(bounds.left, bounds.top);
-        auto b = T.transformPoint(bounds.left + bounds.width, bounds.top);
-        auto c = T.transformPoint(bounds.left + bounds.width, bounds.top + bounds.height);
-        auto d = T.transformPoint(bounds.left, bounds.top + bounds.height);
-        Debug::drawPolyline({a, b, c, d, a}, Blues::Blue);
-    }
-    // draw world bounds
-    if (Debug::detail::gizmoActive(Debug::Gizmo::WorldBounds))
-    {
-        auto bounds = getWorldBounds();
-        auto a = Vector2f(bounds.left, bounds.top);
-        auto b = Vector2f(bounds.left + bounds.width, bounds.top);
-        auto c = Vector2f(bounds.left + bounds.width, bounds.top + bounds.height);
-        auto d = Vector2f(bounds.left, bounds.top + bounds.height);
-        Debug::drawPolyline({a, b, c, d, a}, Cyans::Cyan);
-    }
-    // wireframe
-
+    Renderer::onGizmo();
 }
 
 } // namespace sfvg

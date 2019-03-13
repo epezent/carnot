@@ -311,17 +311,19 @@ void GameObject::onRender(RenderQue& que) {
     }
 }
 
-void GameObject::onDebugRender() {
+void GameObject::onGizmo() {
     if (isEnabled()) {
         // que components
         m_iteratingComponents = true;
-        for (const auto& comp : m_components)
-            comp->onDebugRender();
+        for (const auto& comp : m_components) {
+            if (comp->isEnabled())
+                comp->onGizmo();
+        }
         m_iteratingComponents = false;
         // que children
         m_iteratingChildren = true;
         for (const auto& child : m_children)
-            child->onDebugRender();
+            child->onGizmo();
         m_iteratingChildren = false;
     }
 }

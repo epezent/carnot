@@ -18,7 +18,7 @@ public:
         path->setColor(color);
         path->fromShape(CircleShape(40.0f));
         dot = addComponent<ShapeRenderer>();
-        dot->shape = CircleShape(5.0f);
+        dot->shape = make<CircleShape>(5.0f);
         dot->setColor(Color::White);
     }
 
@@ -30,7 +30,7 @@ public:
             guide->setPoint(1,dotPos.x,800);
         else
             guide->setPoint(1,800,dotPos.y);
-        dot->shape.setPosition(dotPos);
+        dot->shape->setPosition(dotPos);
     }
 
     Handle<LineRenderer> guide;
@@ -51,7 +51,7 @@ public:
         path->setColor(Tween::Linear(r->color, c->color, 0.5f));
 
         dot = addComponent<ShapeRenderer>();
-        dot->shape = CircleShape(3.0f);
+        dot->shape = make<CircleShape>(3.0f);
         dot->setColor(Color::White);
     }
 
@@ -59,7 +59,7 @@ public:
         Vector2f pos;
         pos.y = r->transform.getPosition().y + r->dotPos.y;
         pos.x = c->transform.getPosition().x + c->dotPos.x;
-        dot->shape.setPosition(pos);
+        dot->shape->setPosition(pos);
         path->addPoint(pos);
         if (Input::getKeyDown(Key::Space))
             path->setPointCount(0);
@@ -108,17 +108,6 @@ public:
         lr = addComponent<LineRenderer>();
         lr->setColor(Color::Black);
         lr->addPoint(400,400);
-    }
-
-    void update() override {
-
-        if (Input::getScroll() > 0)
-            Engine::getView(0).zoom(1.1f);
-        else if (Input::getScroll() < 0)
-            Engine::getView(0).zoom(1.0f/1.1f);
-
-        auto drag = Input::dragDeltaRaw(MouseButton::Left);
-        Engine::getView(0).move(-drag.x, -drag.y);
     }
 
     std::vector<Handle<LissaCircle>> rHeaders;

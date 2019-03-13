@@ -11,6 +11,12 @@ public:
     /// Constuctor
     TextRenderer(GameObject& gameObject);
 
+    /// Gets the local bounding rectangle of the Shape
+    virtual FloatRect getLocalBounds() const override;
+
+    /// Gets the global bounding rectangle of the Shape
+    virtual FloatRect getWorldBounds() const override;
+
 public:
 
     Text text;  ///< Text to be rendered

@@ -96,7 +96,7 @@ void Object::onRender(RenderQue& que) {
     // do nothing by default
 }
 
-void Object::onDebugRender() {
+void Object::onGizmo() {
     // do nothing by default
 }
 

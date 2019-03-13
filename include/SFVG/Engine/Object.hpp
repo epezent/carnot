@@ -18,7 +18,6 @@ namespace sfvg {
 
 class Engine;
 class Object;
-class InputSystem;
 class Renderer;
 
 typedef std::vector<std::vector<const Renderer*>> RenderQue;
@@ -81,9 +80,6 @@ public:
     /// Returns the total number of Objects active in the Engine
     static std::size_t getObjectCount();
 
-    /// Makes a new unparented Object
-    template <typename T, typename ...Args> static Ptr<T> make(Args ...);
-
 protected:
 
     friend class Engine;
@@ -98,14 +94,15 @@ protected:
     virtual void update();
     /// Called once per frame
     virtual void lateUpdate();
+
     /// Called when the Object is renamed
     virtual void onRenamed(const Name& newName);
     /// Called when the Engine updates physics
     virtual void onPhysics();
-    /// Called when the Engine renders
+    /// Called when the Engine renders the game
     virtual void onRender(RenderQue& que);
-    /// Called if and when the Engine renders debug info
-    virtual void onDebugRender();
+    /// Called when the Engine renders Gizmos
+    virtual void onGizmo();
 
     //==========================================================================
     // Protected Functions
@@ -125,10 +122,5 @@ private:
     std::vector<Enumerator> m_coroutines; ///< Coroutines
 
 };
-
-template <typename T, typename ...Args>
-Ptr<T> Object::make(Args... args) {
-    return std::make_shared<T>(std::forward<Args>(args)...);
-}
 
 } // namespace sfvg

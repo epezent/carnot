@@ -67,10 +67,10 @@ public:
     void fromShape(const Shape& shape);
 
     /// Gets the local bounding rectangle of the Shape
-    FloatRect getLocalBounds() const;
+    virtual FloatRect getLocalBounds() const override;
 
     /// Gets the global bounding rectangle of the Shape
-    FloatRect getWorldBounds() const;
+    virtual FloatRect getWorldBounds() const override;
 
 protected:
 
@@ -78,7 +78,7 @@ protected:
     virtual void render(RenderTarget& target) const override;
 
     /// Renders stroke bounding box and skeleton
-    virtual void onDebugRender() override;
+    virtual void onGizmo() override;
 
 private:
 

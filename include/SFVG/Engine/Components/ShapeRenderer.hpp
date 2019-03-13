@@ -36,20 +36,23 @@ public:
 
     /// Gets the Texture Rect of the Shape
     const sf::IntRect& getTextureRect() const;
+    
+    /// Gets the local bounding rectangle of the Shape
+    virtual FloatRect getLocalBounds() const override;
 
-    /// Gets the world bounds of the Renderer
-    FloatRect getWorldBounds() const;
+    /// Gets the global bounding rectangle of the Shape
+    virtual FloatRect getWorldBounds() const override;
 
 public:
 
-    Shape shape;  ///< Shape to be rendered
+    Ptr<Shape> shape;  ///< Shape to be rendered
 
 protected:
 
     /// Renders the Shape to RenderTarget
     virtual void render(RenderTarget& target) const override;
     /// Renders shape bounding box and wireframe
-    virtual void onDebugRender() override;
+    virtual void onGizmo() override;
 
 private:
 

@@ -69,7 +69,7 @@ public:
     //==============================================================================
 
     /// Add a generic shape (must be convex)
-    void addShape(const Shape& shape, float skin = 0.0f);
+    void addShape(Ptr<Shape> shape, float skin = 0.0f);
     /// Adds a centered box shape to the RigidBody
     void addBoxShape(float width, float height, const Vector2f& offset = Vector2f(), float skin = 0.0f);
     /// Adds a cenetered circle shape to the RigidBody
@@ -132,7 +132,7 @@ private:
     /// Updates GameObject transform
     void onPhysics() override;
     /// Draws Shapes and RigidBody info
-    void onDebugRender() override;
+    void onGizmo() override;
 
 private:
 

@@ -24,6 +24,10 @@ public:
     void sendToBack();
     /// Sets the render layer to the top layer
     void sendToFront();
+    /// Gets the local bounding rectangle of the Shape
+    virtual FloatRect getLocalBounds() const = 0;
+    /// Gets the global bounding rectangle of the Shape
+    virtual FloatRect getWorldBounds() const = 0;
 
 public:
 
@@ -36,6 +40,8 @@ protected:
 
     /// Ques this Renderer
     void onRender(RenderQue& que) override;
+    /// Renders shape bounding box and wireframe
+    virtual void onGizmo() override;    
     /// Must be overriden to draw the Renderer
     virtual void render(RenderTarget& target) const = 0;
 

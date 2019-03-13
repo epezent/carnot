@@ -38,7 +38,6 @@ Points clipperToSfvg(const ClipperLib::Path& clipper) {
 //==============================================================================
 
 Shape::Shape(std::size_t pointCount) :
-    m_circleRadius(0.0f),
     m_holes(0),
     m_needsUpdate(true)
 {

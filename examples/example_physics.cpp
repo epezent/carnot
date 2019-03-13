@@ -7,7 +7,7 @@ public:
     Wall(float width, float height, float x, float y) {
         transform.setLocalPosition(x,y);
         auto sr = addComponent<ShapeRenderer>();
-        sr->shape = RectangleShape(width,height);
+        sr->shape = make<RectangleShape>(width,height);
         sr->setColor(Color::Black);
         auto rb = addComponent<RigidBody>(RigidBody::Static);
         rb->addBoxShape(width,height);
@@ -39,13 +39,13 @@ public:
         if (!confirmed && Input::getMouse(MouseButton::Right)) {
             end = Input::getMousePosition();
             auto size = absVec(start - end);
-            sr->shape = RectangleShape(size.x, size.y);
+            sr->shape = make<RectangleShape>(size.x, size.y);
             transform.setPosition(start + 0.5f * (end - start));
         }
         if (rb) {
-            Debug::drawText(str("mass = ",rb->getMass()), transform.getPosition());
+            Debug::drawText(str("mass = ",rb->getMass()), transform.getPosition(), Whites::White);
             auto localPos = transform.worldToLocal(Input::getMousePosition());
-            if (inBounds(localPos, sr->shape.getLocalBounds()) && Input::getKeyDown(Key::D))
+            if (inBounds(localPos, sr->shape->getLocalBounds()) && Input::getKeyDown(Key::D))
                 destroy();
             
         }
@@ -77,10 +77,10 @@ public:
             go->transform.setPosition(Input::getMousePosition());
             go->addComponent<ShapeRenderer>();
             go->getComponent<ShapeRenderer>()->setColor(randomColor());
-            go->getComponent<ShapeRenderer>()->shape = CircleShape(30);
-            go->getComponent<ShapeRenderer>()->shape.addHole(StarShape(20,25,20));
+            go->getComponent<ShapeRenderer>()->shape = make<CircleShape>(30);
+            go->getComponent<ShapeRenderer>()->shape->addHole(StarShape(20,25,20));
             go->addComponent<RigidBody>();
-            go->getComponent<RigidBody>()->addCircleShape(30);
+            go->getComponent<RigidBody>()->addShape(go->getComponent<ShapeRenderer>()->shape);
             go->getComponent<RigidBody>()->setShapeDensity(0, 1.0f);
         }
     }

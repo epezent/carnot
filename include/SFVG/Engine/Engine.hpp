@@ -85,7 +85,7 @@ private:
 
 template <typename T, typename ...Args>
 Handle<T> Engine::makeRoot(Args... args) {
-    auto root = Object::make<T>(args...);
+    auto root = make<T>(args...);
     setRoot(root);
     return getRoot().as<T>();
 }

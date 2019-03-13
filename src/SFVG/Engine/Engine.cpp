@@ -291,7 +291,7 @@ void Engine::run() {
         render();
         // update debug
         if (Debug::isShown())
-            g_root->onDebugRender();
+            g_root->onGizmo();
         Debug::detail::update();
         window->setView(window->getDefaultView());
         // draw imgui

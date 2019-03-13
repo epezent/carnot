@@ -128,18 +128,18 @@ void RigidBody::addCircleShape(float radius, const Vector2f& offset) {
     m_mask.push_back(RBShapeTypeCircle);
 }
 
-void RigidBody::addShape(const Shape& _shape, float skin) {
+void RigidBody::addShape(Ptr<Shape> _shape, float skin) {
     // special case circle
-    if (_shape.m_circleRadius > 0.0f && _shape.getScale() == Vector2f(1.0f,1.0f)) {
-        return addCircleShape(_shape.m_circleRadius, _shape.getPosition());
+    if (auto cir =std::dynamic_pointer_cast<CircleShape>(_shape)) {
+        return addCircleShape(cir->getCircleRadius(), cir->getPosition());
     }
     // else it's a polygon
-    auto verts = _shape.getVertices();
+    auto verts = _shape->getVertices();
     int N = (int)verts.size();
     std::vector<cpVect> cpVerts;
     cpVerts.reserve(N);
     for (std::size_t i = 0; i < N; ++i)
-        cpVerts.push_back(sf2cp(_shape.getTransform().transformPoint(verts[i])));
+        cpVerts.push_back(sf2cp(_shape->getTransform().transformPoint(verts[i])));
     cpShape* shape = cpPolyShapeNewRaw(m_body, N, &cpVerts[0], (cpFloat)skin);
     cpSpaceAddShape(Physics::detail::space(), shape);
     cpShapeSetFriction(shape, 0.5f);
@@ -272,9 +272,13 @@ void RigidBody::onPhysics() {
     gameObject.transform.setRotation((float) angle * RAD2DEG);
 }
 
-void RigidBody::onDebugRender() {
+void RigidBody::onGizmo() {
+
+    static Id phyShapesId = Debug::gizmoId("Physics Shape");
+    static Id phyCogId    = Debug::gizmoId("Physics COG");
+
     // draw shapes
-    if (Debug::detail::gizmoActive(Debug::Gizmo::PhysicsShapes)) {
+    if (Debug::gizmoActive(phyShapesId)) {
         for (std::size_t i = 0; i < getShapeCount(); ++i) {
             cpBody* body = cpShapeGetBody(m_shapes[i]);
             if (m_mask[i] == RBShapeTypePolygon) {
@@ -282,13 +286,13 @@ void RigidBody::onDebugRender() {
                 for (int j = 0; j < n; ++j) {
                     Point a = cp2sf(cpBodyLocalToWorld(body,cpPolyShapeGetVert(m_shapes[i], j)));
                     Point b = cp2sf(cpBodyLocalToWorld(body,cpPolyShapeGetVert(m_shapes[i], ((j+1)%n))));
-                    Debug::drawLine(a, b, DEBUG_PHYSICS_SHAPE_COLOR);
+                    Debug::drawLine(a, b, Debug::gizmoColor(phyShapesId));
                 }
             }
             else if (m_mask[i] == RBShapeTypeCircle) {
                 float r = (float)cpCircleShapeGetRadius(m_shapes[i]);
                 Point pos = cp2sf(cpBodyLocalToWorld(body,cpCircleShapeGetOffset(m_shapes[i])));
-                Debug::drawCircle(pos, r, DEBUG_PHYSICS_SHAPE_COLOR);
+                Debug::drawCircle(pos, r, Debug::gizmoColor(phyShapesId));
             }
             else if (m_mask[i] == RBShapeTypeSegment) {
 
@@ -296,11 +300,11 @@ void RigidBody::onDebugRender() {
         }
     }
     // draw center of gravity
-    if (Debug::detail::gizmoActive(Debug::Gizmo::PhysicsCOG)) {
+    if (Debug::gizmoActive(phyCogId)) {
         Vector2f cog = getCOG();
-        Debug::drawCircle(cog, 5, DEBUG_PHYSICS_COG_COLOR);
-        Debug::drawPoint(cog + Vector2f(2,2), DEBUG_PHYSICS_COG_COLOR);
-        Debug::drawPoint(cog - Vector2f(2,2), DEBUG_PHYSICS_COG_COLOR);
+        Debug::drawCircle(cog, 5, Debug::gizmoColor(phyCogId));
+        Debug::drawPoint(cog + Vector2f(2,2), Debug::gizmoColor(phyCogId));
+        Debug::drawPoint(cog - Vector2f(2,2), Debug::gizmoColor(phyCogId));
 
     }
 }

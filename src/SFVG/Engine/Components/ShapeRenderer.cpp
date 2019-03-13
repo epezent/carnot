@@ -28,6 +28,7 @@ namespace sfvg {
 
 ShapeRenderer::ShapeRenderer(GameObject& _gameObject) :
     Renderer(_gameObject),
+    shape(new Shape()),
     m_texture(NULL),
     m_textureRect(),
     m_gradient(),
@@ -88,16 +89,16 @@ const sf::IntRect& ShapeRenderer::getTextureRect() const {
 
 void ShapeRenderer::updateVertexArray() const {
     // make earcut polygon
-    std::vector<Points> polygon(1 + shape.m_holes.size());
-    polygon[0] = shape.m_vertices;
+    std::vector<Points> polygon(1 + shape->m_holes.size());
+    polygon[0] = shape->m_vertices;
     std::size_t n_vertices = polygon[0].size();
     if (n_vertices < 3)
         return;
     // generate vertices for holes
-    for (std::size_t i = 0; i < shape.m_holes.size(); ++i) {
-        if (shape.m_holes[i].m_needsUpdate)
-            shape.m_holes[i].update();
-        polygon[i+1] = shape.m_holes[i].m_vertices;
+    for (std::size_t i = 0; i < shape->m_holes.size(); ++i) {
+        if (shape->m_holes[i].m_needsUpdate)
+            shape->m_holes[i].update();
+        polygon[i+1] = shape->m_holes[i].m_vertices;
         n_vertices += polygon[i+1].size();
     }
     // generate indices
@@ -122,7 +123,7 @@ void ShapeRenderer::updateVertexArray() const {
 }
 
 void ShapeRenderer::updateTexCoords() const {
-    auto bounds = shape.m_bounds;
+    auto bounds = shape->m_bounds;
     float invWidth = 1.0f / bounds.width;
     float invHeight = 1.0f / bounds.height;
     for (std::size_t i = 0; i < m_vertexArray.size(); ++i) {
@@ -149,9 +150,9 @@ void ShapeRenderer::updateFillColors() const
 
 void ShapeRenderer::render(RenderTarget& target) const {
     m_states.transform = gameObject.transform.getWorldMatrix();
-    if (shape.m_needsUpdate) {
+    if (shape->m_needsUpdate) {
         // Update shape geometry
-        shape.update();
+        shape->update();
         // Update vertex array
         updateVertexArray();
         // Updaate texture coordinates
@@ -160,7 +161,7 @@ void ShapeRenderer::render(RenderTarget& target) const {
         if (m_hasSolidFill)
             updateFillColors();
     }
-    m_states.transform *= shape.getTransform();
+    m_states.transform *= shape->getTransform();
     if (m_texture)
         m_states.texture = m_texture;
     else
@@ -171,35 +172,25 @@ void ShapeRenderer::render(RenderTarget& target) const {
         target.draw(&m_vertexArray[0], m_vertexArray.size(), sf::Triangles, m_states);
 }
 
-FloatRect ShapeRenderer::getWorldBounds() const {
-    Matrix3x3 T = gameObject.transform.getWorldMatrix() * shape.getTransform();
-    return T.transformRect(shape.getLocalBounds());
+FloatRect ShapeRenderer::getLocalBounds() const {
+    return shape->getTransform().transformRect(shape->getLocalBounds());
 }
 
-void ShapeRenderer::onDebugRender() {
-    if (!isEnabled())
-        return;
-    // shape local bounds
-    Matrix3x3 T = gameObject.transform.getWorldMatrix() * shape.getTransform();
-    if (Debug::detail::gizmoActive(Debug::Gizmo::LocalBounds)) {
-        auto bounds = shape.getLocalBounds();
-        auto a = T.transformPoint(bounds.left,bounds.top);
-        auto b = T.transformPoint(bounds.left+bounds.width,bounds.top);
-        auto c = T.transformPoint(bounds.left+bounds.width,bounds.top+bounds.height);
-        auto d = T.transformPoint(bounds.left,bounds.top+bounds.height);
-        Debug::drawPolyline({a,b,c,d,a},Blues::Blue);
-    }
-    // draw world bounds
-    if (Debug::detail::gizmoActive(Debug::Gizmo::WorldBounds)) {
-        auto bounds = getWorldBounds();
-        auto a = Vector2f(bounds.left,bounds.top);
-        auto b = Vector2f(bounds.left+bounds.width,bounds.top);
-        auto c = Vector2f(bounds.left+bounds.width,bounds.top+bounds.height);
-        auto d = Vector2f(bounds.left,bounds.top+bounds.height);
-        Debug::drawPolyline({a,b,c,d,a},Cyans::Cyan);
-    }
+FloatRect ShapeRenderer::getWorldBounds() const {
+    Matrix3x3 T = gameObject.transform.getWorldMatrix();
+    return T.transformRect(getLocalBounds());
+}
+
+void ShapeRenderer::onGizmo() {
+    
+    Renderer::onGizmo();
+
+    static Id wireframeId = Debug::gizmoId("Wireframe");
+
+    Matrix3x3 T = gameObject.transform.getWorldMatrix() * shape->getTransform();
+
     // wireframe
-    if (Debug::detail::gizmoActive(Debug::Gizmo::Wireframe)) {
+    if (Debug::gizmoActive(wireframeId)) {
         std::vector<Vector2f> wireframe;
         wireframe.reserve(2 * m_vertexArray.size());
         for (std::size_t i = 0; i < m_vertexArray.size(); i = i + 3) {
@@ -210,7 +201,7 @@ void ShapeRenderer::onDebugRender() {
             wireframe.push_back(T.transformPoint(m_vertexArray[i + 2].position));
             wireframe.push_back(T.transformPoint(m_vertexArray[i].position    ));
         }
-        Debug::drawLines(wireframe,Yellows::Yellow);
+        Debug::drawLines(wireframe, Debug::gizmoColor(wireframeId));
     }
 }
 

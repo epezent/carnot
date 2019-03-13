@@ -7,7 +7,7 @@ public:
     Wall(float width, float height, float x, float y) {
         transform.setLocalPosition(x,y);
         auto sr = addComponent<ShapeRenderer>();
-        sr->shape = RectangleShape(width,height);
+        sr->shape = make<RectangleShape>(width,height);
         sr->setColor(Color::White);
         auto rb = addComponent<RigidBody>(RigidBody::Static);
         rb->addBoxShape(width,height);
@@ -20,7 +20,7 @@ public:
     Ball() {
         transform.setPosition(500,250);
         auto sr = addComponent<ShapeRenderer>();
-        sr->shape = CircleShape(10);
+        sr->shape = make<CircleShape>(10);
         sr->setColor(Reds::FireBrick);
         rb = addComponent<RigidBody>();
         rb->addCircleShape(10);
@@ -47,7 +47,7 @@ public:
     Paddle() {
         auto sr = addComponent<ShapeRenderer>();
         sr->setColor(Color::White);
-        sr->shape = RectangleShape(10,100);
+        sr->shape = make<RectangleShape>(10,100);
         transform.setPosition(125,250);
         rb = addComponent<RigidBody>(RigidBody::Kinematic);
         rb->addBoxShape(10, 100);

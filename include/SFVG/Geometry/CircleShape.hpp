@@ -22,6 +22,7 @@ private:
 
 private:
 
+    float m_circleRadius;
     std::size_t m_smoothness;
 };
 

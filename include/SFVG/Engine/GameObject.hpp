@@ -123,8 +123,8 @@ private:
     void lateUpdateAll();
     /// Ques the GameObject for rendering and the recursively ques all of its children
     void onRender(RenderQue& que) final;
-    /// Calls onDebugRender for all cildren and components
-    void onDebugRender() final;
+    /// Calls onGizmo for all cildren and components
+    void onGizmo() final;
     /// Updates all Physics children and compoents
     void onPhysics() final;
 

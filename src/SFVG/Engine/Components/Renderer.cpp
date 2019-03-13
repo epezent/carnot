@@ -57,4 +57,29 @@ void Renderer::onRender(RenderQue& que) {
 }
 
 
+void Renderer::onGizmo() {
+    static Id localBoundsId = Debug::gizmoId("Local Bounds");
+    static Id worldBoundsId = Debug::gizmoId("World Bounds");
+    // shape local bounds
+    Matrix3x3 T = gameObject.transform.getWorldMatrix(); // * shape.getTransform();
+    if (Debug::gizmoActive(localBoundsId)) {
+        auto bounds = getLocalBounds();
+        auto a = T.transformPoint(bounds.left,bounds.top);
+        auto b = T.transformPoint(bounds.left+bounds.width,bounds.top);
+        auto c = T.transformPoint(bounds.left+bounds.width,bounds.top+bounds.height);
+        auto d = T.transformPoint(bounds.left,bounds.top+bounds.height);
+        Debug::drawPolyline({a,b,c,d,a}, Debug::gizmoColor(localBoundsId));
+    }
+    // draw world bounds
+    if (Debug::gizmoActive(worldBoundsId)) {
+        auto bounds = getWorldBounds();
+        auto a = Vector2f(bounds.left,bounds.top);
+        auto b = Vector2f(bounds.left+bounds.width,bounds.top);
+        auto c = Vector2f(bounds.left+bounds.width,bounds.top+bounds.height);
+        auto d = Vector2f(bounds.left,bounds.top+bounds.height);
+        Debug::drawPolyline({a,b,c,d,a}, Debug::gizmoColor(worldBoundsId));
+    }
+
+}
+
 } // namespace sfvg

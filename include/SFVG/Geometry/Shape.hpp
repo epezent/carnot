@@ -123,9 +123,6 @@ public:
 protected:
 
     friend class ShapeRenderer;
-    friend class RigidBody;
-
-    float m_circleRadius;
 
 private:
 

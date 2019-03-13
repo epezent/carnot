@@ -111,7 +111,7 @@ private:
     void callCallbacks();
 
     /// Renders the Transform axis handles during Debug mode
-    void onDebugRender() override;
+    void onGizmo() override;
 
 private:
 

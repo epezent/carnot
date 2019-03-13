@@ -232,17 +232,16 @@ FloatRect Transform::worldToLocal(const FloatRect& rect) {
 // PRIVATE
 //==============================================================================
 
-void Transform::onDebugRender() {
-    if (!isEnabled())
-        return;
-    if (Debug::detail::gizmoActive(Debug::Gizmo::Transform)) {
+void Transform::onGizmo() {
+    static Id transformId = Debug::gizmoId("Transform");
+    if (Debug::gizmoActive(transformId)) {
         auto x = localToWorld(Vector2f(20.0f,0.0f));
         auto y = localToWorld(Vector2f(0.0f,20.0f));
-        Debug::drawPoint(getPosition(), DEBUG_TRANSFORM_COLOR);
-        Debug::drawPoint(x, DEBUG_XAXIS_COLOR);
-        Debug::drawPoint(y, DEBUG_YAXIS_COLOR);
-        Debug::drawLine(getPosition(), x, DEBUG_XAXIS_COLOR);
-        Debug::drawLine(getPosition(), y, DEBUG_YAXIS_COLOR);
+        Debug::drawPoint(getPosition(), Debug::gizmoColor(transformId));
+        Debug::drawPoint(x, Reds::FireBrick);
+        Debug::drawPoint(y, Greens::LightGreen);
+        Debug::drawLine(getPosition(), x, Reds::FireBrick);
+        Debug::drawLine(getPosition(), y, Greens::LightGreen);
     }
 }
 

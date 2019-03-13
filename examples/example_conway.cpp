@@ -13,7 +13,7 @@ public:
     Cell(float size) {
         sr = addComponent<ShapeRenderer>();
         sr->setColor(Whites::White);
-        sr->shape = SquareShape(size);
+        sr->shape = make<SquareShape>(size);
         sr->setEnabled(false);
     }
 

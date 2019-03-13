@@ -2,77 +2,58 @@
 
 #include <SFVG/Common/Imports.hpp>
 #include <SFVG/Graphics/Color.hpp>
+#include <SFVG/Engine/Id.hpp>
 
 namespace sfvg {
-
-#define DEBUG_COLOR               Greens::Chartreuse
-#define DEBUG_XAXIS_COLOR         Reds::Red
-#define DEBUG_YAXIS_COLOR         Greens::Chartreuse
-#define DEBUG_TRANSFORM_COLOR     Whites::White
-#define DEBUG_LOCAL_BOUNDS_COLOR  Blues::Blue
-#define DEBUG_WORLD_BOUNDS_COLOR  Cyans::Cyan
-#define DEBUG_WIREFRAME_COLOR     Yellows::Yellow
-#define DEBUG_PHYSICS_COG_COLOR   Purples::Magenta
-#define DEBUG_PHYSICS_SHAPE_COLOR Purples::Magenta
-
 namespace Debug {
 
-/// Types of Gizmo that can be displayed
-enum Gizmo {
-    Transform,
-    LocalBounds,
-    WorldBounds,
-    Wireframe,
-    PhysicsCOG,
-    PhysicsShapes,
-    GizmoCount
-};
-
-/// Shows/hides general debug info in top right corner
+/// Shows/hides debug info and Gizmos
 void show(bool show);
 
-/// Returns true if the debug info is show
+/// Returns true if the debug info is shown
 bool isShown();
 
+/// Adds a new Gizmo option and associated color
+void addGizmo(const std::string& name, const Color& color);
+
+/// Returns true if the user as selected a Gizmo to be active
+bool gizmoActive(Id id);
+
+/// Returns Id associated with Gizmo
+Id gizmoId(const std::string& name);
+
+/// Return the color associated with a Gizmo
+const Color& gizmoColor(Id id);
+
 /// Draws a point in global coordinates
-void drawPoint(const Vector2f& position,
-                const Color& color = DEBUG_COLOR);
+void drawPoint(const Vector2f& position, const Color& color);
 
 /// Draws a line in global coordinates
-void drawLine(const Vector2f& start, const Vector2f& end,
-                const Color& color = DEBUG_COLOR);
+void drawLine(const Vector2f& start, const Vector2f& end, const Color& color);
 
 /// Draws unconnected lines between every two points in global coordinates
-void drawLines(const std::vector<Vector2f>& points,
-                const Color& color = DEBUG_COLOR);
+void drawLines(const std::vector<Vector2f>& points, const Color& color);
 
 /// Draws a connected polyline between a series of poits in global coordinates
-void drawPolyline(const std::vector<Vector2f>& points,
-                    const Color& color = DEBUG_COLOR);
+void drawPolyline(const std::vector<Vector2f>& points, const Color& color);
 
 /// Draws a triangle in global coordinates
-void drawTriangle(const Vector2f& a, const Vector2f& b, const Vector2f& c,
-                    const Color& color = DEBUG_COLOR);
+void drawTriangle(const Vector2f& a, const Vector2f& b, const Vector2f& c, const Color& color);
 
 /// Draws a centered rectangle in global coordinates
-void drawRectangle(const Vector2f& position, float width, float height,
-                    const Color& color = DEBUG_COLOR);
+void drawRectangle(const Vector2f& position, float width, float height, const Color& color);
 
 /// Draws a circle in global coordinates
-void drawCircle(const Vector2f& position, float radius,
-                const Color& color = DEBUG_COLOR);
+void drawCircle(const Vector2f& position, float radius, const Color& color);
 
 /// Draws a debug text label in global coordinates
-void drawText(const std::string& text,
-                const Vector2f& position,
-                const Color& color = DEBUG_COLOR);
+void drawText(const std::string& text, const Vector2f& position, const Color& color);
 
 // Implementation details [internal use only]
 namespace detail {
 void init();
 void update();
 bool proceed();
-bool gizmoActive(Gizmo gizmo);
 } // namespace detail
 } // namespace Debug
 } // namespace sfvg

@@ -11,10 +11,10 @@ public:
         bg = makeChild<GameObject>();
         std::size_t n = 50;
         float s = 500.0f/n;
-        SquareShape sqr(s);        
+        auto sqr = make<SquareShape>(s);        
         for (std::size_t i = 0; i < n/2; ++i) {
             for (std::size_t j = 0; j < n; ++j) {
-                sqr.setPosition(s*(j%2) + s/2.0f  + 2*i * s, s/2  + j * s);
+                sqr->setPosition(s*(j%2) + s/2.0f  + 2*i * s, s/2  + j * s);
                 auto check = bg->addComponent<ShapeRenderer>();
                 check->shape = sqr;
                 check->setColor(Grays::Gray50);
@@ -26,9 +26,9 @@ public:
         stroke->setLayer(1);
         sr = addComponent<ShapeRenderer>();
         sr->setLayer(1);
-        sr->shape = SquareShape(50);
+        sr->shape = make<SquareShape>(50);
         sr->setColor(Grays::Gray50);
-        sr->shape.setPosition(250,250);
+        sr->shape->setPosition(250,250);
 
         auto b = Blues::DeepSkyBlue;
         b.a = 128;
@@ -65,13 +65,36 @@ private:
     Handle<GameObject> bg;
 };
 
+
+class MyObject : public GameObject {
+public:
+
+    void start() override {
+        sr = addComponent<ShapeRenderer>();
+        sr->shape = make<SquareShape>(40);
+        sr->setColor(Greens::Green);
+    }
+
+    void update() override {
+        ImGui::Begin("My Window");
+        if (ImGui::Button("My Button")) {
+            print("Hey!");
+        }
+        ImGui::End();
+    }
+
+    Handle<ShapeRenderer> sr;
+    
+};
+
+
 int main(int argc, char const *argv[]) {
     Engine::init(500, 500);
     Engine::setLayerCount(2);
-    Engine::makeRoot<TestObject>();
+    auto root = Engine::makeRoot<TestObject>();
+    root->makeChild<MyObject>();
     Engine::setBackgroundColor(Whites::White);
     Engine::window->setTitle("Evan's Engine");
-    Engine::run();
-    
+    Engine::run();    
     return 0;
 }

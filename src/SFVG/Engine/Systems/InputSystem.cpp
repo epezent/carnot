@@ -24,26 +24,21 @@ bool g_anyMouseUpBool;
 bool g_anyInputBool;
 
 sf::String g_textEntered;
-
-std::array<bool, Key::KeyCount>                    g_keyDownTable;
-std::array<bool, Key::KeyCount>                    g_keyUpTable;
-
-std::array<bool, MouseButton::ButtonCount>         g_mouseDownTable;
-std::array<bool, MouseButton::ButtonCount>         g_mouseUpTable;
-std::array<bool, MouseButton::ButtonCount>         g_dblClkTable;
-
-std::array<float, MouseButton::ButtonCount>        g_dblClkTimes;
-
-std::array<bool, MouseButton::ButtonCount>         g_dragStartedTable;
-std::array<bool, MouseButton::ButtonCount>         g_dragEndedTable;
-std::array<bool, MouseButton::ButtonCount>         g_draggingTable;
-
-std::array<Vector2f, MouseButton::ButtonCount>     g_dragStartTable;
-std::array<Vector2f, MouseButton::ButtonCount>     g_dragLastTable;
-std::array<Vector2i, MouseButton::ButtonCount>     g_dragLastRawTable;
-std::array<Vector2f, MouseButton::ButtonCount>     g_dragDeltaTable;
-std::array<Vector2i, MouseButton::ButtonCount>     g_dragDeltaRawTable;
-std::array<Vector2f, MouseButton::ButtonCount>     g_dragTotalTable;
+std::array<bool, Key::KeyCount>                g_keyDownTable;
+std::array<bool, Key::KeyCount>                g_keyUpTable;
+std::array<bool, MouseButton::ButtonCount>     g_mouseDownTable;
+std::array<bool, MouseButton::ButtonCount>     g_mouseUpTable;
+std::array<bool, MouseButton::ButtonCount>     g_dblClkTable;
+std::array<float, MouseButton::ButtonCount>    g_dblClkTimes;
+std::array<bool, MouseButton::ButtonCount>     g_dragStartedTable;
+std::array<bool, MouseButton::ButtonCount>     g_dragEndedTable;
+std::array<bool, MouseButton::ButtonCount>     g_draggingTable;
+std::array<Vector2f, MouseButton::ButtonCount> g_dragStartTable;
+std::array<Vector2f, MouseButton::ButtonCount> g_dragLastTable;
+std::array<Vector2i, MouseButton::ButtonCount> g_dragLastRawTable;
+std::array<Vector2f, MouseButton::ButtonCount> g_dragDeltaTable;
+std::array<Vector2i, MouseButton::ButtonCount> g_dragDeltaRawTable;
+std::array<Vector2f, MouseButton::ButtonCount> g_dragTotalTable;
 
 } // private namespace
 
