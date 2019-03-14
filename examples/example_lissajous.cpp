@@ -1,6 +1,6 @@
-#include <SFVG/SFVG.hpp>
+#define SFVG_USE_DISCRETE_GPU
 
-SFVG_USE_DISCRETE_GPU
+#include <SFVG/SFVG.hpp>
 
 using namespace sfvg;
 
