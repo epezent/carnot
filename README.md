@@ -1,4 +1,5 @@
-![MEL Logo](https://github.com/epezent/carnot/blob/master/misc/carnot_banner.png)
+<img src="https://github.com/epezent/carnot/blob/master/misc/carnot_banner.png" width="300">
+
 
 ## Developers
 
