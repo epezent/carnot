@@ -1,4 +1,4 @@
-# EE - Simple and Fast Vector Graphics
+# EE - Evan's Engine
 
 ## Developers
 
