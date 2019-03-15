@@ -1,7 +1,7 @@
 
 #include <SFML/Graphics.hpp>
-# include <EE/Graphics.hpp>
-# include <EE/Animation.hpp>
+#include <Carnot/Graphics.hpp>
+#include <Carnot/Animation.hpp>
 
 #include <iostream>
 #include <vector>
@@ -9,7 +9,7 @@
 #include <functional>
 #include "Fps.hpp"
 
-using namespace ee;
+using namespace carnot;
 
 void printColor(const sf::Color& color) {
     std::cout << (int)color.r << ",";
@@ -30,7 +30,7 @@ int main(int argc, char* argv[]) {
 
     sf::ContextSettings settings;
     settings.antialiasingLevel = 8;
-    sf::RenderWindow window(sf::VideoMode(1000, 1000), "EE", sf::Style::Default, settings);
+    sf::RenderWindow window(sf::VideoMode(1000, 1000), "Carnot", sf::Style::Default, settings);
     window.setVerticalSyncEnabled(true);
 
     sf::Font font;

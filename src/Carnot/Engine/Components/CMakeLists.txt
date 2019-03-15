@@ -1,0 +1,11 @@
+target_sources(carnot
+	PRIVATE
+        LineRenderer.cpp
+        Renderer.cpp
+        RigidBody.cpp
+        ShapeRenderer.cpp
+        SpriteRenderer.cpp
+        StrokeRenderer.cpp
+        TextRenderer.cpp
+		Transform.cpp
+)

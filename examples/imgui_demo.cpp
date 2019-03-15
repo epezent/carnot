@@ -1,4 +1,4 @@
-# include <EE/EE.hpp>
+#include <Carnot/Carnot.hpp>
 
 // dear imgui, v1.68 WIP
 // (demo code)

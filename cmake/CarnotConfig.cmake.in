@@ -1,0 +1,16 @@
+get_filename_component(CARNOT_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+
+include(CMakeFindDependencyMacro)
+
+list(APPEND CMAKE_MODULE_PATH ${CARNOT_CMAKE_DIR})
+
+# NOTE Had to use find_package because find_dependency does not support COMPONENTS or MODULE until 3.8.0
+set(SFML_STATIC_LIBRARIES TRUE)
+find_package(SFML 2.5 REQUIRED COMPONENTS audio graphics window system network)
+list(REMOVE_AT CMAKE_MODULE_PATH -1)
+
+if(NOT TARGET Carnot::carnot)
+    include("${CARNOT_CMAKE_DIR}/CARNOTTargets.cmake")
+endif()
+
+set(CARNOT_LIBRARIES Carnot::carnot)

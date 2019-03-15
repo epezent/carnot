@@ -1,6 +1,6 @@
-# include <EE/Animation.hpp>
+#include <Carnot/Animation.hpp>
 
-namespace ee {
+namespace carnot {
 
     AnimationBase::AnimationBase() :
         m_duration(sf::seconds(1.0f)),
@@ -35,4 +35,4 @@ namespace ee {
         m_isPlaying = false;
     }
 
-} // namespace ee
+} // namespace carnot

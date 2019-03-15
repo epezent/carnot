@@ -1,9 +1,9 @@
-# include <EE/Engine.hpp>
-# include <EE/Graphics.hpp>
+#include <Carnot/Engine.hpp>
+#include <Carnot/Graphics.hpp>
 #include <map>
 #include <sstream>
 
-using namespace ee;
+using namespace carnot;
 using std::vector;
 using std::map;
 using std::string;

@@ -1,11 +1,11 @@
-# include <EE/Engine/Object.hpp>
-# include <EE/Engine/Engine.hpp>
-# include <EE/Graphics.hpp>
+#include <Carnot/Engine/Object.hpp>
+#include <Carnot/Engine/Engine.hpp>
+#include <Carnot/Graphics.hpp>
 #include <typeinfo>
 #include <sstream>
-# include <EE/Engine/XboxController.hpp>
+#include <Carnot/Engine/XboxController.hpp>
 
-using namespace ee;
+using namespace carnot;
 
 class MyObject : public Object {
 public:

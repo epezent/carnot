@@ -1,14 +1,14 @@
 #pragma once
 
 #include <SFML/System/Time.hpp>
-# include <EE/Animation/Frame.hpp>
+#include <Carnot/Animation/Frame.hpp>
 #include <map>
 #include <vector>
 #include <cassert>
 #include <algorithm>
 #include <functional>
 
-namespace ee {
+namespace carnot {
 
 class AnimationBase {
 public:
@@ -179,4 +179,4 @@ void Animation<Ps...>::applyTo(S* subject) {
     m_currentFrame.applyTo(subject);
 }
 
-}  // namespace ee
+}  // namespace carnot

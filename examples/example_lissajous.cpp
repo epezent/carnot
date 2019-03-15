@@ -1,8 +1,8 @@
 #define EE_USE_DISCRETE_GPU
 
-# include <EE/EE.hpp>
+#include <Carnot/Carnot.hpp>
 
-using namespace ee;
+using namespace carnot;
 
 class LissaCircle : public GameObject {
 public:

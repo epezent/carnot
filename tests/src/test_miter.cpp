@@ -1,10 +1,10 @@
 #include <SFML/Graphics.hpp>
-# include <EE/Graphics.hpp>
+#include <Carnot/Graphics.hpp>
 #include <iostream>
 #include <sstream>
 #include <iomanip>
 
-using namespace ee;
+using namespace carnot;
 
 sf::RenderWindow* G_WINDOW;
 sf::Font* G_FONT;
@@ -88,7 +88,7 @@ int main(int argc, char* argv[]) {
 
     sf::ContextSettings settings;
     settings.antialiasingLevel = 8;
-    sf::RenderWindow window(sf::VideoMode(750, 750), "EE Shapes", sf::Style::Close, settings);
+    sf::RenderWindow window(sf::VideoMode(750, 750), "Carnot Shapes", sf::Style::Close, settings);
     window.setFramerateLimit(120);
 
     G_WINDOW = &window;
@@ -109,7 +109,7 @@ int main(int argc, char* argv[]) {
     Stroke stroke(4);
     stroke.setColor(sf::Color(255,128,128,64));
 
-    ee::CircleShape handle(15);
+    carnot::CircleShape handle(15);
     handle.setColor(Grays::Gray20);
 
     while (window.isOpen()) {

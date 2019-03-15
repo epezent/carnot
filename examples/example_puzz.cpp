@@ -1,10 +1,10 @@
 // #define EE_USE_DISCRETE_GPU
 // #define EE_NO_CONSOLE
 
-# include <EE/EE.hpp>
+#include <Carnot/Carnot.hpp>
 #include <deque>
 
-using namespace ee;
+using namespace carnot;
 
 //==============================================================================
 // BASIC MATRIX OPERATIONS

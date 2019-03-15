@@ -1,11 +1,11 @@
 #pragma once
 
-# include <EE/Graphics/Points.hpp>
-# include <EE/Tween.hpp>
+#include <Carnot/Graphics/Points.hpp>
+#include <Carnot/Tween.hpp>
 #include <iostream>
 #include <vector>
 
-namespace ee {
+namespace carnot {
 
 enum class PropertyType {
     Skip     = 0,  ///< Property is skpped (default)
@@ -69,4 +69,4 @@ EE_PROPERTY(PGradient,     Gradient,     setGradient,     getGradient);
 EE_PROPERTY(PPoints,       Points,       setPoints,       getPoints);
 EE_PROPERTY(PRadii,  std::vector<float>, setRadii,        getRadii);
 
-}  // namespace ee
+}  // namespace carnot

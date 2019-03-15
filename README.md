@@ -1,4 +1,4 @@
-# EE - Evan's Engine
+# Carnot - Evan's Engine
 
 ## Developers
 
@@ -6,7 +6,7 @@
 
 ## About
 
-EE is an extension to SFML providing functionality to draw and animate vector graphics shapes. At a glance, EE offers:
+Carnot is an extension to SFML providing functionality to draw and animate vector graphics shapes. At a glance, Carnot offers:
 
 - Concave and convex shape triangulation
 - Shape offsetting, clipping, corner rounding, and holes

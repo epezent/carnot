@@ -5,7 +5,7 @@
 #include <cmath>
 #include <vector>
 
-namespace ee {
+namespace carnot {
 
 bool generateVertices(const std::vector<sf::Vector2f>& points,
                       const std::vector<float>& radii,
@@ -28,6 +28,6 @@ bool snip(const std::vector<sf::Vector2f>& vertices,
 bool triangulate(const std::vector<sf::Vector2f>& vertices,
                  std::vector<std::size_t>& indices_out);
 
-} // namespace ee
+} // namespace carnot
 
 #endif  // EE_DETAIL_HPP

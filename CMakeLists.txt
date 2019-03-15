@@ -10,14 +10,14 @@ list(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_SOURCE_DIR}/cmake)
 set(CMAKE_CXX_STANDARD 17)
 
 # create target and add an alias
-add_library(ee "")
-add_library(EE::ee ALIAS ee)
+add_library(carnot "")
+add_library(Carnot::carnot ALIAS carnot)
 
 # add source files to target
 add_subdirectory(src)
 
-file(GLOB_RECURSE EE_INCLUDE "include/EE/*.hpp" "include/EE/*.inl")
-target_sources(ee PRIVATE ${EE_INCLUDE})
+file(GLOB_RECURSE EE_INCLUDE "include/Carnot/*.hpp" "include/Carnot/*.inl")
+target_sources(carnot PRIVATE ${EE_INCLUDE})
 
 # find SFML
 set(SFML_STATIC_LIBRARIES TRUE)
@@ -27,7 +27,7 @@ find_package(SFML 2.5 REQUIRED COMPONENTS audio graphics window system network)
 find_package(Chipmunk REQUIRED)
 
 # add dependcies
-target_link_libraries(ee
+target_link_libraries(carnot
 	PUBLIC
 		ws2_32
 		winmm
@@ -40,7 +40,7 @@ target_link_libraries(ee
 	PRIVATE
 )
 
-target_compile_definitions(ee
+target_compile_definitions(carnot
 	PUBLIC
 		-D_CRT_SECURE_NO_WARNINGS
 		-DNOMINMAX
@@ -48,7 +48,7 @@ target_compile_definitions(ee
 )
 
 # set target properties
-target_include_directories(ee
+target_include_directories(carnot
 	PUBLIC
 		$<INSTALL_INTERFACE:include>
 		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -68,24 +68,24 @@ endif()
 
 # install the library
 include(GNUInstallDirs)
-set(INSTALL_CONFIGDIR ${CMAKE_INSTALL_LIBDIR}/cmake/EE)
-install(TARGETS ee
-	EXPORT ee-targets
+set(INSTALL_CONFIGDIR ${CMAKE_INSTALL_LIBDIR}/cmake/Carnot)
+install(TARGETS carnot
+	EXPORT carnot-targets
 	LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
 	ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
 
-set_target_properties(ee PROPERTIES EXPORT_NAME EE)
-set_target_properties(ee PROPERTIES FOLDER "EE")
+set_target_properties(carnot PROPERTIES EXPORT_NAME Carnot)
+set_target_properties(carnot PROPERTIES FOLDER "Carnot")
 
 install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 # export the targets to a script
-install(EXPORT ee-targets
+install(EXPORT carnot-targets
 	FILE
-		EETargets.cmake
+		CarnotTargets.cmake
 	NAMESPACE
-		ee::
+		carnot::
 	DESTINATION
 		${INSTALL_CONFIGDIR}
 )
@@ -94,26 +94,26 @@ install(EXPORT ee-targets
 include(CMakePackageConfigHelpers)
 
 # generate a package configuration file and a package version file
-configure_package_config_file(${CMAKE_CURRENT_LIST_DIR}/cmake/EEConfig.cmake.in
-	${CMAKE_CURRENT_BINARY_DIR}/EEConfig.cmake
+configure_package_config_file(${CMAKE_CURRENT_LIST_DIR}/cmake/CarnotConfig.cmake.in
+	${CMAKE_CURRENT_BINARY_DIR}/CarnotConfig.cmake
 	INSTALL_DESTINATION ${INSTALL_CONFIGDIR}
 )
 write_basic_package_version_file(
-	${CMAKE_CURRENT_BINARY_DIR}/EEConfigVersion.cmake
+	${CMAKE_CURRENT_BINARY_DIR}/CarnotConfigVersion.cmake
 	VERSION ${PROJECT_VERSION}
 	COMPATIBILITY AnyNewerVersion
 )
 
 # install the config and configversion modules
 install(FILES
-	${CMAKE_CURRENT_BINARY_DIR}/EEConfig.cmake
-	${CMAKE_CURRENT_BINARY_DIR}/EEConfigVersion.cmake
+	${CMAKE_CURRENT_BINARY_DIR}/CarnotConfig.cmake
+	${CMAKE_CURRENT_BINARY_DIR}/CarnotConfigVersion.cmake
 	DESTINATION ${INSTALL_CONFIGDIR}
 )
 
 # export from the build tree
-export(EXPORT ee-targets
-	   NAMESPACE ee::
-	   FILE ${CMAKE_CURRENT_BINARY_DIR}/EETargets.cmake)
+export(EXPORT carnot-targets
+	   NAMESPACE carnot::
+	   FILE ${CMAKE_CURRENT_BINARY_DIR}/CarnotTargets.cmake)
 
 add_subdirectory(examples)

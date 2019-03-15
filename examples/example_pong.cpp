@@ -1,6 +1,6 @@
-# include <EE/EE.hpp>
+#include <Carnot/Carnot.hpp>
 
-using namespace ee;
+using namespace carnot;
 
 class Wall : public GameObject {
 public:

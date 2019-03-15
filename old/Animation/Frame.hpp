@@ -1,9 +1,9 @@
 #pragma once
 
-# include <EE/Animation/Detail/Detail.hpp>
-# include <EE/Animation/Property.hpp>
+#include <Carnot/Animation/Detail/Detail.hpp>
+#include <Carnot/Animation/Property.hpp>
 
-namespace ee {
+namespace carnot {
 
 template <typename... Ps>
 class Animation;
@@ -131,4 +131,4 @@ P& Frame<Ps...>::setFrom(S* subject) {
     return p;
 }
 
-}  // namespace ee
+}  // namespace carnot

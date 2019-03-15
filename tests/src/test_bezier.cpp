@@ -1,8 +1,8 @@
 #include <SFML/Graphics.hpp>
-# include <EE/Graphics.hpp>
+#include <Carnot/Graphics.hpp>
 #include <iostream>
 
-using namespace ee;
+using namespace carnot;
 
 int main(int argc, char* argv[]) {
 
@@ -10,7 +10,7 @@ int main(int argc, char* argv[]) {
 
     sf::ContextSettings settings;
     settings.antialiasingLevel = 8;
-    sf::RenderWindow window(sf::VideoMode(1000, 1000), "EE Shapes", sf::Style::Default, settings);
+    sf::RenderWindow window(sf::VideoMode(1000, 1000), "Carnot Shapes", sf::Style::Default, settings);
     window.setVerticalSyncEnabled(true);
 
     sf::Font font;

@@ -1,6 +1,6 @@
 #include "imgui_demo.cpp"
 
-using namespace ee;
+using namespace carnot;
 
 class MyGameObject : public GameObject {
 public:

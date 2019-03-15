@@ -1,8 +1,8 @@
-# include <EE/Graphics.hpp>
-# include <EE/Animation.hpp>
+#include <Carnot/Graphics.hpp>
+#include <Carnot/Animation.hpp>
 #include <iostream>
 
-using namespace ee;
+using namespace carnot;
 
 template <typename T>
 void print(const T& t) {

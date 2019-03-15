@@ -1,8 +1,8 @@
 #include "Triangulate.hpp"
-# include <EE/Common/Math.hpp>
+#include <Carnot/Common/Math.hpp>
 #include <algorithm>
 
-namespace ee {
+namespace carnot {
 
 bool generateVertices(const std::vector<sf::Vector2f>& points,
                       const std::vector<float>& radii,
@@ -199,5 +199,5 @@ bool triangulate(const std::vector<sf::Vector2f>& vertices,
     return true;
 }
 
-} // namespace ee
+} // namespace carnot
 

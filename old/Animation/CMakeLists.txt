@@ -1,4 +1,4 @@
-target_sources(ee
+target_sources(carnot
 	PRIVATE
 		Animation.cpp
 )

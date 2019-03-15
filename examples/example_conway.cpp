@@ -1,6 +1,6 @@
-# include <EE/EE.hpp>
+#include <Carnot/Carnot.hpp>
 
-using namespace ee;
+using namespace carnot;
 
 // Any live cell with fewer than two live neighbors dies, as if by underpopulation.
 // Any live cell with more than three live neighbors dies, as if by overpopulation.

@@ -1,8 +1,8 @@
-set(ICON ee.rc)
+set(ICON carnot.rc)
 
 macro(ee_example EE_EXAMPLE_NAME)
     add_executable(${EE_EXAMPLE_NAME} "example_${EE_EXAMPLE_NAME}.cpp" ${ICON})
-    target_link_libraries(${EE_EXAMPLE_NAME} ee)
+    target_link_libraries(${EE_EXAMPLE_NAME} carnot)
     set_target_properties(${EE_EXAMPLE_NAME} PROPERTIES LINK_FLAGS "/ENTRY:mainCRTStartup")
 endmacro()
 

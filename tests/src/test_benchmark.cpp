@@ -6,9 +6,9 @@
 #include <cmath>
 #include <sstream>
 #include <limits>
-# include <EE/Graphics.hpp>
+#include <Carnot/Graphics.hpp>
 
-using namespace ee;
+using namespace carnot;
 
 #define     WINDOW_WIDTH    1000.0f
 #define     WINDOW_HEIGHT   1000.0f
@@ -19,7 +19,7 @@ int main()
 
     sf::ContextSettings settings;
     settings.antialiasingLevel = 8;
-    sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "EE", sf::Style::Default, settings);
+    sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "Carnot", sf::Style::Default, settings);
 
     sf::Shader shader;
     shader.loadFromFile("../shaders/linear_gradient.frag", sf::Shader::Fragment);

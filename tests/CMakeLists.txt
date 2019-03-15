@@ -1,6 +1,6 @@
 macro(ee_test EE_TEST_NAME)
     add_executable(${EE_TEST_NAME} src/test_${EE_TEST_NAME}.cpp)
-    target_link_libraries(${EE_TEST_NAME} PRIVATE ee::ee)
+    target_link_libraries(${EE_TEST_NAME} PRIVATE carnot::carnot)
     set_target_properties(${EE_TEST_NAME} PROPERTIES FOLDER "Tests")
 endmacro()
 
