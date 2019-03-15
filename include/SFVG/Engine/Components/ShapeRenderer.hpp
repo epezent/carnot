@@ -13,6 +13,9 @@ public:
     /// Constuctor
     ShapeRenderer(GameObject& gameObject);
 
+    /// Constructor which takes a Shape
+    ShapeRenderer(GameObject& gameObject, Ptr<Shape> shape);
+
     /// Sets the fill of a shape to a solid Color
     void setColor(const sf::Color& color);
 

@@ -96,8 +96,6 @@ const std::vector<Matrix> g_matPieces
     {{4, 8, 0}, {8, 4, 8}, {4, 8, 0}},                                      // MAGENTA    {5 13}
 };
 
-
-
 const std::vector<Vector2i> g_solutions {
     {9, 0}, 
     {6, 1}, 
@@ -113,6 +111,23 @@ const std::vector<Vector2i> g_solutions {
     {11, 8},
     {7, 11},
     {5, 13},
+};
+
+const std::vector<Color> g_colors {
+    Reds::Red,
+    Oranges::Orange,
+    Yellows::Gold,
+    Yellows::Yellow,
+    Greens::Chartreuse,
+    Greens::Lime,
+    Greens::Green,
+    Cyans::Turquoise,
+    Cyans::Aqua,
+    Blues::DeepSkyBlue,
+    Blues::Blue,
+    Purples::Violet,
+    Purples::Purple,
+    Purples::Magenta
 };
 
 //==============================================================================
@@ -336,23 +351,6 @@ class Puzzometry : public GameObject
 
     Puzzometry() : GameObject("puzzometry")
     {
-        const std::vector<Color> g_colors {
-            Reds::Red,
-            Oranges::Orange,
-            Yellows::Gold,
-            Yellows::Yellow,
-            Greens::Chartreuse,
-            Greens::Lime,
-            Greens::Green,
-            Cyans::Turquoise,
-            Cyans::Aqua,
-            Blues::DeepSkyBlue,
-            Blues::Blue,
-            Purples::Violet,
-            Purples::Purple,
-            Purples::Magenta
-        };
-
         board = makeChild<Board>();
         for (std::size_t i = 0; i < g_numPieces; ++i) {
             auto p = makeChild<Piece>(g_matPieces[i], g_colors[i]);
@@ -364,21 +362,21 @@ class Puzzometry : public GameObject
 
     void update() override {
         if (Input::getKeyDown(Key::Space) && !spinning)
-            startCoroutine(spin());
+            startCoroutine(spin(0.25f));
     }
 
-    Enumerator spin() {
+    Enumerator spin(float spinTime) {        
         spinning = true;
         float t = 0.0f;
-        float begin = Engine::getView(0).getRotation() == 315.0f ? 45.0f : 0;
-        float end = begin == 45.0f ? 0.0f : 45.0f;
-        while (t < 0.25f) {
-            auto r = Tween::Smoothstep(begin, end, t/0.25f);
+        float rBegin = Engine::getView(0).getRotation() == 315.0f ? 45.0f : 0;
+        float rEnd = rBegin == 45.0f ? 0.0f : 45.0f;
+        while (t < spinTime) {
+            auto r = Tween::Smootheststep(rBegin, rEnd, t/spinTime);
             Engine::getView(0).setRotation(-r);
             t += Engine::deltaTime();
             co_yield nullptr;
         }
-        Engine::getView(0).setRotation(-end);
+        Engine::getView(0).setRotation(-rEnd);
         spinning = false;
     }
 
@@ -391,13 +389,15 @@ int main(int argc, char const *argv[])
 {
     Engine::init();
     Engine::window->setTitle("Puzzometry");
-    Engine::getView(0).setCenter((size(g_matBoard,0)-1) * g_gridSize / 2.0f, (size(g_matBoard,1)-1) * g_gridSize / 2.0f);
-    Engine::makeRoot<Puzzometry>();
+    Engine::window->setFramerateLimit(144);
+    // Engine::window->setVerticalSyncEnabled(true);
     Debug::addGizmo("Grid", Grays::Gray50);
     Debug::setGizmoActive(Debug::gizmoId("Grid"), true);
     Debug::setGizmoActive(Debug::gizmoId("Wireframe"), true);
     Debug::setGizmoActive(Debug::gizmoId("Transform"), true);
     Debug::show(true);
+    Engine::getView(0).setCenter((size(g_matBoard,0)-1) * g_gridSize / 2.0f, (size(g_matBoard,1)-1) * g_gridSize / 2.0f);
+    Engine::makeRoot<Puzzometry>();
     Engine::run();
     return 0;
 }

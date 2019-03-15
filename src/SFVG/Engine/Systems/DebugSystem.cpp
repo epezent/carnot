@@ -11,9 +11,11 @@
 #include <SFVG/Engine/ImGui/imgui.h>
 #include <SFVG/Engine/ImGui/imgui-SFML.h>
 #include <SFVG/Engine/FontAwesome5.hpp>
+#include <SFVG/Graphics/NamedColors.hpp>
 #include <sstream>
 #include <array>
 #include <map>
+#include <tuple>
 
 #define DEBUG_COLOR               Greens::Chartreuse
 #define DEBUG_XAXIS_COLOR         Reds::Red
@@ -41,12 +43,13 @@ namespace {
     bool g_show;
     bool g_paused;
     bool g_advance;
-    bool g_gizmoFrameActive;
     bool g_panTool;
+
+    Text g_text;
 
     std::vector<Vertex> g_triangles;
     std::vector<Vertex> g_lines;
-    std::vector<Text>   g_text;
+    std::vector<std::tuple<std::string, Vector2f, Color>> g_texts;
 
     struct DebugInfo {
         float       elapsedTime = 0.0f;
@@ -60,6 +63,8 @@ namespace {
     };
 
     DebugInfo g_info;
+
+    float g_windowDistance;
 
 } // private namespace
 
@@ -101,6 +106,14 @@ Id gizmoId(const std::string& name) {
 
 const Color& gizmoColor(Id id) {
     return g_gizmoColors[id];
+}
+
+void setPaused(bool pause) {
+    g_paused = pause;
+}
+
+bool isPaused() {
+    return g_paused;
 }
 
 void drawPoint(const Vector2f& position, const Color& color) {
@@ -161,23 +174,22 @@ void drawCircle(const Vector2f &position, float radius, const Color& color) {
     drawPolyline(polyline,color);
 }
 
-void drawText(const std::string& _text,
+void drawText(const std::string& text,
                const Vector2f& position,
                const Color& color)
 {
-    Text text;
-    text.setFont(Engine::fonts.get("RobotoMonoBold"));
-    text.setPosition(position);
-    text.setCharacterSize(10 * Engine::getDpiFactor());
-    text.setScale(1.0f / Engine::getDpiFactor(), 1.0f / Engine::getDpiFactor());
-    text.setFillColor(color);
-    text.setString(_text);
-    alignCenter(text);
-    g_text.push_back(text);
+    // Text text;
+    // text.setFont(Engine::fonts.get("RobotoMonoBold"));
+    // text.setPosition(position);
+    // text.setCharacterSize((unsigned int)(10 * Engine::getDpiFactor()));
+    // text.setScale(1.0f / Engine::getDpiFactor(), 1.0f / Engine::getDpiFactor());
+    // text.setFillColor(color);
+    // text.setString(_text);
+    // alignCenter(text);
+    g_texts.push_back({text, position, color});
 }
 
 namespace detail {
-
 namespace {
 
 void updateInfo() {
@@ -213,74 +225,68 @@ void showContextMenu(int& corner) {
     }
 }
 
+void tooltip(const std::string& tip) {
+    if (ImGui::IsItemHovered()) 
+        ImGui::SetTooltip(tip.c_str());
+}
+
 void infoMenu() {
-    const float DISTANCE = 10.0f;
     static int corner = 0;
     ImGuiIO& io = ImGui::GetIO();
-    ImVec2 window_pos = ImVec2((corner & 1) ? io.DisplaySize.x - DISTANCE : DISTANCE, (corner & 2) ? io.DisplaySize.y - DISTANCE : DISTANCE);
+    ImVec2 window_pos = ImVec2((corner & 1) ? io.DisplaySize.x - g_windowDistance : g_windowDistance, (corner & 2) ? io.DisplaySize.y - g_windowDistance : g_windowDistance);
     ImVec2 window_piv = ImVec2((corner & 1) ? 1.0f : 0.0f, (corner & 2) ? 1.0f : 0.0f);
     if (corner != -1)
         ImGui::SetNextWindowPos(window_pos, ImGuiCond_Always, window_piv);
-    ImGui::SetNextWindowBgAlpha(0.9f); // Transparent background
-    ImGui::SetNextWindowFocus();
-    if (ImGui::Begin("Info", &g_gizmoFrameActive, (corner != -1 ? ImGuiWindowFlags_NoMove : 0) | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize /*| ImGuiWindowFlags_AlwaysAutoResize*/ | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav))
+    ImGui::SetNextWindowContentWidth(150);
+    if (ImGui::Begin("Info", nullptr, (corner != -1 ? ImGuiWindowFlags_NoMove : 0) | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoNav))
     {
         ImGui::Text("CLK: %.2f s", Engine::time());
-        if (ImGui::IsItemHovered()) ImGui::SetTooltip("Current time");
-
+        tooltip("Current time");
         ImGui::Text("FPS: %u", (int)g_info.fpsDisplay);
-        if (ImGui::IsItemHovered()) ImGui::SetTooltip("Frames per second");
-
+        tooltip("Frames per second");
         ImGui::Text("FRM: %u", (int)g_info.framesDisplay);
-        if (ImGui::IsItemHovered()) ImGui::SetTooltip("Current frame");
-
+        tooltip("Current frame");
         ImGui::Separator();
-        ImGui::Text("CPU: %.2f",   g_info.cpuDisplay);
-        if (ImGui::IsItemHovered()) ImGui::SetTooltip("Percent CPU utilized");
-
+        ImGui::Text("CPU: %.2f", g_info.cpuDisplay);
+        tooltip("Percent CPU utilized");
         ImGui::Text("RAM: %u MB", (int)g_info.ramDisplay);
-        if (ImGui::IsItemHovered()) ImGui::SetTooltip("Amount of RAM used");
-
+        tooltip("Amount of RAM used");
         ImGui::Separator();
         ImGui::Text("PIX: %d,%d px", Input::getRawMousePosition().x, Input::getRawMousePosition().y);
-        if (ImGui::IsItemHovered()) ImGui::SetTooltip("Mouse pixel position");
-
-
+        tooltip("Mouse pixel position");
         ImGui::Text("X,Y: %.2f, %.2f", Input::getMousePosition().x, Input::getMousePosition().y);
-        if (ImGui::IsItemHovered()) ImGui::SetTooltip("Mouse world position");
-
+        tooltip("Mouse world position");
         ImGui::Separator();
         ImGui::Text("OBJ: %i", (int)Object::getObjectCount());
-        if (ImGui::IsItemHovered()) ImGui::SetTooltip("Total Object count");
-
+        tooltip("Total Object count");
         ImGui::Text("RND: %i", (int)Renderer::getRendererCount());
-        if (ImGui::IsItemHovered()) ImGui::SetTooltip("Total Renderer count");
-
+        tooltip("Total Renderer count");
         ImGui::Text("BDY: %i", (int)RigidBody::getRigidBodyCount());
-        if (ImGui::IsItemHovered()) ImGui::SetTooltip("Total RigidBody count");
-
+        tooltip("Total RigidBody count");
         showContextMenu(corner);
     }
     ImGui::End();
 }
 
 void gizmoMenu() {
-    const float DISTANCE = 10.0f;
     static int corner = 1;
     ImGuiIO& io = ImGui::GetIO();
-    ImVec2 window_pos = ImVec2((corner & 1) ? io.DisplaySize.x - DISTANCE : DISTANCE, (corner & 2) ? io.DisplaySize.y - DISTANCE : DISTANCE);
+    ImVec2 window_pos = ImVec2((corner & 1) ? io.DisplaySize.x - g_windowDistance : g_windowDistance, (corner & 2) ? io.DisplaySize.y - g_windowDistance : g_windowDistance);
     ImVec2 window_piv = ImVec2((corner & 1) ? 1.0f : 0.0f, (corner & 2) ? 1.0f : 0.0f);
     if (corner != -1)
         ImGui::SetNextWindowPos(window_pos, ImGuiCond_Always, window_piv);
-    ImGui::SetNextWindowBgAlpha(0.9f); // Transparent background
-    ImGui::SetNextWindowFocus();
-    if (ImGui::Begin("Gizmos", &g_gizmoFrameActive, (corner != -1 ? ImGuiWindowFlags_NoMove : 0) | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav))
+    // ImGui::SetNextWindowContentWidth(150);
+    if (ImGui::Begin("Gizmos", nullptr, (corner != -1 ? ImGuiWindowFlags_NoMove : 0) | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoNav))
     {
         for (auto& id : g_gizmoIds) {
             auto color = g_gizmoColors[id];
-            color.a /= 2;
+            auto textColor = ImGui::GetStyle().Colors[ImGuiCol_Text];
+            if (g_gizmoActives[id] && luminance(color) > 0.5f)
+                textColor = ImGui::GetStyle().Colors[ImGuiCol_TextDisabled];
             ImGui::PushStyleColor(ImGuiCol_Header, color);
+            ImGui::PushStyleColor(ImGuiCol_Text, textColor);
             ImGui::Selectable(g_gizmoNames[id].c_str(), &g_gizmoActives[id]);
+            ImGui::PopStyleColor();
             ImGui::PopStyleColor();
         }
         showContextMenu(corner);
@@ -289,14 +295,11 @@ void gizmoMenu() {
 }
 
 void toolbarMenu() {
-    const float DISTANCE = 10.0f;
     ImGuiIO& io = ImGui::GetIO();
-    ImVec2 window_pos = ImVec2(io.DisplaySize.x * 0.5f, DISTANCE);
+    ImVec2 window_pos = ImVec2(io.DisplaySize.x * 0.5f, g_windowDistance);
     ImVec2 window_piv = ImVec2(0.5f, 0.0f);
     ImGui::SetNextWindowPos(window_pos, ImGuiCond_Always, window_piv);
-    ImGui::SetNextWindowBgAlpha(0.9f); // Transparent background
-    ImGui::SetNextWindowFocus();
-    if (ImGui::Begin("Toolbar", &g_gizmoFrameActive, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize /*| ImGuiWindowFlags_AlwaysAutoResize*/ | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav))
+    if (ImGui::Begin("Toolbar", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav))
     {
 
         if (!g_paused) {
@@ -345,7 +348,7 @@ void toolbarMenu() {
 }
 
 void clearDrawables() {
-    g_text.clear();
+    g_texts.clear();
     g_lines.clear();
     g_triangles.clear();
 }
@@ -366,7 +369,13 @@ void init()
     g_gizmoActives.clear();
     g_triangles.clear();
     g_lines.clear();
-    g_text.clear();    
+    g_texts.clear();    
+
+    g_windowDistance = 10.0f;
+
+    g_text.setFont(Engine::fonts.get("RobotoMonoBold"));
+    g_text.setCharacterSize((unsigned int)(10 * Engine::getDpiFactor()));
+    g_text.setScale(1.0f / Engine::getDpiFactor(), 1.0f / Engine::getDpiFactor());
 
     addGizmo("Transform", DEBUG_TRANSFORM_COLOR);
     addGizmo("Local Bounds", DEBUG_LOCAL_BOUNDS_COLOR);
@@ -417,14 +426,15 @@ void update() {
             Engine::window->draw(&g_triangles[0], g_triangles.size(), sf::Triangles);
         if (g_lines.size() > 0)
             Engine::window->draw(&g_lines[0], g_lines.size(), sf::Lines);
-        for (auto& text : g_text)
-            Engine::window->draw(text);
-        // clear drawbales if we are going to advance frames
-        if (!g_paused || g_advance)
-            clearDrawables();
+        for (auto& text : g_texts) {
+            g_text.setString(std::get<0>(text));
+            g_text.setPosition(std::get<1>(text));
+            g_text.setFillColor(std::get<2>(text));
+            alignCenter(g_text);
+            Engine::window->draw(g_text);
+        }
     }
-    else
-        clearDrawables();
+    clearDrawables();
 }
 
 bool proceed() {

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <SFVG/Common/Imports.hpp>
-#include <SFVG/Graphics/Color.hpp>
 #include <SFVG/Engine/Id.hpp>
 
 namespace sfvg {
@@ -27,6 +26,12 @@ Id gizmoId(const std::string& name);
 
 /// Return the color associated with a Gizmo
 const Color& gizmoColor(Id id);
+
+/// Pauses or unpaues the application
+void setPaused(bool pause);
+
+/// Returns true if the application is currently paused
+bool isPaused();
 
 /// Draws a point in global coordinates
 void drawPoint(const Vector2f& position, const Color& color);

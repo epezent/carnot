@@ -38,6 +38,12 @@ ShapeRenderer::ShapeRenderer(GameObject& _gameObject) :
     setTextureRect(sf::IntRect(0, 0, 1, 1));
 }
 
+ShapeRenderer::ShapeRenderer(GameObject& _gameObject, Ptr<Shape> _shape) :
+    ShapeRenderer(_gameObject)
+{
+    shape = std::move(_shape);
+}
+
 void ShapeRenderer::setGradient(const Gradient &gradient) {
     m_gradient = gradient;
     m_hasSolidFill = false;

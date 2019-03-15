@@ -7,6 +7,8 @@ using namespace sfvg;
 // Any live cell with two or three live neighbors lives on to the next generation.
 // Any dead cell with exactly three live neighbors becomes a live cell, as if by reproduction.
 
+Sequence<Color> g_colorSpectrum;
+
 class Cell : public GameObject {
 public:
 
@@ -29,14 +31,21 @@ public:
     }
 
     void lateUpdate() override {
-        if (willLive)
+        if (willLive) {
             alive = true;
-        else
+            age++;
+        }
+        else {
             alive = false;
+            age = 0;
+        }
         if (alive)
             sr->setEnabled(true);
         else
             sr->setEnabled(false);
+        float t = clamp01((float)age / (500.0f));
+        auto color = g_colorSpectrum(t);
+        sr->setColor(color);
     }
 
     std::size_t livingNeighbors() {
@@ -52,24 +61,37 @@ public:
         return i;
     }
 
+    int age = 0;
     bool alive    = false;
     bool willLive = false;
     Handle<Cell> left, right, top, bottom;
     Handle<ShapeRenderer> sr;
 };
 
-class God : public GameObject {
+class Conway : public GameObject {
 public:
-    God(float _width, float _height, float _size) :
-        width(_width), height(_height), size(_size)
+    Conway(float _size) :
+        width(Engine::getView(0).getSize().x), height(Engine::getView(0).getSize().y), size(_size),
+        R((std::size_t)(height/size)),
+        C((std::size_t)(width/size))
     {
-        auto R = (std::size_t)(height/size);
-        auto C = (std::size_t)(width/size);
         cells.resize(R);
+        loadBg = addComponent<ShapeRenderer>(make<RectangleShape>(500,20));
+        loadBg->setColor(Grays::Gray50);
+        loadBg->shape->setPosition(960,540);
+        loadRect = make<RectangleShape>(0,20);
+        loadFg = addComponent<ShapeRenderer>(loadRect);
+        loadFg->setColor(Whites::White);
+        loadFg->shape->setPosition(960,540);
+        startCoroutine(load());
+    }
+
+    Enumerator load() {
         for (auto r : range(R)) {
             cells[r].resize(C);
             for (auto c : range(C)) {
                 auto cell = makeChild<Cell>(size);
+                cell->setEnabled(false);
                 cell->transform.setPosition(size/2 + c * size, size/2 + r * size);
 
                 // setup doubly link list
@@ -91,13 +113,19 @@ public:
                 }
                 cells[r][c] = cell;
             }
+            if (r%2) {
+                float percentDone = (float)r/(float)R;
+                loadRect->setWidth(500 * percentDone);
+                co_yield nullptr;
+            }
         }
-
-        for (auto i : range(100)) {
-            gliderBR(random(0,R-1),random(0,C-1));
-            gliderBL(random(0,R-1),random(0,C-1));
-        }
-
+        for (auto r : range(R))
+            for(auto c : range(C))
+                cells[r][c]->setEnabled(true);
+        loaded = true;
+        loadBg->setEnabled(false);
+        loadFg->setEnabled(false);
+        spawn();
     }
 
     void gliderBR(std::size_t r, std::size_t c) {
@@ -126,17 +154,39 @@ public:
         cell->bottom->right->alive = true;
     }
 
+    void spawn() {
+        for (auto i : range(500)) {
+            gliderBR(random(0,R-1),random(0,C-1));
+            gliderBL(random(0,R-1),random(0,C-1));
+        }
+    }
+
+    void update() override {
+        if (loaded && Input::getKeyDown(Key::Space)) {
+            spawn();
+        }
+    }
 
 public:
+    bool loaded = false;
+    Handle<ShapeRenderer> loadBg, loadFg;
+    Ptr<RectangleShape> loadRect;
     float width, height, size;
+    std::size_t R, C;
     std::vector<std::vector<Handle<Cell>>> cells;
 };
 
 int main(int argc, char const *argv[])
 {
+    g_colorSpectrum[0.0f] = Whites::White;
+    g_colorSpectrum[0.2f] = Yellows::PaleGoldenrod;
+    g_colorSpectrum[0.4f] = Reds::LightSalmon;
+    g_colorSpectrum[0.6f] = Reds::LightCoral;
+    g_colorSpectrum[0.8f] = Purples::Plum;
+    g_colorSpectrum[1.0f] = Grays::LightSlateGray;
+
     Engine::init();
-    Engine::window->setFramerateLimit(10);
-    Engine::makeRoot<God>(1920,1080,10);
+    Engine::makeRoot<Conway>(5);
     Engine::run();
     return 0;
 }

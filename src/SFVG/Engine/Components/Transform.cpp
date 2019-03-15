@@ -3,6 +3,7 @@
 #include <SFVG/Engine/Engine.hpp>
 #include <SFVG/Common/Math.hpp>
 #include <SFVG/Engine/ImGui/imgui.h>
+#include <SFVG/Graphics/NamedColors.hpp>
 
 namespace sfvg {
 

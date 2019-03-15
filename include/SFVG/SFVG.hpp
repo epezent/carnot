@@ -54,3 +54,4 @@
 
 #include <SFVG/Graphics/Color.hpp>
 #include <SFVG/Graphics/Gradient.hpp>
+#include <SFVG/Graphics/NamedColors.hpp>

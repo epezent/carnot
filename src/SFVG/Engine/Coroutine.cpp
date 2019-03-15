@@ -1,4 +1,5 @@
 #include <SFVG/Engine/Coroutine.hpp>
+#include <SFVG/Engine/Engine.hpp>
 
 namespace sfvg {
 
@@ -18,12 +19,14 @@ bool YieldInstruction::isOver() {
 
 WaitForSeconds::WaitForSeconds(float duration) :
    YieldInstruction(),
-   m_duration(seconds(duration))
+   m_duration(duration),
+   m_elapsedTime(0.0f)
 {
 }
 
 bool WaitForSeconds::isOver() {
-   return m_clock.getElapsedTime() >= m_duration;
+    m_elapsedTime += Engine::deltaTime();
+    return m_elapsedTime >= m_duration;
 }
 
 //==============================================================================

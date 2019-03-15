@@ -32,8 +32,8 @@ struct WaitForSeconds : public YieldInstruction {
     WaitForSeconds(float duration);
     bool isOver() override;
 private:
-    Time m_duration;
-    Clock m_clock;
+    float m_duration;
+    float m_elapsedTime;
 };
 
 //==============================================================================
