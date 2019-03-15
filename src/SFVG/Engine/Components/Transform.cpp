@@ -164,7 +164,7 @@ void Transform::setPosition(float x, float y) {
 }
 
 Vector2f Transform::getPosition() const {
-    return getWorldMatrix() * Vector2f();
+    return getWorldMatrix() * getLocalOrigin();
 }
 
 void Transform::setRotation(float angle) {
@@ -236,8 +236,8 @@ FloatRect Transform::worldToLocal(const FloatRect& rect) {
 void Transform::onGizmo() {
     static Id transformId = Debug::gizmoId("Transform");
     if (Debug::gizmoActive(transformId)) {
-        auto x = localToWorld(Vector2f(20.0f,0.0f));
-        auto y = localToWorld(Vector2f(0.0f,20.0f));
+        auto x = localToWorld(Vector2f(20.0f,0.0f) + getLocalOrigin());
+        auto y = localToWorld(Vector2f(0.0f,20.0f) + getLocalOrigin());
 
         if (magnitude(Input::getMousePosition() - getPosition()) < 20.0f)
             Debug::drawText(gameObject.getName(), Input::getMousePosition() - Vector2f(5,5), Debug::gizmoColor(transformId));

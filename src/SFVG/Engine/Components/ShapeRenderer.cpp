@@ -168,6 +168,8 @@ void ShapeRenderer::render(RenderTarget& target) const {
         m_states.texture = SFVG_WHITE_TEXTURE;
     if (!m_hasSolidFill)
         m_states.shader = m_gradient.getShader();
+    else
+        m_states.shader = nullptr;
     if (m_vertexArray.size() > 0)
         target.draw(&m_vertexArray[0], m_vertexArray.size(), sf::Triangles, m_states);
 }

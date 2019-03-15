@@ -1,9 +1,10 @@
+// #define SFVG_USE_DISCRETE_GPU
+// #define SFVG_NO_CONSOLE
+
 #include <SFVG/SFVG.hpp>
+#include <deque>
 
 using namespace sfvg;
-
-const float SIDE_LENGTH = 30.0f;
-const float GRID_SIZE   = (2.0f + sqrt(2.0f)) * 0.5f * SIDE_LENGTH * 0.999f;
 
 //==============================================================================
 // BASIC MATRIX OPERATIONS
@@ -11,160 +12,391 @@ const float GRID_SIZE   = (2.0f + sqrt(2.0f)) * 0.5f * SIDE_LENGTH * 0.999f;
 
 typedef std::vector<std::vector<char>> Matrix;
 
-inline Matrix ones(std::size_t r, std::size_t c) {
-    return Matrix(r,std::vector<char>(c, 1));
+inline Matrix ones(std::size_t r, std::size_t c)
+{
+    return Matrix(r, std::vector<char>(c, 1));
 }
 
-inline Matrix zeros(std::size_t r, std::size_t c) {
-    return Matrix(r,std::vector<char>(c, 0));
+inline Matrix zeros(std::size_t r, std::size_t c)
+{
+    return Matrix(r, std::vector<char>(c, 0));
 }
 
-inline void flipLR(Matrix& mat) {
-    for (auto& row : mat)
-        std::reverse(row.begin(),row.end());
+inline void flipLR(Matrix &mat)
+{
+    for (auto &row : mat)
+        std::reverse(row.begin(), row.end());
 }
 
-inline void flipUD(Matrix& mat) {
+inline void flipUD(Matrix &mat)
+{
     std::reverse(mat.begin(), mat.end());
 }
 
-bool allZeros(const Matrix& mat) {
-    for (auto& row : mat)
-        for (auto& col : row)
+bool allZeros(const Matrix &mat)
+{
+    for (auto &row : mat)
+        for (auto &col : row)
             if (col != 0)
                 return false;
     return true;
 }
 
-Matrix board = {{0, 0, 0, 0, 0, 0, 0, 0, 4, 8, 0, 0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0, 0, 0, 4, 8, 4, 8, 0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0, 0, 4, 8, 4, 8, 4, 8, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0, 0, 8, 4, 8, 4, 8, 4, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0, 0, 4, 8, 4, 8, 4, 8, 4, 8, 0, 0},
-                {0, 0, 0, 0, 8, 4, 8, 4, 8, 4, 8, 4, 8, 4, 8, 0},
-                {0, 0, 4, 8, 4, 8, 4, 8, 4, 8, 4, 8, 4, 8, 4, 8},
-                {0, 4, 8, 4, 8, 4, 8, 4, 8, 4, 8, 4, 8, 4, 8, 0},
-                {0, 8, 4, 8, 4, 8, 4, 8, 4, 8, 4, 8, 4, 8, 0, 0},
-                {8, 4, 8, 4, 8, 4, 8, 4, 8, 4, 8, 4, 8, 0, 0, 0},
-                {0, 8, 4, 8, 4, 8, 4, 8, 4, 8, 4, 8, 0, 0, 0, 0},
-                {0, 0, 0, 4, 8, 4, 8, 4, 8, 4, 8, 0, 0, 0, 0, 0},
-                {0, 0, 0, 8, 4, 8, 4, 8, 4, 8, 0, 0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 8, 4, 8, 4, 8, 0, 0, 0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0, 8, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0}};
+std::size_t size(const Matrix& mat, int dim) {
+    if (dim == 0)
+        return mat.size();
+    else if (dim == 1)
+        return mat[0].size();
+    return 0;
+} 
+
+//==============================================================================
+// GLOBAL DEFINITIONS
+//==============================================================================
+
+const float g_sideLength = 30.0f;
+const float g_gridSize   = (2.0f + sqrt(2.0f)) * 0.5f * g_sideLength * 0.999f;
+
+const std::size_t g_numPieces = 14;
+
+const Matrix g_matBoard {
+    {0, 0, 0, 0, 0, 0, 0, 0, 4, 8, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 0, 4, 8, 4, 8, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 4, 8, 4, 8, 4, 8, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 8, 4, 8, 4, 8, 4, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 4, 8, 4, 8, 4, 8, 4, 8, 0, 0},
+    {0, 0, 0, 0, 8, 4, 8, 4, 8, 4, 8, 4, 8, 4, 8, 0},
+    {0, 0, 4, 8, 4, 8, 4, 8, 4, 8, 4, 8, 4, 8, 4, 8},
+    {0, 4, 8, 4, 8, 4, 8, 4, 8, 4, 8, 4, 8, 4, 8, 0},
+    {0, 8, 4, 8, 4, 8, 4, 8, 4, 8, 4, 8, 4, 8, 0, 0},
+    {8, 4, 8, 4, 8, 4, 8, 4, 8, 4, 8, 4, 8, 0, 0, 0},
+    {0, 8, 4, 8, 4, 8, 4, 8, 4, 8, 4, 8, 0, 0, 0, 0},
+    {0, 0, 0, 4, 8, 4, 8, 4, 8, 4, 8, 0, 0, 0, 0, 0},
+    {0, 0, 0, 8, 4, 8, 4, 8, 4, 8, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 8, 4, 8, 4, 8, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 8, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+};
+
+const std::vector<Matrix> g_matPieces
+{
+    {{8, 4, 8, 4}, {0, 8, 4, 8}},                                           // RED        {9 0} 
+    {{0, 4, 8}, {4, 8, 4}, {8, 4, 8}},                                      // ORANGE     {6 1} 
+    {{8, 4, 0}, {4, 8, 4}, {8, 4, 0}},                                      // GOLD       {5 4} 
+    {{0, 4, 0}, {4, 8, 4}, {8, 4, 8}, {4, 8, 4}, {8, 4, 0}},                // YELLOW     {1 6} 
+    {{4, 8, 0, 0}, {8, 4, 8, 0}, {0, 8, 4, 8}, {0, 4, 8, 4}, {0, 8, 4, 0}}, // CHARTREUSE {0 8} 
+    {{4, 8, 0}, {8, 4, 8}, {0, 8, 4}},                                      // LIME       {11 3}
+    {{4, 0, 0, 0}, {8, 4, 0, 0}, {4, 8, 4, 0}, {0, 4, 8, 4}},               // GREEN      {8 4} 
+    {{0, 0, 0, 8, 4}, {0, 0, 8, 4, 8}, {0, 8, 4, 8, 0}, {8, 4, 0, 0, 0}},   // TURQUOISE  {5 5} 
+    {{0, 0, 0, 4, 0}, {0, 8, 4, 8, 4}, {8, 4, 8, 4, 8}, {0, 8, 4, 8, 4}},   // AQUA       {6 7} 
+    {{0, 8, 4, 8}, {8, 4, 8, 0}, {4, 8, 4, 0}, {8, 0, 0, 0}},               // DODGERBLUE {4 10}
+    {{0, 4, 8}, {0, 8, 4}, {8, 4, 0}, {0, 8, 0}},                           // BLUE       {12 5}
+    {{8, 4, 8}, {4, 8, 0}, {8, 0, 0}},                                      // VIOLET     {11 8}
+    {{4, 8, 0}, {8, 4, 8}, {4, 8, 0}, {8, 0, 0}},                           // PURPLE     {7 11}
+    {{4, 8, 0}, {8, 4, 8}, {4, 8, 0}},                                      // MAGENTA    {5 13}
+};
+
+
+
+const std::vector<Vector2i> g_solutions {
+    {9, 0}, 
+    {6, 1}, 
+    {5, 4}, 
+    {1, 6}, 
+    {0, 8}, 
+    {11, 3},
+    {8, 4}, 
+    {5, 5}, 
+    {7, 6}, 
+    {4, 10},
+    {12, 5},
+    {11, 8},
+    {7, 11},
+    {5, 13},
+};
+
+//==============================================================================
+// HELPERS
+//==============================================================================
+
+Vector2f coordPosition(const Vector2i& coord) {
+    return Vector2f(coord.y * g_gridSize, coord.x * g_gridSize);
+}
+
+Vector2f coordPosition(int i, int j) {
+    return coordPosition(Vector2i(i,j));
+}
+
+//==============================================================================
+// GRID GIZMO
+//==============================================================================
+
+class GridGizmo : public Component {
+public:
+    GridGizmo(GameObject& go) : Component(go) { }
+    void onGizmo() override {
+        static auto id = Debug::gizmoId("Grid");
+        if (Debug::gizmoActive(id)) {
+            for (int i = 0; i < 16; ++i) {
+                for (int j = 0; j < 16; ++j)
+                    Debug::drawText(str(i)+","+str(j), coordPosition(Vector2i(i,j)), Whites::White);
+                Debug::drawLine(coordPosition(-1, i), coordPosition(16, i), Debug::gizmoColor(id));
+                Debug::drawLine(coordPosition(i, -1), coordPosition(i, 16), Debug::gizmoColor(id));
+            }
+        }
+    }
+};
+
+//==============================================================================
+// BOARD
+//==============================================================================
+
+class Board : public GameObject
+{
+  public:
+
+    Handle<ShapeRenderer> bg;
+
+    Board() : GameObject("board"), matrix(g_matBoard), color(Grays::Gray80)
+    {
+        addComponent<GridGizmo>();
+
+        bg = addComponent<ShapeRenderer>();
+        bg->shape->setPointCount(4);
+        bg->shape->setPoint(0, coordPosition(9,-2));
+        bg->shape->setPoint(1, coordPosition(-2,9));
+        bg->shape->setPoint(2, coordPosition(6,17));
+        bg->shape->setPoint(3, coordPosition(17,6));
+
+        auto alpha = color;;
+        alpha.a = 128;
+        bg->setGradient(Gradient(color,alpha, 45.0f));
+        bg->shape->setRadii(g_gridSize);
+        bg->shape->setHoleCount(1);
+    }
+
+    Enumerator makeShape()
+    {
+        auto sqr = SquareShape(g_sideLength);
+        auto oct = PolygonShape(8, PolygonShape::SideLength, g_sideLength);
+        oct.rotate(360.0f / 16.0f);
+        oct.applyTransform();
+        auto R = matrix.size();
+        auto C = matrix[0].size();
+        std::deque<Shape> shapes;
+        for (std::size_t r = 0; r < R; ++r)
+        {
+            for (std::size_t c = 0; c < C; ++c)
+            {
+                if (matrix[r][c] == 4)
+                    shapes.push_back(sqr);
+                else if (matrix[r][c] == 8)
+                    shapes.push_back(oct);
+                oct.move(g_gridSize, 0);
+                oct.applyTransform();
+                sqr.move(g_gridSize, 0);
+                sqr.applyTransform();
+            }
+            oct.move(-g_gridSize * C, g_gridSize);
+            oct.applyTransform();
+            sqr.move(-g_gridSize * C, g_gridSize);
+            sqr.applyTransform();
+        }
+        Shape shape;
+        while (!shapes.empty())
+        {
+            auto toMerge = shapes.front();
+            shapes.pop_front();
+            auto merged = Shape::clipShapes(shape, toMerge, Shape::Union);
+            if (merged.size() == 1)
+            {
+                shape = merged[0];
+                bg->shape->setHole(0, shape);
+                co_yield nullptr;
+            }
+            else
+                shapes.push_back(toMerge);
+        }
+        shape = Shape::offsetShape(shape, 2.0f);
+        bg->shape->setHole(0, shape);
+    }
+
+    void update()
+    {
+        if (Input::getKeyDown(Key::B))
+            startCoroutine(makeShape());
+    }
+
+    Matrix matrix;
+    Color color;
+};
 
 //==============================================================================
 // PIECE
 //==============================================================================
 
-class Piece : public GameObject {
-public:
-
+class Piece : public GameObject
+{
+  public:
     Handle<ShapeRenderer> sr;
 
-    Piece(const Matrix& mat, const Color& col) :
-        matrix(mat),
-        color(col)
+    Piece(const Matrix &mat, const Color &col) : matrix(mat),
+                                                 color(col)
     {
         sr = addComponent<ShapeRenderer>();
-        sr->setColor(color);
-        // makeShape();
+        auto alpha = color;;
+        alpha.a = 128;
+        sr->setGradient(Gradient(alpha,color,45.0f));
     }
 
-    Enumerator makeShape() {
-        auto sqr = SquareShape(SIDE_LENGTH);
-        auto oct = PolygonShape(8, PolygonShape::SideLength, SIDE_LENGTH);
-        oct.rotate(360.0f/16.0f);
+    void update()
+    {
+        auto localPos = transform.worldToLocal(Input::getMousePosition());
+        if (inBounds(localPos, sr->getLocalBounds()) &&  sr->shape->isInside(localPos))
+        {
+            sr->setColor(Whites::White);
+            auto scale = transform.getScale();
+            if (Input::getKeyDown(Key::Left) || Input::getKeyDown(Key::Right))
+                transform.setScale(-1 * scale.x, scale.y);
+            else if (Input::getKeyDown(Key::Up) || Input::getKeyDown(Key::Down))
+                transform.setScale(scale.x, -1 * scale.y);
+        }
+        else
+        {
+            auto alpha = color;;
+            alpha.a = 128;
+            sr->setGradient(Gradient(color,alpha,45.0f));
+        }
+
+        if (Input::getKeyDown(Key::P))
+            startCoroutine(makeShape());
+    }
+
+    Enumerator makeShape()
+    {
+        auto sqr = SquareShape(g_sideLength);
+        auto oct = PolygonShape(8, PolygonShape::SideLength, g_sideLength);
+        oct.rotate(360.0f / 16.0f);
         oct.applyTransform();
-        Shape shape;
         auto R = matrix.size();
         auto C = matrix[0].size();
-        auto check = ones(R,C);        
-            for (std::size_t r = 0; r < R; ++r) {
-                for (std::size_t c = 0; c < C; ++c) {
-                    if (matrix[r][c] == 4) {
-                        auto shapes = Shape::clipShapes(shape, sqr, Shape::Union);
-                        if (shapes.size() > 0) {
-                            check[r][c] = 0;
-                            shape = shapes[0];
-                            // shape.setHoleCount(0);
-                        }
-                    }
-                    else if (matrix[r][c] == 8) {
-                        auto shapes =Shape::clipShapes(shape, oct, Shape::Union);
-                        if (shapes.size() > 0) {
-                            check[r][c] = 0;
-                            shape = shapes[0];
-                            // shape.setHoleCount(0);
-                        }
-                    }  
-                    oct.move(GRID_SIZE, 0); oct.applyTransform();
-                    sqr.move(GRID_SIZE, 0); sqr.applyTransform();
-                    *sr->shape = shape;  
-                    if (matrix[r][c] != 0)     
-                        co_yield nullptr;
-                }
-                oct.move(-GRID_SIZE * C, GRID_SIZE); oct.applyTransform();
-                sqr.move(-GRID_SIZE * C, GRID_SIZE); sqr.applyTransform();
+        std::deque<Shape> shapes;
+        for (std::size_t r = 0; r < R; ++r)
+        {
+            for (std::size_t c = 0; c < C; ++c)
+            {
+                if (matrix[r][c] == 4)
+                    shapes.push_back(sqr);
+                else if (matrix[r][c] == 8)
+                    shapes.push_back(oct);
+                oct.move(g_gridSize, 0);
+                oct.applyTransform();
+                sqr.move(g_gridSize, 0);
+                sqr.applyTransform();
             }
-        // shape = Shape::offsetShape(shape,-2.0f);
-        print("Done!");
+            oct.move(-g_gridSize * C, g_gridSize);
+            oct.applyTransform();
+            sqr.move(-g_gridSize * C, g_gridSize);
+            sqr.applyTransform();
+        }
+        Shape shape;
+        while (!shapes.empty())
+        {
+            auto toMerge = shapes.front();
+            shapes.pop_front();
+            auto merged = Shape::clipShapes(shape, toMerge, Shape::Union);
+            if (merged.size() == 1)
+            {
+                shape = merged[0];
+                *sr->shape = shape;
+                co_yield new WaitForSeconds(0.1f);
+            }
+            else
+                shapes.push_back(toMerge);
+        }
+        *sr->shape = Shape::offsetShape(shape, -2.0f);
     }
 
-    void update() {
-        auto localPos = transform.worldToLocal(Input::getMousePosition());
-        if (sr->shape->isInside(localPos)) {
-            sr->setColor(Whites::White);
-            transform.move(Input::dragDelta(MouseButton::Left));
-        }
-        else {
-            sr->setColor(color);
-        }
-
-        auto scale = transform.getScale();
-        if (Input::getKeyDown(Key::Left) || Input::getKeyDown(Key::Right))
-            transform.setScale(-1 * scale.x ,scale.y);
-        else if (Input::getKeyDown(Key::Up) || Input::getKeyDown(Key::Down))
-            transform.setScale(scale.x , -1 * scale.y);
-
-        if (Input::getKeyDown(Key::Space))
-            startCoroutine(makeShape());
-
-    }        
+    void setCoordinate(const Vector2i& coord) {
+        transform.setPosition(coordPosition(coord));
+    }
 
     Matrix matrix;
-    Color  color;
+    Color color;
 };
 
 //==============================================================================
 // PUZZ
 //==============================================================================
 
-class Puzz : public GameObject {
-public:
-
+class Puzzometry : public GameObject
+{
+  public:
     Handle<ShapeRenderer> sr;
 
-    Puzz() {
-        flipUD(board);
-        flipLR(board);
-        makeChild<Piece>(board, Grays::Gray50)->transform.setPosition(-350,-350);
-        // makeChild<Piece>(Matrix{{8, 4, 8, 4},{0, 8, 4, 8}}, Reds::FireBrick);
-        // makeChild<Piece>(Matrix{{8, 4, 0}, {4, 8, 4}, {8, 4, 8}}, Oranges::Orange);
-        // makeChild<Piece>(Matrix{{8, 4, 0}, {4, 8, 4}, {8, 4, 0}}, Yellows::Gold);
-        // makeChild<Piece>(Matrix{{8, 4, 0}, {4, 8, 4}, {8, 4, 8}, {4, 8, 4}, {0, 4, 0}}, Yellows::Yellow);
-        // makeChild<Piece>(Matrix{{4, 8, 0, 0},{8, 4, 8, 0},{0, 8, 4, 8},{0, 4, 8, 4},{0, 8, 4, 0}}, Greens::Chartreuse);        
-        // makeChild<Piece>(Matrix{{4, 8, 0}, {8, 4, 8}, {0, 8, 4}}, Greens::Lime);
-        //makeChild<Piece>(Matrix{{4, 0, 0, 0}, {8, 4, 0, 0}, {4, 8, 4, 0}, {0, 4, 8, 4}}, Greens::Green);
+    Puzzometry() : GameObject("puzzometry")
+    {
+        const std::vector<Color> g_colors {
+            Reds::Red,
+            Oranges::Orange,
+            Yellows::Gold,
+            Yellows::Yellow,
+            Greens::Chartreuse,
+            Greens::Lime,
+            Greens::Green,
+            Cyans::Turquoise,
+            Cyans::Aqua,
+            Blues::DeepSkyBlue,
+            Blues::Blue,
+            Purples::Violet,
+            Purples::Purple,
+            Purples::Magenta
+        };
 
+        board = makeChild<Board>();
+        for (std::size_t i = 0; i < g_numPieces; ++i) {
+            auto p = makeChild<Piece>(g_matPieces[i], g_colors[i]);
+            p->setName("piece_"+str(i));
+            p->setCoordinate(g_solutions[i]);
+            pieces.push_back(p);
+        }
     }
+
+    void update() override {
+        if (Input::getKeyDown(Key::Space) && !spinning)
+            startCoroutine(spin());
+    }
+
+    Enumerator spin() {
+        spinning = true;
+        float t = 0.0f;
+        float begin = Engine::getView(0).getRotation() == 315.0f ? 45.0f : 0;
+        float end = begin == 45.0f ? 0.0f : 45.0f;
+        while (t < 0.25f) {
+            auto r = Tween::Smoothstep(begin, end, t/0.25f);
+            Engine::getView(0).setRotation(-r);
+            t += Engine::deltaTime();
+            co_yield nullptr;
+        }
+        Engine::getView(0).setRotation(-end);
+        spinning = false;
+    }
+
+    Handle<Board> board;
+    std::vector<Handle<Piece>> pieces;
+    bool spinning = false;
 };
 
 int main(int argc, char const *argv[])
 {
-    Engine::init(1000,1000);
-    Engine::getView(0).setCenter(0,0);
-    Engine::makeRoot<Puzz>();
+    Engine::init();
+    Engine::window->setTitle("Puzzometry");
+    Engine::getView(0).setCenter((size(g_matBoard,0)-1) * g_gridSize / 2.0f, (size(g_matBoard,1)-1) * g_gridSize / 2.0f);
+    Engine::makeRoot<Puzzometry>();
+    Debug::addGizmo("Grid", Grays::Gray50);
+    Debug::setGizmoActive(Debug::gizmoId("Grid"), true);
+    Debug::setGizmoActive(Debug::gizmoId("Wireframe"), true);
+    Debug::setGizmoActive(Debug::gizmoId("Transform"), true);
     Debug::show(true);
     Engine::run();
     return 0;

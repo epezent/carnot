@@ -19,6 +19,9 @@ void addGizmo(const std::string& name, const Color& color);
 /// Returns true if the user as selected a Gizmo to be active
 bool gizmoActive(Id id);
 
+/// Sets a Gizmo active state
+void setGizmoActive(Id id, bool active);
+
 /// Returns Id associated with Gizmo
 Id gizmoId(const std::string& name);
 

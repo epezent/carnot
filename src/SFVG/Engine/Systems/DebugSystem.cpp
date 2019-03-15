@@ -90,6 +90,10 @@ bool gizmoActive(Id id) {
     return g_gizmoActives[id];
 }
 
+void setGizmoActive(Id id, bool active) {
+    g_gizmoActives[id] = active;
+}
+
 Id gizmoId(const std::string& name) {
     Name intern = "__" + name + "__";
     return ID::getId(intern);
@@ -164,8 +168,8 @@ void drawText(const std::string& _text,
     Text text;
     text.setFont(Engine::fonts.get("RobotoMonoBold"));
     text.setPosition(position);
-    text.setCharacterSize(20);
-    text.setScale(0.5f, 0.5f);
+    text.setCharacterSize(10 * Engine::getDpiFactor());
+    text.setScale(1.0f / Engine::getDpiFactor(), 1.0f / Engine::getDpiFactor());
     text.setFillColor(color);
     text.setString(_text);
     alignCenter(text);
