@@ -1,7 +1,7 @@
 
 #include <SFML/Graphics.hpp>
-#include <SFVG/Graphics.hpp>
-#include <SFVG/Animation.hpp>
+# include <EE/Graphics.hpp>
+# include <EE/Animation.hpp>
 
 #include <iostream>
 #include <vector>
@@ -9,7 +9,7 @@
 #include <functional>
 #include "Fps.hpp"
 
-using namespace sfvg;
+using namespace ee;
 
 void printColor(const sf::Color& color) {
     std::cout << (int)color.r << ",";
@@ -26,11 +26,11 @@ T MyTween(const T& a, const T& b, float t) {
 
 int main(int argc, char* argv[]) {
 
-    sfvgInit();
+    eeInit();
 
     sf::ContextSettings settings;
     settings.antialiasingLevel = 8;
-    sf::RenderWindow window(sf::VideoMode(1000, 1000), "SFVG", sf::Style::Default, settings);
+    sf::RenderWindow window(sf::VideoMode(1000, 1000), "EE", sf::Style::Default, settings);
     window.setVerticalSyncEnabled(true);
 
     sf::Font font;

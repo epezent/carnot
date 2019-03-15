@@ -1,8 +1,8 @@
-#include <SFVG/Graphics.hpp>
-#include <SFVG/Animation.hpp>
+# include <EE/Graphics.hpp>
+# include <EE/Animation.hpp>
 #include <iostream>
 
-using namespace sfvg;
+using namespace ee;
 
 template <typename T>
 void print(const T& t) {

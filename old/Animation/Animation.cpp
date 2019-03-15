@@ -1,6 +1,6 @@
-#include <SFVG/Animation.hpp>
+# include <EE/Animation.hpp>
 
-namespace sfvg {
+namespace ee {
 
     AnimationBase::AnimationBase() :
         m_duration(sf::seconds(1.0f)),
@@ -35,4 +35,4 @@ namespace sfvg {
         m_isPlaying = false;
     }
 
-} // namespace sfvg
+} // namespace ee

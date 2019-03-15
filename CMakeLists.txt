@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.13.0)
 
 # create project
-project(SFVG VERSION 1.0.0 LANGUAGES CXX)
+project(EvansEngine VERSION 1.0.0 LANGUAGES CXX)
 
 # add modules
 list(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_SOURCE_DIR}/cmake)
@@ -10,17 +10,14 @@ list(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_SOURCE_DIR}/cmake)
 set(CMAKE_CXX_STANDARD 17)
 
 # create target and add an alias
-add_library(sfvg "")
-add_library(SFVG::sfvg ALIAS sfvg)
-
-file(GLOB_RECURSE SFVG_INCLUDE "include/SFVG/*.hpp" "include/SFVG/*.inl")
-
+add_library(ee "")
+add_library(EE::ee ALIAS ee)
 
 # add source files to target
 add_subdirectory(src)
 
-file(GLOB_RECURSE SFVG_INCLUDE "include/SFVG/*.hpp" "include/SFVG/*.inl")
-target_sources(sfvg PRIVATE ${SFVG_INCLUDE})
+file(GLOB_RECURSE EE_INCLUDE "include/EE/*.hpp" "include/EE/*.inl")
+target_sources(ee PRIVATE ${EE_INCLUDE})
 
 # find SFML
 set(SFML_STATIC_LIBRARIES TRUE)
@@ -30,7 +27,7 @@ find_package(SFML 2.5 REQUIRED COMPONENTS audio graphics window system network)
 find_package(Chipmunk REQUIRED)
 
 # add dependcies
-target_link_libraries(sfvg
+target_link_libraries(ee
 	PUBLIC
 		ws2_32
 		winmm
@@ -43,7 +40,7 @@ target_link_libraries(sfvg
 	PRIVATE
 )
 
-target_compile_definitions(sfvg
+target_compile_definitions(ee
 	PUBLIC
 		-D_CRT_SECURE_NO_WARNINGS
 		-DNOMINMAX
@@ -51,7 +48,7 @@ target_compile_definitions(sfvg
 )
 
 # set target properties
-target_include_directories(sfvg
+target_include_directories(ee
 	PUBLIC
 		$<INSTALL_INTERFACE:include>
 		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -60,12 +57,6 @@ target_include_directories(sfvg
 		${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
-# don't know why this doesn't work for setting compile options
-# target_compile_options(sfvg
-# 	PRIVATE $<$<CXX_COMPILER_ID:GNU>:"-Wall">
-# 		$<$<CXX_COMPILER_ID:MSVC>:"/W4">
-# 		$<$<CXX_COMPILER_ID:MSVC>:"/MP">
-# )
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wall -O3") # ALL WARNINGS
 elseif(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
@@ -75,33 +66,26 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -fcoroutines-ts -stdlib=libc++") # COROUTINES
 endif()
 
-# # set binary output location for executables
-# set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
-# # set binary output location for static libraries
-# set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib)
-# # set binary output location for shared libraries
-# set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib)
-
 # install the library
 include(GNUInstallDirs)
-set(INSTALL_CONFIGDIR ${CMAKE_INSTALL_LIBDIR}/cmake/SFVG)
-install(TARGETS sfvg
-	EXPORT sfvg-targets
+set(INSTALL_CONFIGDIR ${CMAKE_INSTALL_LIBDIR}/cmake/EE)
+install(TARGETS ee
+	EXPORT ee-targets
 	LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
 	ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
 
-set_target_properties(sfvg PROPERTIES EXPORT_NAME SFVG)
-set_target_properties(sfvg PROPERTIES FOLDER "SFVG")
+set_target_properties(ee PROPERTIES EXPORT_NAME EE)
+set_target_properties(ee PROPERTIES FOLDER "EE")
 
 install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 # export the targets to a script
-install(EXPORT sfvg-targets
+install(EXPORT ee-targets
 	FILE
-		SFVGTargets.cmake
+		EETargets.cmake
 	NAMESPACE
-		SFVG::
+		ee::
 	DESTINATION
 		${INSTALL_CONFIGDIR}
 )
@@ -110,30 +94,26 @@ install(EXPORT sfvg-targets
 include(CMakePackageConfigHelpers)
 
 # generate a package configuration file and a package version file
-configure_package_config_file(${CMAKE_CURRENT_LIST_DIR}/cmake/SFVGConfig.cmake.in
-	${CMAKE_CURRENT_BINARY_DIR}/SFVGConfig.cmake
+configure_package_config_file(${CMAKE_CURRENT_LIST_DIR}/cmake/EEConfig.cmake.in
+	${CMAKE_CURRENT_BINARY_DIR}/EEConfig.cmake
 	INSTALL_DESTINATION ${INSTALL_CONFIGDIR}
 )
 write_basic_package_version_file(
-	${CMAKE_CURRENT_BINARY_DIR}/SFVGConfigVersion.cmake
+	${CMAKE_CURRENT_BINARY_DIR}/EEConfigVersion.cmake
 	VERSION ${PROJECT_VERSION}
 	COMPATIBILITY AnyNewerVersion
 )
 
 # install the config and configversion modules
 install(FILES
-	${CMAKE_CURRENT_BINARY_DIR}/SFVGConfig.cmake
-	${CMAKE_CURRENT_BINARY_DIR}/SFVGConfigVersion.cmake
+	${CMAKE_CURRENT_BINARY_DIR}/EEConfig.cmake
+	${CMAKE_CURRENT_BINARY_DIR}/EEConfigVersion.cmake
 	DESTINATION ${INSTALL_CONFIGDIR}
 )
 
 # export from the build tree
-export(EXPORT sfvg-targets
-	   NAMESPACE SFVG::
-	   FILE ${CMAKE_CURRENT_BINARY_DIR}/SFVGTargets.cmake)
+export(EXPORT ee-targets
+	   NAMESPACE ee::
+	   FILE ${CMAKE_CURRENT_BINARY_DIR}/EETargets.cmake)
 
-# build tests
-# add_subdirectory(tests)
-
-# build examples
 add_subdirectory(examples)

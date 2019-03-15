@@ -1,12 +1,12 @@
 #include <SFML/Graphics.hpp>
-#include <SFVG/Graphics.hpp>
+# include <EE/Graphics.hpp>
 #include <iostream>
 
-using namespace sfvg;
+using namespace ee;
 
 int main(int argc, char* argv[]) {
 
-    sfvgInit();
+    eeInit();
 
     std::size_t n = 100;
     auto t = linspace(0, 1.0, n);
@@ -20,7 +20,7 @@ int main(int argc, char* argv[]) {
     // stroke1.showWireFrame(true);
 
     Stroke stroke2;
-    stroke2.setColor(sfvg::Greens::Chartreuse);
+    stroke2.setColor(ee::Greens::Chartreuse);
     stroke2.addPoint(100,100);
     stroke2.addPoint(500,100);
     stroke2.addPoint(900,100);
@@ -32,7 +32,7 @@ int main(int argc, char* argv[]) {
 
 
     Stroke stroke3;
-    stroke3.setColor(sfvg::Blues::DeepSkyBlue);
+    stroke3.setColor(ee::Blues::DeepSkyBlue);
     stroke3.setPointCount(3);
     stroke3.setPoint(0, 100, 500);
     stroke3.setPoint(1, 500, 500);
@@ -50,7 +50,7 @@ int main(int argc, char* argv[]) {
 
     sf::ContextSettings settings;
     settings.antialiasingLevel = 8;
-    sf::RenderWindow window(sf::VideoMode(1000, 1000), "SFVG Shapes", sf::Style::Default, settings);
+    sf::RenderWindow window(sf::VideoMode(1000, 1000), "EE Shapes", sf::Style::Default, settings);
     // window.setVerticalSyncEnabled(true);
 
     while (window.isOpen()) {

@@ -1,11 +1,11 @@
-#include <SFVG/SFVG.hpp>
+# include <EE/EE.hpp>
 #include <deque>
 
 #ifdef _MSC_VER
 #    pragma comment(linker, "/subsystem:windows /ENTRY:mainCRTStartup")
 #endif
 
-using namespace sfvg;
+using namespace ee;
 
 float sinWave(float f, float t) {
     return std::sin(2.0f * PI * f *t);

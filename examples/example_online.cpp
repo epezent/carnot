@@ -1,9 +1,9 @@
-#include <SFVG/Engine.hpp>
-#include <SFVG/Graphics.hpp>
+# include <EE/Engine.hpp>
+# include <EE/Graphics.hpp>
 #include <map>
 #include <sstream>
 
-using namespace sfvg;
+using namespace ee;
 using std::vector;
 using std::map;
 using std::string;

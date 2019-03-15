@@ -1,8 +1,8 @@
-#define SFVG_USE_DISCRETE_GPU
+#define EE_USE_DISCRETE_GPU
 
-#include <SFVG/SFVG.hpp>
+# include <EE/EE.hpp>
 
-using namespace sfvg;
+using namespace ee;
 
 class LissaCircle : public GameObject {
 public:

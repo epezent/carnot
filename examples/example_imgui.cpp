@@ -1,6 +1,6 @@
 #include "imgui_demo.cpp"
 
-using namespace sfvg;
+using namespace ee;
 
 class MyGameObject : public GameObject {
 public:

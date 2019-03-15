@@ -1,5 +1,5 @@
-#ifndef SFVG_FPS_HPP
-#define SFVG_FPS_HPP
+#ifndef EE_FPS_HPP
+#define EE_FPS_HPP
 
 #include <SFML/System/Clock.hpp>
 
@@ -36,4 +36,4 @@ public:
     }
 };
 
-#endif // SFVG_FPS_HPP
+#endif // EE_FPS_HPP

@@ -1,19 +1,19 @@
 #include <SFML/Graphics.hpp>
-#include <SFVG/Graphics.hpp>
-#include <SFVG/Tween.hpp>
+# include <EE/Graphics.hpp>
+# include <EE/Tween.hpp>
 
-using namespace sfvg;
+using namespace ee;
 
 #define WINDOW_WIDTH 1000.0f
 #define WINDOW_HEIGHT 1000.0f
 
 int main() {
 
-    sfvgInit();
+    eeInit();
 
     sf::ContextSettings settings;
     settings.antialiasingLevel = 8;
-    sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "SFVG",
+    sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "EE",
                             sf::Style::Default, settings);
     window.setVerticalSyncEnabled(true);
 

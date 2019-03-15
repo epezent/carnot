@@ -1,10 +1,10 @@
-// #define SFVG_USE_DISCRETE_GPU
-// #define SFVG_NO_CONSOLE
+// #define EE_USE_DISCRETE_GPU
+// #define EE_NO_CONSOLE
 
-#include <SFVG/SFVG.hpp>
+# include <EE/EE.hpp>
 #include <deque>
 
-using namespace sfvg;
+using namespace ee;
 
 //==============================================================================
 // BASIC MATRIX OPERATIONS

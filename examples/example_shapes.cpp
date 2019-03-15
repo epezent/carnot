@@ -1,16 +1,16 @@
 #include <SFML/Graphics.hpp>
-#include <SFVG/Graphics.hpp>
+# include <EE/Graphics.hpp>
 #include <iostream>
 
-using namespace sfvg;
+using namespace ee;
 
 int main(int argc, char* argv[]) {
 
-    sfvgInit();
+    eeInit();
 
     sf::ContextSettings settings;
     settings.antialiasingLevel = 8;
-    sf::RenderWindow window(sf::VideoMode(1000, 1000), "SFVG Shapes", sf::Style::Default, settings);
+    sf::RenderWindow window(sf::VideoMode(1000, 1000), "EE Shapes", sf::Style::Default, settings);
     window.setVerticalSyncEnabled(true);
 
     CircleShape circle(50);

@@ -1,11 +1,11 @@
-#ifndef SFVG_DETAIL_HPP
-#define SFVG_DETAIL_HPP
+#ifndef EE_DETAIL_HPP
+#define EE_DETAIL_HPP
 
 #include <SFML/System/Vector2.hpp>
 #include <cmath>
 #include <vector>
 
-namespace sfvg {
+namespace ee {
 
 bool generateVertices(const std::vector<sf::Vector2f>& points,
                       const std::vector<float>& radii,
@@ -28,6 +28,6 @@ bool snip(const std::vector<sf::Vector2f>& vertices,
 bool triangulate(const std::vector<sf::Vector2f>& vertices,
                  std::vector<std::size_t>& indices_out);
 
-} // namespace sfvg
+} // namespace ee
 
-#endif  // SFVG_DETAIL_HPP
+#endif  // EE_DETAIL_HPP

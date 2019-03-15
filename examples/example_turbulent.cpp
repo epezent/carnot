@@ -1,10 +1,10 @@
-#include <SFVG/Engine/Object.hpp>
-#include <SFVG/Engine/Engine.hpp>
-#include <SFVG/Engine/XboxController.hpp>
-#include <SFVG/Graphics.hpp>
+# include <EE/Engine/Object.hpp>
+# include <EE/Engine/Engine.hpp>
+# include <EE/Engine/XboxController.hpp>
+# include <EE/Graphics.hpp>
 #include <chipmunk.h>
 
-using namespace sfvg;
+using namespace ee;
 
 //=============================================================================
 // WORLD

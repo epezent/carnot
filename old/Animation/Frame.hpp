@@ -1,9 +1,9 @@
 #pragma once
 
-#include <SFVG/Animation/Detail/Detail.hpp>
-#include <SFVG/Animation/Property.hpp>
+# include <EE/Animation/Detail/Detail.hpp>
+# include <EE/Animation/Property.hpp>
 
-namespace sfvg {
+namespace ee {
 
 template <typename... Ps>
 class Animation;
@@ -131,4 +131,4 @@ P& Frame<Ps...>::setFrom(S* subject) {
     return p;
 }
 
-}  // namespace sfvg
+}  // namespace ee

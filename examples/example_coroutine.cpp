@@ -1,11 +1,11 @@
-#include <SFVG/Engine/Object.hpp>
-#include <SFVG/Engine/Engine.hpp>
-#include <SFVG/Graphics.hpp>
+# include <EE/Engine/Object.hpp>
+# include <EE/Engine/Engine.hpp>
+# include <EE/Graphics.hpp>
 #include <typeinfo>
 #include <sstream>
-#include <SFVG/Engine/XboxController.hpp>
+# include <EE/Engine/XboxController.hpp>
 
-using namespace sfvg;
+using namespace ee;
 
 class MyObject : public Object {
 public:

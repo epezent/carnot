@@ -1,4 +1,4 @@
-target_sources(sfvg
+target_sources(ee
 	PRIVATE
 		Animation.cpp
 )

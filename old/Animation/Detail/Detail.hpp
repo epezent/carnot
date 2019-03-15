@@ -8,7 +8,7 @@
 
 #include <tuple>
 
-namespace sfvg {
+namespace ee {
 
 namespace detail {
 
@@ -58,4 +58,4 @@ void for_each_in_tuple3(std::tuple<Ts...>& t1,
 
 }  // namespace detail
 
-}  // namespace sfvg
+}  // namespace ee

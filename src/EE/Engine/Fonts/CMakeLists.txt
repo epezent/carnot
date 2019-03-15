@@ -1,0 +1,10 @@
+target_sources(ee
+    PRIVATE
+        FontAwesome5.cpp
+        RobotoRegular.cpp
+        RobotoBold.cpp
+        RobotoItalic.cpp
+        RobotoMonoRegular.cpp
+        RobotoMonoBold.cpp
+        RobotoMonoItalic.cpp
+)

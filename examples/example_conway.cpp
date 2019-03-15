@@ -1,6 +1,6 @@
-#include <SFVG/SFVG.hpp>
+# include <EE/EE.hpp>
 
-using namespace sfvg;
+using namespace ee;
 
 // Any live cell with fewer than two live neighbors dies, as if by underpopulation.
 // Any live cell with more than three live neighbors dies, as if by overpopulation.

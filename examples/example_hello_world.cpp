@@ -1,6 +1,6 @@
-#include <SFVG/SFVG.hpp>
+# include <EE/EE.hpp>
 
-using namespace sfvg;
+using namespace ee;
 
 int main(int argc, char const *argv[])
 {

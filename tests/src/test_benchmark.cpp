@@ -6,20 +6,20 @@
 #include <cmath>
 #include <sstream>
 #include <limits>
-#include <SFVG/Graphics.hpp>
+# include <EE/Graphics.hpp>
 
-using namespace sfvg;
+using namespace ee;
 
 #define     WINDOW_WIDTH    1000.0f
 #define     WINDOW_HEIGHT   1000.0f
 
 int main()
 {
-    sfvgInit();
+    eeInit();
 
     sf::ContextSettings settings;
     settings.antialiasingLevel = 8;
-    sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "SFVG", sf::Style::Default, settings);
+    sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "EE", sf::Style::Default, settings);
 
     sf::Shader shader;
     shader.loadFromFile("../shaders/linear_gradient.frag", sf::Shader::Fragment);

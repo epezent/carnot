@@ -1,14 +1,14 @@
 #pragma once
 
 #include <SFML/System/Time.hpp>
-#include <SFVG/Animation/Frame.hpp>
+# include <EE/Animation/Frame.hpp>
 #include <map>
 #include <vector>
 #include <cassert>
 #include <algorithm>
 #include <functional>
 
-namespace sfvg {
+namespace ee {
 
 class AnimationBase {
 public:
@@ -179,4 +179,4 @@ void Animation<Ps...>::applyTo(S* subject) {
     m_currentFrame.applyTo(subject);
 }
 
-}  // namespace sfvg
+}  // namespace ee

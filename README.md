@@ -1,4 +1,4 @@
-# SFVG - Simple and Fast Vector Graphics
+# EE - Simple and Fast Vector Graphics
 
 ## Developers
 
@@ -6,7 +6,7 @@
 
 ## About
 
-SFVG is an extension to SFML providing functionality to draw and animate vector graphics shapes. At a glance, SFVG offers:
+EE is an extension to SFML providing functionality to draw and animate vector graphics shapes. At a glance, EE offers:
 
 - Concave and convex shape triangulation
 - Shape offsetting, clipping, corner rounding, and holes
