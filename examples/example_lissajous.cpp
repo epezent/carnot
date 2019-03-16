@@ -1,4 +1,4 @@
-#define EE_USE_DISCRETE_GPU
+#define CARNOT_USE_DISCRETE_GPU
 
 #include <Carnot/Carnot.hpp>
 

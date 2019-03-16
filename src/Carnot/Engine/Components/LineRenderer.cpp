@@ -46,10 +46,11 @@ namespace carnot {
         addPoint(sf::Vector2f(x,y));
     }
 
-    void LineRenderer::fromShape(const carnot::Shape &shape) {
+    void LineRenderer::fromShape(const Shape &shape) {
         setPointCount(shape.getVerticesCount());
+        const Points& verts = shape.getVertices();
         for (std::size_t i = 0; i < shape.getVerticesCount(); ++i)
-            m_vertexArray[i].position = shape.getPoint(i);
+            m_vertexArray[i].position = verts[i];
         addPoint(getPoint(0));
     }
 

@@ -1,5 +1,5 @@
-// #define EE_USE_DISCRETE_GPU
-// #define EE_NO_CONSOLE
+// #define CARNOT_USE_DISCRETE_GPU
+// #define CARNOT_NO_CONSOLE
 
 #include <Carnot/Carnot.hpp>
 #include <deque>
@@ -12,6 +12,14 @@ using namespace carnot;
 
 typedef std::vector<std::vector<char>> Matrix;
 
+std::size_t size(const Matrix& mat, int dim) {
+    if (dim == 0)
+        return mat.size();
+    else if (dim == 1)
+        return mat[0].size();
+    return 0;
+} 
+
 inline Matrix ones(std::size_t r, std::size_t c)
 {
     return Matrix(r, std::vector<char>(c, 1));
@@ -22,33 +30,34 @@ inline Matrix zeros(std::size_t r, std::size_t c)
     return Matrix(r, std::vector<char>(c, 0));
 }
 
-inline void flipLR(Matrix &mat)
-{
-    for (auto &row : mat)
-        std::reverse(row.begin(), row.end());
-}
-
-inline void flipUD(Matrix &mat)
-{
-    std::reverse(mat.begin(), mat.end());
-}
-
-bool allZeros(const Matrix &mat)
-{
-    for (auto &row : mat)
-        for (auto &col : row)
-            if (col != 0)
-                return false;
-    return true;
-}
-
-std::size_t size(const Matrix& mat, int dim) {
+inline void flipMat(Matrix &mat, int dim) {
     if (dim == 0)
-        return mat.size();
-    else if (dim == 1)
-        return mat[0].size();
-    return 0;
-} 
+        std::reverse(mat.begin(), mat.end());
+    else if (dim == 1) {
+        for (auto &row : mat)
+            std::reverse(row.begin(), row.end());
+    }
+}
+
+inline void rotate(Matrix& mat) {
+    auto temp = mat;
+    mat.resize(size(temp,1));
+    for (auto j : range(size(temp,1))) {
+        mat[j].resize(size(temp,0));
+        for (auto i : range(size(temp,0)))
+            mat[j][i] = temp[i][j];
+    }
+    flipMat(mat,1);
+}
+
+void printMat(const Matrix& mat) {
+    for (auto i : range(size(mat,0))) {
+        for (auto j : range(size(mat,1)))
+            std::cout << (int)mat[i][j] << " ";
+        std::cout << std::endl;
+    }
+    std::cout << std::endl;
+}
 
 //==============================================================================
 // GLOBAL DEFINITIONS
@@ -170,24 +179,35 @@ class Board : public GameObject
 {
   public:
 
-    Handle<ShapeRenderer> bg;
+    Handle<ShapeRenderer> sr;
+    Handle<LineRenderer> lr1, lr2;
 
     Board() : GameObject("board"), matrix(g_matBoard), color(Grays::Gray80)
     {
         addComponent<GridGizmo>();
 
-        bg = addComponent<ShapeRenderer>();
-        bg->shape->setPointCount(4);
-        bg->shape->setPoint(0, coordPosition(9,-2));
-        bg->shape->setPoint(1, coordPosition(-2,9));
-        bg->shape->setPoint(2, coordPosition(6,17));
-        bg->shape->setPoint(3, coordPosition(17,6));
+        sr = addComponent<ShapeRenderer>();
+        sr->shape->setPointCount(4);
+        sr->shape->setPoint(0, coordPosition(9,-2));
+        sr->shape->setPoint(1, coordPosition(-2,9));
+        sr->shape->setPoint(2, coordPosition(6,17));
+        sr->shape->setPoint(3, coordPosition(17,6));
 
         auto alpha = color;;
         alpha.a = 128;
-        bg->setGradient(Gradient(color,alpha, 45.0f));
-        bg->shape->setRadii(g_gridSize);
-        bg->shape->setHoleCount(1);
+        sr->setGradient(Gradient(color,alpha, 45.0f));
+        sr->shape->setRadii(g_gridSize);
+        sr->shape->setHoleCount(1);
+
+        lr1 = addComponent<LineRenderer>();
+        lr2 = addComponent<LineRenderer>();
+
+        lr1->setColor(Whites::White);
+        lr2->setColor(Whites::White);
+        
+        lr1->fromShape(*sr->shape);
+
+        startCoroutine(makeShape());
     }
 
     Enumerator makeShape()
@@ -226,14 +246,15 @@ class Board : public GameObject
             if (merged.size() == 1)
             {
                 shape = merged[0];
-                bg->shape->setHole(0, shape);
+                sr->shape->setHole(0, shape);
                 co_yield nullptr;
             }
             else
                 shapes.push_back(toMerge);
         }
         shape = Shape::offsetShape(shape, 2.0f);
-        bg->shape->setHole(0, shape);
+        sr->shape->setHole(0, shape);
+        lr2->fromShape(shape);
     }
 
     void update()
@@ -254,6 +275,7 @@ class Piece : public GameObject
 {
   public:
     Handle<ShapeRenderer> sr;
+    Handle<LineRenderer> lr;
 
     Piece(const Matrix &mat, const Color &col) : matrix(mat),
                                                  color(col)
@@ -262,6 +284,9 @@ class Piece : public GameObject
         auto alpha = color;;
         alpha.a = 128;
         sr->setGradient(Gradient(alpha,color,45.0f));
+        lr = addComponent<LineRenderer>();
+        lr->setColor(Whites::White);
+        startCoroutine(makeShape());
     }
 
     void update()
@@ -272,9 +297,11 @@ class Piece : public GameObject
             sr->setColor(Whites::White);
             auto scale = transform.getScale();
             if (Input::getKeyDown(Key::Left) || Input::getKeyDown(Key::Right))
-                transform.setScale(-1 * scale.x, scale.y);
-            else if (Input::getKeyDown(Key::Up) || Input::getKeyDown(Key::Down))
-                transform.setScale(scale.x, -1 * scale.y);
+                flipLR();
+            if (Input::getKeyDown(Key::Up) || Input::getKeyDown(Key::Down))
+                flipUD();
+            if (Input::getKeyDown(Key::Q))
+                printMat(matrix);
         }
         else
         {
@@ -330,10 +357,21 @@ class Piece : public GameObject
                 shapes.push_back(toMerge);
         }
         *sr->shape = Shape::offsetShape(shape, -2.0f);
+        lr->fromShape(*sr->shape);
     }
 
     void setCoordinate(const Vector2i& coord) {
         transform.setPosition(coordPosition(coord));
+    }
+
+    void flipLR() {
+        flipMat(matrix,1);
+        transform.setScale(transform.getScale().x * -1, transform.getScale().y );
+    }
+
+    void flipUD() {
+        flipMat(matrix,0);
+        transform.setScale(transform.getScale().x , transform.getScale().y * -1);
     }
 
     Matrix matrix;
@@ -351,6 +389,22 @@ class Puzzometry : public GameObject
 
     Puzzometry() : GameObject("puzzometry")
     {
+
+        // init background
+        auto bg = makeChild<GameObject>();
+        std::size_t n = 100;
+        float s = 1000.0f/n;
+        for (std::size_t i = 0; i < n/2; ++i) {
+            for (std::size_t j = 0; j < n; ++j) {
+                auto check = bg->addComponent<ShapeRenderer>();
+                check->shape = make<SquareShape>(s);
+                check->shape->setPosition(s*(j%2) + s/2.0f  + 2*i * s, s/2  + j * s);
+                check->setColor(Grays::Gray10);
+                check->setLayer(0);
+            }
+        }
+        bg->transform.setPosition((size(g_matBoard,0)-1) * g_gridSize / 2.0f-500, (size(g_matBoard,1)-1) * g_gridSize / 2.0f-500);
+
         board = makeChild<Board>();
         for (std::size_t i = 0; i < g_numPieces; ++i) {
             auto p = makeChild<Piece>(g_matPieces[i], g_colors[i]);
@@ -387,7 +441,8 @@ class Puzzometry : public GameObject
 
 int main(int argc, char const *argv[])
 {
-    Engine::init();
+   
+    Engine::init(1000,1000);
     Engine::window->setTitle("Puzzometry");
     Engine::window->setFramerateLimit(144);
     // Engine::window->setVerticalSyncEnabled(true);
@@ -395,7 +450,7 @@ int main(int argc, char const *argv[])
     Debug::setGizmoActive(Debug::gizmoId("Grid"), true);
     Debug::setGizmoActive(Debug::gizmoId("Wireframe"), true);
     Debug::setGizmoActive(Debug::gizmoId("Transform"), true);
-    Debug::show(true);
+    // Debug::show(true);
     Engine::getView(0).setCenter((size(g_matBoard,0)-1) * g_gridSize / 2.0f, (size(g_matBoard,1)-1) * g_gridSize / 2.0f);
     Engine::makeRoot<Puzzometry>();
     Engine::run();
