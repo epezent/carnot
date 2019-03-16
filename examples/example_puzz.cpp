@@ -1,7 +1,7 @@
 // #define CARNOT_USE_DISCRETE_GPU
 // #define CARNOT_NO_CONSOLE
 
-#include <Carnot/Carnot.hpp>
+#include <carnot>
 #include <deque>
 
 using namespace carnot;
@@ -195,7 +195,7 @@ class Board : public GameObject
 
         auto alpha = color;;
         alpha.a = 128;
-        sr->setGradient(Gradient(color,alpha, 45.0f));
+        sr->setEffect(make<Gradient>(color,alpha, 45.0f));
         sr->shape->setRadii(g_gridSize);
         sr->shape->setHoleCount(1);
 
@@ -283,7 +283,7 @@ class Piece : public GameObject
         sr = addComponent<ShapeRenderer>();
         auto alpha = color;;
         alpha.a = 128;
-        sr->setGradient(Gradient(alpha,color,45.0f));
+        sr->setEffect(make<Gradient>(alpha,color,45.0f));
         lr = addComponent<LineRenderer>();
         lr->setColor(Whites::White);
         startCoroutine(makeShape());
@@ -307,7 +307,7 @@ class Piece : public GameObject
         {
             auto alpha = color;;
             alpha.a = 128;
-            sr->setGradient(Gradient(color,alpha,45.0f));
+            sr->setEffect(make<Gradient>(color,alpha,45.0f));
         }
 
         if (Input::getKeyDown(Key::P))

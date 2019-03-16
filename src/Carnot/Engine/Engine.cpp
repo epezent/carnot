@@ -1,12 +1,12 @@
 #include <SFML/Window/Event.hpp>
-#include <Carnot/Engine/Engine.hpp>
-#include <Carnot/Engine/GameObject.hpp>
+#include <Engine/Engine.hpp>
+#include <Engine/GameObject.hpp>
 #include <cassert>
 #include "Fonts/EngineFonts.hpp"
-#include <Carnot/Engine/Components/Renderer.hpp>
-#include <Carnot/Engine/ImGui/imgui.h>
-#include <Carnot/Engine/ImGui/imgui-SFML.h>
-#include <Carnot/Engine/FontAwesome5.hpp>
+#include <Engine/Components/Renderer.hpp>
+#include <Engine/ImGui/imgui.h>
+#include <Engine/ImGui/imgui-SFML.h>
+#include <Engine/FontAwesome5.hpp>
 #include <windows.h>
 #include <winuser.h>
 #include <ShellScalingAPI.h>
@@ -16,12 +16,6 @@ namespace carnot {
 //==============================================================================
 // GLOBAL VARIABLES / PRIVATE FUNCTIONS
 //==============================================================================
-
-Image*   EE_WHITE_IMAGE;
-Texture* EE_WHITE_TEXTURE;
-Shader*  EE_SOLID_SHADER;
-Shader*  EE_GRADIENT_SHADER;
-
 namespace {   
 
 bool              g_initialized = false;
@@ -35,27 +29,6 @@ RenderQue         g_renderQue   = RenderQue(1);
 Color             g_bgColor     = Color();
 Clock             g_clock       = Clock();
 Ptr<GameObject>   g_root;
-
-const std::string g_solidShaderGlsl = \
-    "uniform vec4 u_color;" \
-    "uniform sampler2D u_texture;" \
-    "void main() {" \
-    "    vec4 pixel = texture2D(u_texture, gl_TexCoord[0].xy);" \
-    "    gl_FragColor = u_color * pixel;" \
-    "}";
-
-const std::string g_gradientShaderGlsl = \
-    "uniform vec4 u_color1;" \
-    "uniform vec4 u_color2;" \
-    "uniform float u_angle;" \
-    "uniform sampler2D u_texture;" \
-    "void main() {" \
-    "    vec4 pixel = texture2D(u_texture, gl_TexCoord[0].xy);" \
-    "    vec2 center = gl_TexCoord[0].xy - 0.5;" \
-    "    float radians = -0.0174532925199433 * u_angle;" \
-    "    float t = center.x * sin(radians) + center.y * cos(radians) + 0.5;" \
-    "    gl_FragColor = mix(u_color1, u_color2, t) * pixel;" \
-    "}";
 
 unsigned char white_pixel[] = {
     0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00, 0x00, 0x0d,
@@ -73,30 +46,16 @@ void loadResources() {
 
     Engine::window = std::make_shared<RenderWindow>();
 
-    Engine::fonts.load("Roboto",           &Roboto_Regular_ttf,      Roboto_Regular_ttf_len);
-    Engine::fonts.load("RobotoBold",       &Roboto_Bold_ttf,         Roboto_Bold_ttf_len);
-    Engine::fonts.load("RobotoItalic",     &Roboto_Italic_ttf,       Roboto_Italic_ttf_len);
-    Engine::fonts.load("RobotoMono",       &RobotoMono_Regular_ttf,  RobotoMono_Regular_ttf_len);
-    Engine::fonts.load("RobotoMonoBold",   &RobotoMono_Bold_ttf,     RobotoMono_Bold_ttf_len);
-    Engine::fonts.load("RobotoMonoItalic", &RobotoMono_Italic_ttf,   RobotoMono_Italic_ttf_len);
-    Engine::fonts.load("FontAwesome5",     &fa_solid_900_ttf,        fa_solid_900_ttf_len);
+    Engine::fonts.load(ID::makeId("Roboto"),           &Roboto_Regular_ttf,      Roboto_Regular_ttf_len);
+    Engine::fonts.load(ID::makeId("RobotoBold"),       &Roboto_Bold_ttf,         Roboto_Bold_ttf_len);
+    Engine::fonts.load(ID::makeId("RobotoItalic"),     &Roboto_Italic_ttf,       Roboto_Italic_ttf_len);
+    Engine::fonts.load(ID::makeId("RobotoMono"),       &RobotoMono_Regular_ttf,  RobotoMono_Regular_ttf_len);
+    Engine::fonts.load(ID::makeId("RobotoMonoBold"),   &RobotoMono_Bold_ttf,     RobotoMono_Bold_ttf_len);
+    Engine::fonts.load(ID::makeId("RobotoMonoItalic"), &RobotoMono_Italic_ttf,   RobotoMono_Italic_ttf_len);
+    Engine::fonts.load(ID::makeId("FontAwesome5"),     &fa_solid_900_ttf,        fa_solid_900_ttf_len);
 
-    Engine::shaders.load("Solid"   ,g_solidShaderGlsl,    sf::Shader::Fragment);
-    Engine::shaders.load("Gradient",g_gradientShaderGlsl, sf::Shader::Fragment);
-    
-    Engine::textures.load("__white__", white_pixel, white_pixel_len);
-
-    EE_WHITE_IMAGE     = new sf::Image();
-    EE_WHITE_TEXTURE   = new sf::Texture();
-    EE_SOLID_SHADER    = new sf::Shader();
-    EE_GRADIENT_SHADER = new sf::Shader();
-    // load resources
-    EE_WHITE_IMAGE->create(1, 1, sf::Color::White);
-    EE_WHITE_TEXTURE->loadFromImage(*EE_WHITE_IMAGE);
-    EE_SOLID_SHADER->loadFromMemory(g_solidShaderGlsl, sf::Shader::Fragment);
-    EE_SOLID_SHADER->setUniform("u_texture", sf::Shader::CurrentTexture);
-    EE_GRADIENT_SHADER->loadFromMemory(g_gradientShaderGlsl, sf::Shader::Fragment);
-    EE_GRADIENT_SHADER->setUniform("u_texture", sf::Shader::CurrentTexture);
+    /// Built in textures
+    Engine::textures.load(ID::makeId("__texture_white"), white_pixel, white_pixel_len);
 }
 
 void freeResources() {
@@ -105,10 +64,6 @@ void freeResources() {
     Engine::fonts.unloadAll();
     Engine::sounds.unloadAll();
     Engine::shaders.unloadAll();
-    delete EE_WHITE_IMAGE;
-    delete EE_WHITE_TEXTURE;
-    delete EE_SOLID_SHADER;
-    delete EE_GRADIENT_SHADER;
     // free window
     Engine::window.reset();
 }
@@ -144,10 +99,10 @@ void setUserIcon(sf::WindowHandle handle) {
 
 Ptr<RenderWindow> Engine::window;
 
-ResourceManager<Texture, std::string>     Engine::textures = ResourceManager<Texture, std::string>();
-ResourceManager<Font, std::string>        Engine::fonts    = ResourceManager<Font, std::string>();
-ResourceManager<SoundBuffer, std::string> Engine::sounds   = ResourceManager<SoundBuffer, std::string>();
-ResourceManager<Shader, std::string>      Engine::shaders  = ResourceManager<Shader, std::string>();
+ResourceManager<Texture>     Engine::textures = ResourceManager<Texture>();
+ResourceManager<Font>        Engine::fonts    = ResourceManager<Font>();
+ResourceManager<SoundBuffer> Engine::sounds   = ResourceManager<SoundBuffer>();
+ResourceManager<Shader>      Engine::shaders  = ResourceManager<Shader>();
 
 void Engine::init() {
     init(sf::VideoMode::getDesktopMode().width, sf::VideoMode::getDesktopMode().height, WindowStyle::Fullscreen);

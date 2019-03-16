@@ -1,8 +1,6 @@
-#include <Carnot/Engine/Components/StrokeRenderer.hpp>
-#include <Carnot/Engine/GameObject.hpp>
-#include <Carnot/Engine/Engine.hpp>
-#include "../SharedResources.hpp"
-#include <Carnot/Common/Math.hpp>
+#include <Engine/Components/StrokeRenderer.hpp>
+#include <Engine/GameObject.hpp>
+#include <Common/Math.hpp>
 #include <SFML/OpenGL.hpp>
 #include <SFML/Graphics/Transform.hpp>
 

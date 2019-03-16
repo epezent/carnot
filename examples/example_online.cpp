@@ -1,5 +1,5 @@
-#include <Carnot/Engine.hpp>
-#include <Carnot/Graphics.hpp>
+#include <Engine.hpp>
+#include <Graphics.hpp>
 #include <map>
 #include <sstream>
 

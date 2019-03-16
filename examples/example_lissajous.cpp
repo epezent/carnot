@@ -1,7 +1,7 @@
 #define CARNOT_USE_DISCRETE_GPU
+#define CARNOT_NO_CONSOLE
 
-#include <Carnot/Carnot.hpp>
-
+#include <carnot>
 using namespace carnot;
 
 class LissaCircle : public GameObject {

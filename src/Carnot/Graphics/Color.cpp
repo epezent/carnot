@@ -1,5 +1,5 @@
-#include <Carnot/Graphics/Color.hpp>
-#include <Carnot/Common/Math.hpp>
+#include <Graphics/Color.hpp>
+#include <Common/Math.hpp>
 #include <cmath>
 #include <cstdio>
 #include <iostream>

@@ -1,6 +1,6 @@
-#include <Carnot/Engine/Systems/InputSystem.hpp>
-#include <Carnot/Common/Print.hpp>
-#include <Carnot/Engine/Engine.hpp>
+#include <Engine/Systems/InputSystem.hpp>
+#include <Common/Print.hpp>
+#include <Engine/Engine.hpp>
 #include <array>
 
 namespace carnot {

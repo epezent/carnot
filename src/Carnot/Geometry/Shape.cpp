@@ -1,7 +1,7 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Graphics/RenderTarget.hpp>
-#include <Carnot/Geometry/Shape.hpp>
-#include <Carnot/Common/Math.hpp>
+#include <Geometry/Shape.hpp>
+#include <Common/Math.hpp>
 #include <iostream>
 #include <limits>
 #include "clipper/clipper.hpp"

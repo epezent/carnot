@@ -1,9 +1,9 @@
-#include <Carnot/Engine/Object.hpp>
-#include <Carnot/Engine/Engine.hpp>
-#include <Carnot/Graphics.hpp>
+#include <Engine/Object.hpp>
+#include <Engine/Engine.hpp>
+#include <Graphics.hpp>
 #include <typeinfo>
 #include <sstream>
-#include <Carnot/Engine/XboxController.hpp>
+#include <Engine/XboxController.hpp>
 
 using namespace carnot;
 

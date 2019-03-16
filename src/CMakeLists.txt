@@ -2,4 +2,4 @@
 add_subdirectory(Box2D)
 add_subdirectory(clipper)
 add_subdirectory(vaser)
-add_subdirectory(Carnot)
+add_subdirectory(carnot)

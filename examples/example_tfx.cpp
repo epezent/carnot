@@ -1,4 +1,4 @@
-#include <Carnot/Carnot.hpp>
+#include <carnot>
 #include <deque>
 
 #ifdef _MSC_VER

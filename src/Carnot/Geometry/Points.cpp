@@ -1,5 +1,5 @@
-#include <Carnot/Geometry/Points.hpp>
-#include <Carnot/Common/Math.hpp>
+#include <Geometry/Points.hpp>
+#include <Common/Math.hpp>
 #include <cassert>
 
 namespace carnot {

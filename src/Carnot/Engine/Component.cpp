@@ -1,6 +1,6 @@
-#include <Carnot/Engine/Component.hpp>
-#include <Carnot/Engine/Object.hpp>
-#include <Carnot/Engine/GameObject.hpp>
+#include <Engine/Component.hpp>
+#include <Engine/Object.hpp>
+#include <Engine/GameObject.hpp>
 
 namespace carnot {
 

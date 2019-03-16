@@ -1,7 +1,7 @@
 #include <Windows.h>
 #include <Xinput.h>
-#include <Carnot/Engine/XboxController.hpp>
-#include <Carnot/Common/Math.hpp>
+#include <Engine/XboxController.hpp>
+#include <Common/Math.hpp>
 #include <array>
 
 namespace carnot {

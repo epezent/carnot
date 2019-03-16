@@ -1,5 +1,5 @@
-#include <Carnot/Graphics/Gradient.hpp>
-#include "../Engine/SharedResources.hpp"
+#include <Graphics/Gradient.hpp>
+#include <Engine/Engine.hpp>
 #include <string>
 #include <iostream>
 
@@ -16,33 +16,49 @@ sf::Glsl::Vec4 sfmlToGlsl(const sf::Color& color) {
     );
 }
 
-//sf::Shader Gradient::solidShader;
+namespace {
+    bool g_shaderLoaded = false;
+    const std::string g_shaderCode = \
+    "uniform vec4 u_color1;" \
+    "uniform vec4 u_color2;" \
+    "uniform float u_angle;" \
+    "uniform sampler2D u_texture;" \
+    "void main() {" \
+    "    vec4 pixel = texture2D(u_texture, gl_TexCoord[0].xy);" \
+    "    vec2 center = gl_TexCoord[0].xy - 0.5;" \
+    "    float radians = -0.0174532925199433 * u_angle;" \
+    "    float t = center.x * sin(radians) + center.y * cos(radians) + 0.5;" \
+    "    gl_FragColor = mix(u_color1, u_color2, t) * pixel;" \
+    "}";
+} // private  namespace
 
 //==============================================================================
 // PUBLIC FUNCTIONS
 //==============================================================================
 
 Gradient::Gradient() :
-    type(Gradient::Linear),
-    colors({sf::Color::Black, sf::Color::Black}),
-    angle(0.0f),
-    m_shader(EE_GRADIENT_SHADER)
+    Gradient(Color::Black, Color::White, 0.0f)
 {
 }
 
 Gradient::Gradient(const sf::Color& color1, const sf::Color& color2, float angle_) :
     type(Gradient::Linear),
     colors({color1, color2}),
-    angle(angle_),
-    m_shader(EE_GRADIENT_SHADER)
+    angle(angle_)
 {
+    if (!g_shaderLoaded) {
+        Engine::shaders.load(ID::makeId("__shader_linear_gradient"),g_shaderCode, sf::Shader::Fragment);  
+        Engine::shaders.get(ID::getId("__shader_linear_gradient")).setUniform("u_texture", sf::Shader::CurrentTexture);
+        g_shaderLoaded = true;
+    }
+    m_shader = &Engine::shaders.get(ID::getId("__shader_linear_gradient"));
 }
 
 //==============================================================================
 // PRIVATE FUNCTIONS
 //==============================================================================
 
-sf::Shader* Gradient::getShader() const {
+sf::Shader* Gradient::shader() const {
     switch(type) {
         case Linear:
             m_shader->setUniform("u_color1", sfmlToGlsl(colors[0]));

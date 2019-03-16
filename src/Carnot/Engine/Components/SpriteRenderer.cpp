@@ -1,6 +1,6 @@
-#include <Carnot/Engine/Components/SpriteRenderer.hpp>
-#include <Carnot/Engine/GameObject.hpp>
-#include <Carnot/Engine/Engine.hpp>
+#include <Engine/Components/SpriteRenderer.hpp>
+#include <Engine/GameObject.hpp>
+#include <Engine/Engine.hpp>
 
 namespace carnot {
 

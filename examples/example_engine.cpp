@@ -1,5 +1,4 @@
-#include <Carnot/Carnot.hpp>
-
+#include <carnot>
 using namespace carnot;
 
 class TestObject : public GameObject {
@@ -31,7 +30,7 @@ public:
 
         auto b = Blues::DeepSkyBlue;
         b.a = 128;
-        sr->setGradient(Gradient(b, Greens::Chartreuse));
+        sr->setEffect(make<Gradient>(b, Greens::Chartreuse));
         stroke->addVertex(250,250,randomColor(), 5.0f);
     }
 

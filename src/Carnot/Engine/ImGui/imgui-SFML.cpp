@@ -1,6 +1,6 @@
-#include <Carnot/Engine/ImGui/imgui-SFML.h>
-#include <Carnot/Engine/ImGui/imgui.h>
-#include <Carnot/Common/Print.hpp>
+#include <Engine/ImGui/imgui-SFML.h>
+#include <Engine/ImGui/imgui.h>
+#include <Common/Print.hpp>
 
 #include <SFML/OpenGL.hpp>
 #include <SFML/Graphics/Color.hpp>

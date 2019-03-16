@@ -1,7 +1,7 @@
-#include <Carnot/Engine/Object.hpp>
-#include <Carnot/Engine/Engine.hpp>
-#include <Carnot/Engine/XboxController.hpp>
-#include <Carnot/Graphics.hpp>
+#include <Engine/Object.hpp>
+#include <Engine/Engine.hpp>
+#include <Engine/XboxController.hpp>
+#include <Graphics.hpp>
 #include <chipmunk.h>
 
 using namespace carnot;

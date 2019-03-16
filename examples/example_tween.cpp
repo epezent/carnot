@@ -1,6 +1,6 @@
 #include <SFML/Graphics.hpp>
-#include <Carnot/Graphics.hpp>
-#include <Carnot/Tween.hpp>
+#include <Graphics.hpp>
+#include <Tween.hpp>
 
 using namespace carnot;
 

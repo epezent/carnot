@@ -1,5 +1,5 @@
-#include <Carnot/Engine/Components/TextRenderer.hpp>
-#include <Carnot/Engine/GameObject.hpp>
+#include <Engine/Components/TextRenderer.hpp>
+#include <Engine/GameObject.hpp>
 
 namespace carnot {
 

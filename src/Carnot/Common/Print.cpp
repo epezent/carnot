@@ -1,5 +1,5 @@
-#include <Carnot/Common/Print.hpp>
-#include <Carnot/Common/Math.hpp>
+#include <Common/Print.hpp>
+#include <Common/Math.hpp>
 #include <sstream>
 
 namespace carnot {

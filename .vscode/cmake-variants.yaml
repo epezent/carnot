@@ -1,0 +1,29 @@
+# carnot CMake Tools Variants
+# Evan Pezent (epezent@rice.edu)
+
+buildType: 
+ default: release
+ description: "Build Type"
+ choices: 
+  release: 
+   short: Release
+   long: "Building with optimizations"
+   buildType: Release
+  debug: 
+   short: Debug
+   long: "Build with debugging info"
+   buildType: Debug
+
+# examples: 
+#  default: on
+#  choices: 
+#   on: 
+#    short: Examples
+#    long: "Build examples"
+#    settings: 
+#     CARNOT_EXAMPLES: ON
+#   off: 
+#    short: "No Examples"
+#    long: "Do not build examples"
+#    settings: 
+#     CARNOT_EXAMPLES: OFF

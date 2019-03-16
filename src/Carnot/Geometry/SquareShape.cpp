@@ -1,4 +1,4 @@
-#include <Carnot/Geometry/SquareShape.hpp>
+#include <Geometry/SquareShape.hpp>
 
 namespace carnot {
 

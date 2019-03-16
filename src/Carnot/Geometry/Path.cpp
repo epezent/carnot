@@ -1,6 +1,6 @@
-#include <Carnot/Geometry/Path.hpp>
+#include <Geometry/Path.hpp>
 #include <SFML/Graphics/RenderTarget.hpp>
-#include <Carnot/Common/Math.hpp>
+#include <Common/Math.hpp>
 
 namespace carnot {
 

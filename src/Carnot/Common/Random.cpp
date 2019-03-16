@@ -1,4 +1,4 @@
-#include <Carnot/Common/Random.hpp>
+#include <Common/Random.hpp>
 #include <SFML/Config.hpp>
 #include <cassert>
 #include <ctime>

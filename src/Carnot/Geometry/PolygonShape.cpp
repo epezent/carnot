@@ -1,5 +1,5 @@
-#include <Carnot/Geometry/PolygonShape.hpp>
-#include <Carnot/Common/Math.hpp>
+#include <Geometry/PolygonShape.hpp>
+#include <Common/Math.hpp>
 
 namespace carnot {
 

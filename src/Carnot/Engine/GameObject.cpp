@@ -1,9 +1,9 @@
 #pragma warning (disable : 4100)
 
-#include <Carnot/Engine/Components/Transform.hpp>
-#include <Carnot/Engine/GameObject.hpp>
-#include <Carnot/Engine/Engine.hpp>
-#include <Carnot/Engine/Coroutine.hpp>
+#include <Engine/Components/Transform.hpp>
+#include <Engine/GameObject.hpp>
+#include <Engine/Engine.hpp>
+#include <Engine/Coroutine.hpp>
 #include <algorithm>
 #include <cmath>
 

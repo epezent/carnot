@@ -1,8 +1,7 @@
-#include <Carnot/Engine/Components/LineRenderer.hpp>
-#include <Carnot/Engine/GameObject.hpp>
-#include <Carnot/Engine/Engine.hpp>
-#include "../SharedResources.hpp"
-#include <Carnot/Common/Math.hpp>
+#include <Engine/Components/LineRenderer.hpp>
+#include <Engine/GameObject.hpp>
+#include <Engine/Engine.hpp>
+#include <Common/Math.hpp>
 
 namespace carnot {
 

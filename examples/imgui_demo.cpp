@@ -1,5 +1,4 @@
-#include <Carnot/Carnot.hpp>
-
+#include <carnot>
 // dear imgui, v1.68 WIP
 // (demo code)
 

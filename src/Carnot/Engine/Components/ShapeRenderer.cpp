@@ -1,8 +1,6 @@
-#include <Carnot/Engine/Components/ShapeRenderer.hpp>
-#include <Carnot/Engine/GameObject.hpp>
-#include <Carnot/Engine/Engine.hpp>
-#include "../SharedResources.hpp"
-
+#include <Engine/Components/ShapeRenderer.hpp>
+#include <Engine/GameObject.hpp>
+#include <Engine/Engine.hpp>
 #include "earcut/earcut.hpp"
 
 // Custom earcut point types for Carnot/SFML types
@@ -29,13 +27,12 @@ namespace carnot {
 ShapeRenderer::ShapeRenderer(GameObject& _gameObject) :
     Renderer(_gameObject),
     shape(new Shape()),
-    m_texture(NULL),
+    m_texture(nullptr),
     m_textureRect(),
-    m_gradient(),
-    m_needsUpdate(true),
-    m_hasSolidFill(true)
+    m_effect(nullptr),
+    m_needsUpdate(true)
 {
-    setTextureRect(sf::IntRect(0, 0, 1, 1));
+    setTextureRect(IntRect(0, 0, 1, 1));
 }
 
 ShapeRenderer::ShapeRenderer(GameObject& _gameObject, Ptr<Shape> _shape) :
@@ -44,48 +41,46 @@ ShapeRenderer::ShapeRenderer(GameObject& _gameObject, Ptr<Shape> _shape) :
     shape = std::move(_shape);
 }
 
-void ShapeRenderer::setGradient(const Gradient &gradient) {
-    m_gradient = gradient;
-    m_hasSolidFill = false;
+void ShapeRenderer::setEffect(Ptr<Effect> effect) {
+    m_effect = std::move(effect);
 }
 
-Gradient ShapeRenderer::getGradient() const {
-    return m_gradient;
+Ptr<Effect> ShapeRenderer::getEffect() const {
+    return m_effect;
 }
 
-void ShapeRenderer::setColor(const sf::Color& color)
+void ShapeRenderer::setColor(const Color& color)
 {
     m_color = color;
-    m_hasSolidFill = true;
     updateFillColors();
 }
 
-const sf::Color& ShapeRenderer::getColor() const
+const Color& ShapeRenderer::getColor() const
 {
     return m_color;
 }
 
-void ShapeRenderer::setTexture(const sf::Texture* texture, bool resetRect) {
+void ShapeRenderer::setTexture(Ptr<Texture> texture, bool resetRect) {
     if (texture) {
         // Recompute the texture area if requested, or if there was no texture
         if (resetRect || !m_texture) {
-            setTextureRect(sf::IntRect(0, 0, texture->getSize().x, texture->getSize().y));
+            setTextureRect(IntRect(0, 0, texture->getSize().x, texture->getSize().y));
         }
     }
     // Assign the new texture
     m_texture = texture;
 }
 
-const sf::Texture* ShapeRenderer::getTexture() const {
+Ptr<Texture> ShapeRenderer::getTexture() const {
     return m_texture;
 }
 
-void ShapeRenderer::setTextureRect(const sf::IntRect& rect) {
+void ShapeRenderer::setTextureRect(const IntRect& rect) {
     m_textureRect = rect;
     updateTexCoords();
 }
 
-const sf::IntRect& ShapeRenderer::getTextureRect() const {
+const IntRect& ShapeRenderer::getTextureRect() const {
     return m_textureRect;
 }
 
@@ -155,6 +150,7 @@ void ShapeRenderer::updateFillColors() const
 }
 
 void ShapeRenderer::render(RenderTarget& target) const {
+    static Id whiteId = ID::getId("__texture_white");
     m_states.transform = gameObject.transform.getWorldMatrix();
     if (shape->m_needsUpdate) {
         // Update shape geometry
@@ -164,16 +160,16 @@ void ShapeRenderer::render(RenderTarget& target) const {
         // Updaate texture coordinates
         updateTexCoords();
         // Fill color (solid)
-        if (m_hasSolidFill)
+        if (!m_effect)
             updateFillColors();
     }
     m_states.transform *= shape->getTransform();
     if (m_texture)
-        m_states.texture = m_texture;
+        m_states.texture = m_texture.get();
     else
-        m_states.texture = EE_WHITE_TEXTURE;
-    if (!m_hasSolidFill)
-        m_states.shader = m_gradient.getShader();
+        m_states.texture = &Engine::textures.get(whiteId);
+    if (m_effect)
+        m_states.shader = m_effect->shader();
     else
         m_states.shader = nullptr;
     if (m_vertexArray.size() > 0)

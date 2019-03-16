@@ -1,5 +1,4 @@
-#include <Carnot/Carnot.hpp>
-
+#include <carnot>
 using namespace carnot;
 
 class Wall : public GameObject {

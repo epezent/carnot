@@ -1,5 +1,5 @@
-#include <Carnot/Geometry/CircleShape.hpp>
-#include <Carnot/Common/Math.hpp>
+#include <Geometry/CircleShape.hpp>
+#include <Common/Math.hpp>
 
 namespace carnot {
 

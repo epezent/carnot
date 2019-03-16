@@ -1,5 +1,5 @@
-#include <Carnot/Geometry/StarShape.hpp>
-#include <Carnot/Common/Math.hpp>
+#include <Geometry/StarShape.hpp>
+#include <Common/Math.hpp>
 
 namespace carnot {
 

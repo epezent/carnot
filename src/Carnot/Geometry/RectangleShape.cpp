@@ -1,4 +1,4 @@
-#include <Carnot/Geometry/RectangleShape.hpp>
+#include <Geometry/RectangleShape.hpp>
 
 namespace carnot {
 

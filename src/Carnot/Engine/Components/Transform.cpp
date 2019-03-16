@@ -1,9 +1,9 @@
-#include <Carnot/Engine/Components/Transform.hpp>
-#include <Carnot/Engine/GameObject.hpp>
-#include <Carnot/Engine/Engine.hpp>
-#include <Carnot/Common/Math.hpp>
-#include <Carnot/Engine/ImGui/imgui.h>
-#include <Carnot/Graphics/NamedColors.hpp>
+#include <Engine/Components/Transform.hpp>
+#include <Engine/GameObject.hpp>
+#include <Engine/Engine.hpp>
+#include <Common/Math.hpp>
+#include <Engine/ImGui/imgui.h>
+#include <Graphics/NamedColors.hpp>
 
 namespace carnot {
 

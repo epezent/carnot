@@ -1,9 +1,9 @@
-#include <Carnot/Engine/Components/RigidBody.hpp>
-#include <Carnot/Engine/Engine.hpp>
-#include <Carnot/Common/Math.hpp>
+#include <Engine/Components/RigidBody.hpp>
+#include <Engine/Engine.hpp>
+#include <Common/Math.hpp>
 #include <chipmunk/chipmunk_private.h>
 #include <cassert>
-#include <Carnot/Geometry/CircleShape.hpp>
+#include <Geometry/CircleShape.hpp>
 
 namespace carnot {
 

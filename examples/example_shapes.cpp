@@ -1,5 +1,5 @@
 #include <SFML/Graphics.hpp>
-#include <Carnot/Graphics.hpp>
+#include <Graphics.hpp>
 #include <iostream>
 
 using namespace carnot;

@@ -1,4 +1,4 @@
-#include <Carnot/Geometry/CrossShape.hpp>
+#include <Geometry/CrossShape.hpp>
 
 namespace carnot {
 

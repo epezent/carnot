@@ -1,5 +1,5 @@
-#include <Carnot/Engine/Components/Renderer.hpp>
-#include <Carnot/Engine/Engine.hpp>
+#include <Engine/Components/Renderer.hpp>
+#include <Engine/Engine.hpp>
 #include <cassert>
 
 namespace carnot {
