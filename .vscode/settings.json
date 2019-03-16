@@ -2,6 +2,7 @@
     "C_Cpp.default.configurationProvider": "vector-of-bool.cmake-tools",
     "cmake.buildDirectory": "${workspaceRoot}/build-${buildKit}-${variant:buildType}",
     "files.associations": {
+        "*.in": "cmake",
         "vector": "cpp",
         "algorithm": "cpp",
         "array": "cpp",
@@ -77,6 +78,7 @@
         "numeric": "cpp",
         "queue": "cpp",
         "set": "cpp",
-        "variant": "cpp"
+        "variant": "cpp",
+        "carnot": "cpp"
     }
 }
