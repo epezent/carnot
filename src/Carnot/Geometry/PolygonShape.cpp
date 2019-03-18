@@ -39,28 +39,28 @@ float PolygonShape::getCircumscribedRadius() const {
 }
 
 void PolygonShape::setInscribedRadius(float radius) {
-    m_circumscribedRadius = radius / std::cos(PI / m_sideCount);
+    m_circumscribedRadius = radius / std::cos(Math::PI / m_sideCount);
     updatePolygonShape();
 }
 
 float PolygonShape::getInscribedRadius() const {
-    return std::cos(PI / m_sideCount) * m_circumscribedRadius;
+    return std::cos(Math::PI / m_sideCount) * m_circumscribedRadius;
 }
 
 void PolygonShape::setSideLength(float length) {
-    m_circumscribedRadius = length / (2 * std::sin(PI / m_sideCount));
+    m_circumscribedRadius = length / (2 * std::sin(Math::PI / m_sideCount));
     updatePolygonShape();
 }
 
 float PolygonShape::getSideLength() const {
-    return (2 * std::sin(PI / m_sideCount)) * m_circumscribedRadius;
+    return (2 * std::sin(Math::PI / m_sideCount)) * m_circumscribedRadius;
 }
 
 void PolygonShape::updatePolygonShape() {
     setPointCount(m_sideCount);
-    float angleIncrement = 2.0f * PI / m_sideCount;
+    float angleIncrement = 2.0f * Math::PI / m_sideCount;
     for (std::size_t i = 0; i < m_sideCount; i++) {
-        float angle = i * angleIncrement - 0.5f * PI;
+        float angle = i * angleIncrement - 0.5f * Math::PI;
         setPoint(i, sf::Vector2f(std::cos(angle) * m_circumscribedRadius,
                                  std::sin(angle) * m_circumscribedRadius));
     }

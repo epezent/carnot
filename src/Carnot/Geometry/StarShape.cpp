@@ -41,8 +41,8 @@ float StarShape::getStarRadiusB() const {
 
 void StarShape::updateStarShape() {
     setPointCount(m_starPointCount * 2);
-    float angleIncrement =  PI / m_starPointCount;
-    float offset = PI * 0.5f;
+    float angleIncrement =  Math::PI / m_starPointCount;
+    float offset = Math::PI * 0.5f;
     for (std::size_t i = 0; i < m_starPointCount; i++)
     {
         float angleA = 2 * i * angleIncrement + offset;

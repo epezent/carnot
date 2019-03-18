@@ -4,7 +4,6 @@ target_sources(carnot
       CircleShape.cpp
       CrossShape.cpp
       Path.cpp
-      Points.cpp
       PolygonShape.cpp
       RectangleShape.cpp
       Shape.cpp

@@ -2,8 +2,7 @@
 
 #include <SFML/Graphics/Drawable.hpp>
 #include <SFML/Graphics/Transformable.hpp>
-#include <Geometry/Points.hpp>
-#include <Common/Imports.hpp>
+#include <Common/Types.hpp>
 #include <vector>
 
 namespace carnot {
@@ -13,8 +12,15 @@ class RigidBody;
 
 /// Encapsulates an advanced vector graphics object
 class Shape : public Transformable {
-
 public:
+
+    /// Mode by which to query shape information
+    enum QueryMode {
+        Points,  ///< queried against points
+        Vertices ///< queried against vertices
+    };
+
+public:    
 
     /// Default constructor
     Shape(std::size_t pointCount = 0);
@@ -29,22 +35,22 @@ public:
     std::size_t getPointCount() const;
 
     /// Sets the position of a point
-    void setPoint(std::size_t index, Point position);
+    void setPoint(std::size_t index, Vector2f position);
 
     /// Sets the position of a point
     void setPoint(std::size_t index, float x, float y);
 
     /// Sets the positions of all points in a shape and resets the point count
-    void setPoints(const Points& points);
+    void setPoints(const std::vector<Vector2f>& points);
 
     /// Gets the position of a point
-    Point getPoint(std::size_t index) const;
+    Vector2f getPoint(std::size_t index) const;
 
     /// Gets the positions of all points
-    const Points& getPoints() const;
+    const std::vector<Vector2f>& getPoints() const;
 
     /// Adds a new point and increments the point count
-    void addPoint(Point position);
+    void addPoint(Vector2f position);
 
     /// Adds a new point and increments the point count
     void addPoint(float x, float y);
@@ -70,7 +76,7 @@ public:
 
     /// Gets the vertices making up the Shape's outer contour after all radii
     // have been applied.
-    const Points& getVertices() const;
+    const std::vector<Vector2f>& getVertices() const;
 
     /// Permantly applies all radii
     void flatten();
@@ -95,13 +101,16 @@ public:
     void addHole(const Shape& hole);
 
     /// Gets the local bounding rectangle of the Shape
-    FloatRect getLocalBounds() const;
+    FloatRect getLocalBounds(QueryMode mode = Points) const;
 
     /// Gets the global bounding rectangle of the Shape
-    FloatRect getGlobalBounds() const;
+    FloatRect getGlobalBounds(QueryMode mode = Points) const;
 
     /// Tests if a point is inside of a Shape
-    bool isInside(const Vector2f& point) const;
+    bool isInside(const Vector2f& point, QueryMode mode = Points) const;
+
+    /// Returns area of shape including radii and holes
+    float getArea(QueryMode mode = Points) const;
 
 public:
 
@@ -123,23 +132,23 @@ public:
     static Shape offsetShape(const Shape& shape, float offset, OffsetType type = Miter);
     static std::vector<Shape> clipShapes(const Shape& subject, const Shape& clip, ClipType type);
 
-protected:
+private:
 
     friend class ShapeRenderer;
-
-private:
+    friend class Trigger;
 
     void updateVertices() const;
     void updateBounds() const;
     void update() const;
 
 private:
-    Points m_points;
+    std::vector<Vector2f> m_points;
     std::vector<float> m_radii;
     std::vector<std::size_t> m_smoothness;
     std::vector<Shape> m_holes;
-    mutable Points m_vertices;
-    mutable FloatRect m_bounds;
+    mutable std::vector<Vector2f> m_vertices;
+    mutable FloatRect m_pointsBounds;
+    mutable FloatRect m_verticesBounds;
     mutable bool m_needsUpdate;
 };
 

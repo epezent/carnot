@@ -7,5 +7,6 @@ target_sources(carnot
         SpriteRenderer.cpp
         StrokeRenderer.cpp
         TextRenderer.cpp
-		Transform.cpp
+        Transform.cpp
+        Trigger.cpp
 )

@@ -8,7 +8,7 @@
 using namespace carnot;
 
 float sinWave(float f, float t) {
-    return std::sin(2.0f * PI * f *t);
+    return std::sin(2.0f * Math::PI * f *t);
 }
 
 float sqrWave(float f, float t) {
@@ -17,11 +17,11 @@ float sqrWave(float f, float t) {
 }
 
 float sawWave(float f, float t) {
-   return -2.0f / PI * std::atan(std::cos(PI * f * t) / std::sin(PI * f * t));
+   return -2.0f / Math::PI * std::atan(std::cos(Math::PI * f * t) / std::sin(Math::PI * f * t));
 }
 
 float triWave(float f, float t) {
-    return 2.0f / PI * std::asin(std::sin(2.0f * PI * f * t));
+    return 2.0f / Math::PI * std::asin(std::sin(2.0f * Math::PI * f * t));
 }
 
 class TfxDemo : public GameObject {
@@ -102,12 +102,12 @@ public:
                 else if (wave == 3)
                     v *= triWave((float)freq, t);
                 if (mod > 0)
-                    v*= std::sin(2.0f * PI * (float)mod * t);
+                    v*= std::sin(2.0f * Math::PI * (float)mod * t);
                 float env = 1.0f;
                 if (t < (float)a/1000.0f)
-                    env = interp(t,0,(float)a/1000.0f,0.0f,1.0f);
+                    env = Math::interp(t,0.0f,(float)a/1000.0f,0.0f,1.0f);
                 else if (t > (float)(a+s)/1000.0f)
-                    env = interp(t, (float)(a+s)/1000.0f, (float)(a+s+r)/1000.0f, 1.0f, 0.0f);
+                    env = Math::interp(t, (float)(a+s)/1000.0f, (float)(a+s+r)/1000.0f, 1.0f, 0.0f);
                 v *= env;
 
                 sinwave.push_back(v);

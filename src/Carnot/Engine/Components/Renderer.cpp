@@ -68,7 +68,7 @@ void Renderer::onGizmo() {
         auto b = T.transformPoint(bounds.left+bounds.width,bounds.top);
         auto c = T.transformPoint(bounds.left+bounds.width,bounds.top+bounds.height);
         auto d = T.transformPoint(bounds.left,bounds.top+bounds.height);
-        Debug::drawPolyline({a,b,c,d,a}, Debug::gizmoColor(localBoundsId));
+        Debug::drawPolyline({a,b,c,d,a}, Debug::getGizmoColor(localBoundsId));
     }
     // draw world bounds
     if (Debug::gizmoActive(worldBoundsId)) {
@@ -77,7 +77,7 @@ void Renderer::onGizmo() {
         auto b = Vector2f(bounds.left+bounds.width,bounds.top);
         auto c = Vector2f(bounds.left+bounds.width,bounds.top+bounds.height);
         auto d = Vector2f(bounds.left,bounds.top+bounds.height);
-        Debug::drawPolyline({a,b,c,d,a}, Debug::gizmoColor(worldBoundsId));
+        Debug::drawPolyline({a,b,c,d,a}, Debug::getGizmoColor(worldBoundsId));
     }
 
 }

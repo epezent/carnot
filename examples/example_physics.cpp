@@ -17,13 +17,13 @@ class RectObject : public GameObject {
 public:
     RectObject() {
         sr = addComponent<ShapeRenderer>();
-        sr->setColor(color = randomColor());
+        sr->setColor(color = Random::color());
         start = Input::getMousePosition();
     }
 
     void update() {
         if (!confirmed && Input::getMouseUp(MouseButton::Right)) {
-            if (absVec(start - end) == Vector2f(0,0)) {
+            if (Math::absVec(start - end) == Vector2f(0,0)) {
                 destroy();
             }
             else {
@@ -37,14 +37,14 @@ public:
         }
         if (!confirmed && Input::getMouse(MouseButton::Right)) {
             end = Input::getMousePosition();
-            auto size = absVec(start - end);
+            auto size = Math::absVec(start - end);
             sr->shape = make<RectangleShape>(size.x, size.y);
             transform.setPosition(start + 0.5f * (end - start));
         }
         if (rb) {
             Debug::drawText(str("mass = ",rb->getMass()), transform.getPosition(), Whites::White);
             auto localPos = transform.worldToLocal(Input::getMousePosition());
-            if (inBounds(localPos, sr->shape->getLocalBounds()) && Input::getKeyDown(Key::D))
+            if (Math::inBounds(localPos, sr->shape->getLocalBounds()) && Input::getKeyDown(Key::D))
                 destroy();
             
         }
@@ -75,7 +75,7 @@ public:
             auto go = makeChild<GameObject>();
             go->transform.setPosition(Input::getMousePosition());
             go->addComponent<ShapeRenderer>();
-            go->getComponent<ShapeRenderer>()->setColor(randomColor());
+            go->getComponent<ShapeRenderer>()->setColor(Random::color());
             go->getComponent<ShapeRenderer>()->shape = make<CircleShape>(30);
             go->getComponent<ShapeRenderer>()->shape->addHole(StarShape(20,25,20));
             go->addComponent<RigidBody>();

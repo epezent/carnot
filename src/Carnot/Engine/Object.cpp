@@ -19,7 +19,8 @@ std::size_t g_objectCount = 0;
 
 Object::Object(const Name& name) :
     m_id(ID::makeId(name)),
-    m_enabled(true)
+    m_enabled(true),
+    showGizmos(true)
 {
     g_objectCount++;
 }
@@ -54,6 +55,10 @@ Id Object::getId() const {
 
 void Object::setEnabled(bool enabled) {
     m_enabled = enabled;
+    if (enabled)
+        onEnable();
+    else
+        onDisable();    
 }
 
 bool Object::isEnabled() const {
@@ -89,7 +94,7 @@ void Object::onRenamed(const Name& newName) {
 }
 
 void Object::onPhysics() {
-
+    // do nothing by default
 }
 
 void Object::onRender(RenderQue& que) {
@@ -99,6 +104,15 @@ void Object::onRender(RenderQue& que) {
 void Object::onGizmo() {
     // do nothing by default
 }
+
+void Object::onEnable() {
+    // do nothing by default
+}
+
+void Object::onDisable() {
+    // do nothing by default
+}
+
 
 //=============================================================================
 // Coroutines

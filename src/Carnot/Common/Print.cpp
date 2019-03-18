@@ -5,16 +5,16 @@
 namespace carnot {
 
 std::string numToStr(float number) {
-    int order = orderOfMagnitude(number);
-    std::size_t prec = precision(order);
+    int order = Math::orderOfMagnitude(number);
+    std::size_t prec = Math::precision(order);
     std::stringstream stream;
     stream << std::fixed << std::setprecision(prec) << number;
     return stream.str();
 }
 
 std::string numToStr(double number) {
-    int order = orderOfMagnitude(static_cast<float>(number));
-    std::size_t prec = precision(order);
+    int order = Math::orderOfMagnitude(static_cast<float>(number));
+    std::size_t prec = Math::precision(order);
     std::stringstream stream;
     stream << std::fixed << std::setprecision(prec) << number;
     return stream.str();

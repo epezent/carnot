@@ -3,7 +3,7 @@
 #include <Engine/Coroutine.hpp>
 #include <Engine/Handle.hpp>
 #include <Engine/Id.hpp>
-#include <Common/Imports.hpp>
+#include <Common/Types.hpp>
 #include <Common/Print.hpp>
 #include <Common/Random.hpp>
 #include <vector>
@@ -73,19 +73,24 @@ public:
 
 public:
 
+    bool showGizmos;  ///< whether the Object's gizmos are shown
+
+public:
+
     //==========================================================================
     // Public Static Functions
     //==========================================================================
 
     /// Returns the total number of Objects active in the Engine
     static std::size_t getObjectCount();
+    
 
 protected:
 
     friend class Engine;
 
     //==========================================================================
-    // Virtual Functions
+    // Virtual Callbacks
     //==========================================================================
 
     /// Called once during the lifetime of the Object before any calls to update
@@ -103,6 +108,10 @@ protected:
     virtual void onRender(RenderQue& que);
     /// Called when the Engine renders Gizmos
     virtual void onGizmo();
+    /// Called when the Object is enabled
+    virtual void onEnable();
+    /// Called when the Obejct is disabled
+    virtual void onDisable();
 
     //==========================================================================
     // Protected Functions

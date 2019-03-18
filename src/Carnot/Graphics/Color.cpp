@@ -162,6 +162,11 @@ Color hexCode(std::string hex) {
     return static_cast<Color>(toRgb(hex));
 }
 
+Color withAlpha(Color color, float a) {
+    color.a = static_cast<sf::Uint8>(255 * a);
+    return color;
+}
+
 float luminance(const Color& color) {
     return ( 0.299f * color.r + 0.587f * color.g + 0.114f * color.b) / 255.0f;
 }

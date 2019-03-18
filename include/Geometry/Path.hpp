@@ -3,7 +3,6 @@
 #include <SFML/Graphics/Drawable.hpp>
 #include <SFML/Graphics/Transformable.hpp>
 #include <SFML/Graphics/Vertex.hpp>
-#include <Geometry/Points.hpp>
 #include <Geometry/Anchor.hpp>
 
 namespace carnot {

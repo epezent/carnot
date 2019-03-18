@@ -1,8 +1,7 @@
 #pragma once
 
 #include <Common/Alignment.hpp>
-#include <Common/Assert.hpp>
-#include <Common/Imports.hpp>
+#include <Common/Types.hpp>
 #include <Common/Math.hpp>
 #include <Common/Options.hpp>
 #include <Common/Print.hpp>
@@ -32,6 +31,7 @@
 #include <Engine/Components/StrokeRenderer.hpp>
 #include <Engine/Components/TextRenderer.hpp>
 #include <Engine/Components/Transform.hpp>
+#include <Engine/Components/Trigger.hpp>
 
 #include <Engine/Systems/DebugSystem.hpp>
 #include <Engine/Systems/InputSystem.hpp>
@@ -45,13 +45,13 @@
 #include <Geometry/CircleShape.hpp>
 #include <Geometry/CrossShape.hpp>
 #include <Geometry/Path.hpp>
-#include <Geometry/Points.hpp>
 #include <Geometry/PolygonShape.hpp>
 #include <Geometry/RectangleShape.hpp>
 #include <Geometry/Shape.hpp>
 #include <Geometry/SquareShape.hpp>
 #include <Geometry/StarShape.hpp>
 
+#include <Graphics/Checkerboard.hpp>
 #include <Graphics/Color.hpp>
 #include <Graphics/Effect.hpp>
 #include <Graphics/Gradient.hpp>

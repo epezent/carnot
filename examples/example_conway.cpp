@@ -43,7 +43,7 @@ public:
             sr->setEnabled(true);
         else
             sr->setEnabled(false);
-        float t = clamp01((float)age / (500.0f));
+        float t = Math::clamp01((float)age / (500.0f));
         auto color = g_colorSpectrum(t);
         sr->setColor(color);
     }
@@ -156,8 +156,8 @@ public:
 
     void spawn() {
         for (auto i : range(500)) {
-            gliderBR(random(0,R-1),random(0,C-1));
-            gliderBL(random(0,R-1),random(0,C-1));
+            gliderBR(Random::range(0,R-1),Random::range(0,C-1));
+            gliderBL(Random::range(0,R-1),Random::range(0,C-1));
         }
     }
 

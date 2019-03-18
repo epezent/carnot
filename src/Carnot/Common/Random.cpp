@@ -7,7 +7,7 @@
 namespace carnot {
 namespace {
 
-#ifdef THOR_USE_STD_RANDOMENGINE
+#ifdef CARNOT_USE_STD_RANDOMENGINE
 
 // Use Mersenne Twister as default standard random engine
 typedef std::mt19937 Engine;
@@ -16,14 +16,14 @@ typedef std::mt19937 Engine;
 
 // Random generator engine (Multiply With Carry)
 // Many thanks to Volkard Henkel for the implementation.
-class Engine {
+class RandomEngine {
 public:
     // Type definition for usage inside Std.Random
     typedef sf::Uint32 result_type;
 
 public:
     // Constructor
-    explicit Engine(sf::Uint32 seedVal) { seed(seedVal); }
+    explicit RandomEngine(sf::Uint32 seedVal) { seed(seedVal); }
 
     // Return random number
     sf::Uint32 operator()() {
@@ -46,52 +46,58 @@ private:
     sf::Uint64 x;
 };
 
-#endif  // THOR_USE_STD_RANDOMENGINE
+#endif  // CARNOT_USE_STD_RANDOMENGINE
 
 // Function initializing the engine and its seed at startup time
-Engine createInitialEngine() {
-    return Engine(static_cast<unsigned long>(std::time(nullptr)));
+RandomEngine createInitialEngine() {
+    return RandomEngine(static_cast<unsigned long>(std::time(nullptr)));
 }
 
 // Pseudo random number generator engine
-Engine globalEngine = createInitialEngine();
+RandomEngine g_rnEngine = createInitialEngine();
 
 }  // namespace
 
-int random(int min, int max) {
+namespace Random {
+
+int range(int min, int max) {
     assert(min <= max);
     std::uniform_int_distribution<int> distribution(min, max);
-    return distribution(globalEngine);
+    return distribution(g_rnEngine);
 }
 
-unsigned int random(unsigned int min, unsigned int max) {
+unsigned int range(unsigned int min, unsigned int max) {
     assert(min <= max);
     std::uniform_int_distribution<unsigned int> distribution(min, max);
-    return distribution(globalEngine);
+    return distribution(g_rnEngine);
 }
 
-float random(float min, float max) {
+float range(float min, float max) {
     assert(min <= max);
     std::uniform_real_distribution<float> distribution(min, max);
-    return distribution(globalEngine);
+    return distribution(g_rnEngine);
 }
 
-float randomDev(float middle, float deviation) {
-    assert(deviation >= 0.f);
-    return random(middle - deviation, middle + deviation);
+void setSeed(unsigned long seed) {
+    g_rnEngine.seed(seed);
 }
 
-void setRandomSeed(unsigned long seed) {
-    globalEngine.seed(seed);
-}
-
-Color randomColor() {
+Color color() {
     Color color;
-    color.r = (sf::Uint8)random(0,255);
-    color.g = (sf::Uint8)random(0,255);
-    color.b = (sf::Uint8)random(0,255);
+    color.r = static_cast<sf::Uint8>(range(0,255));
+    color.g = static_cast<sf::Uint8>(range(0,255));
+    color.b = static_cast<sf::Uint8>(range(0,255));
     return color;
 }
 
-
+Color color(const Color& color1, const Color& color2) {
+    Color color;
+    color.r = static_cast<sf::Uint8>(range(color1.r, color2.r));
+    color.g = static_cast<sf::Uint8>(range(color1.g, color2.g));
+    color.b = static_cast<sf::Uint8>(range(color1.b, color2.b));
+    color.a = static_cast<sf::Uint8>(range(color1.a, color2.a));
+    return color;
 }
+
+}  // namespace Random
+}  // namespace carnot

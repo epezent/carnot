@@ -58,9 +58,6 @@ bool GameObject::isRoot() const {
     return m_isRoot;
 }
 
-
-
-
 //==============================================================================
 // Children
 //==============================================================================
@@ -220,6 +217,22 @@ Handle<Component> GameObject::attachComponent(Ptr<Component> component) {
 }
 
 //==============================================================================
+// Virtual Callbacks
+//==============================================================================
+
+void GameObject::onMouseEnter() {
+    // do nothing by default
+}
+
+void GameObject::onMouseExit() {
+    // do nothing by default
+}
+
+void GameObject::onMouseStay() {
+    // do nothing by default
+}
+
+//==============================================================================
 // Private Functions
 //==============================================================================
 
@@ -316,7 +329,7 @@ void GameObject::onGizmo() {
         // que components
         m_iteratingComponents = true;
         for (const auto& comp : m_components) {
-            if (comp->isEnabled())
+            if (comp->isEnabled() && comp->showGizmos)
                 comp->onGizmo();
         }
         m_iteratingComponents = false;

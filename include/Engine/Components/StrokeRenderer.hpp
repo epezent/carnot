@@ -3,7 +3,6 @@
 #include <Engine/Components/Renderer.hpp>
 #include <Graphics/Gradient.hpp>
 #include <Geometry/Shape.hpp>
-#include <Geometry/Points.hpp>
 
 namespace carnot {
 
@@ -11,14 +10,14 @@ namespace carnot {
 class StrokeRenderer : public Renderer {
 public:
 
-    /// Stroke cap types
+    /// Stroke cap types (TODO)
     enum CapType {
         CapButt,
         CapSquare,
         CapRound
     };
 
-    /// Stroke joint type
+    /// Stroke joint type (TODO)
     enum JointType {
         JointMiter,
         JointBevel,
@@ -60,6 +59,12 @@ public:
     /// Gets the thickness of the Stroke vertex
     float getThickness(std::size_t index) const;
 
+    /// Set the miter limit (ratio of miter length to thickness, default 4)
+    void setMiterLimit(float miterLimit);
+
+    /// Get the miter limit
+    float getMiterLimit() const;
+
     /// Sets the Color of all Stroke vertices
     void setColor(const Color& color);
 
@@ -88,6 +93,8 @@ protected:
 
 private:
 
+    void updateVertexArray() const;
+    void updateColor() const;
     void updateBounds() const;
 
 private:
@@ -96,6 +103,12 @@ private:
     std::vector<RGB>      m_colors;
     std::vector<double>   m_thicknesses;
 
+    Color m_color;
+    double m_thickness;
+
+    float m_miterLimit;
+
+    mutable std::vector<Vertex> m_vertexArray;
     mutable FloatRect m_bounds;
     mutable bool m_needsUpdate;
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Common/Imports.hpp>
+#include <Common/Types.hpp>
 #include <Engine/Id.hpp>
 
 namespace carnot {
@@ -24,8 +24,11 @@ void setGizmoActive(Id id, bool active);
 /// Returns Id associated with Gizmo
 Id gizmoId(const std::string& name);
 
+/// Sets an existing Gizmo color
+void setGizmoColor(Id id, const Color& color);
+
 /// Return the color associated with a Gizmo
-const Color& gizmoColor(Id id);
+const Color& getGizmoColor(Id id);
 
 /// Pauses or unpaues the application
 void setPaused(bool pause);

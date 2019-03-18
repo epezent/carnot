@@ -29,6 +29,7 @@ using sf::Event;
 using sf::Drawable;
 using sf::Transformable;
 using sf::NonCopyable;
+
 using sf::Vector2f;
 using sf::Vector2i;
 using sf::Vector2u;
@@ -60,6 +61,7 @@ using sf::Sound;
 using sf::Music;
 using sf::Shader;
 using sf::Vertex;
+using sf::BlendMode;
 
 using Key         = sf::Keyboard::Key;
 using MouseButton = sf::Mouse::Button;
@@ -70,6 +72,10 @@ using sf::milliseconds;
 using sf::microseconds;
 
 namespace WindowStyle = sf::Style;
+
+template <class T> using Rect    = sf::Rect<T>;
+template <class T> using Vector2 = sf::Vector2<T>;
+template <class T> using Vector3 = sf::Vector3<T>;
 
 typedef sf::Vector2<double> Vector2d;
 

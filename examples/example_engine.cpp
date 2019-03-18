@@ -31,7 +31,7 @@ public:
         auto b = Blues::DeepSkyBlue;
         b.a = 128;
         sr->setEffect(make<Gradient>(b, Greens::Chartreuse));
-        stroke->addVertex(250,250,randomColor(), 5.0f);
+        stroke->addVertex(250,250,Random::color(), 5.0f);
     }
 
     void update() override {
@@ -44,7 +44,7 @@ public:
         }     
 
         if (Input::getMouseDown(MouseButton::Left))
-            stroke->addVertex(Input::getMousePosition(),randomColor(), 5.0f);
+            stroke->addVertex(Input::getMousePosition(),Random::color(), 5.0f);
 
         if (Input::getKeyDown(Key::Up))
             transform.scale(0.5f,0.5f);

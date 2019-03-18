@@ -33,6 +33,7 @@ ShapeRenderer::ShapeRenderer(GameObject& _gameObject) :
     m_needsUpdate(true)
 {
     setTextureRect(IntRect(0, 0, 1, 1));
+    setTexture(nullptr);
 }
 
 ShapeRenderer::ShapeRenderer(GameObject& _gameObject, Ptr<Shape> _shape) :
@@ -61,6 +62,8 @@ const Color& ShapeRenderer::getColor() const
 }
 
 void ShapeRenderer::setTexture(Ptr<Texture> texture, bool resetRect) {
+    static Id whiteId = ID::getId("__texture_white");
+    // reset rect
     if (texture) {
         // Recompute the texture area if requested, or if there was no texture
         if (resetRect || !m_texture) {
@@ -69,6 +72,11 @@ void ShapeRenderer::setTexture(Ptr<Texture> texture, bool resetRect) {
     }
     // Assign the new texture
     m_texture = texture;
+    // Set RenderStates
+    if (m_texture)
+        m_states.texture = m_texture.get();
+    else
+        m_states.texture = &Engine::textures.get(whiteId);
 }
 
 Ptr<Texture> ShapeRenderer::getTexture() const {
@@ -84,13 +92,47 @@ const IntRect& ShapeRenderer::getTextureRect() const {
     return m_textureRect;
 }
 
+Texture ShapeRenderer::toTexture() const {
+    auto bounds = getLocalBounds();
+    sf::ContextSettings settings;
+    settings.antialiasingLevel = 8;
+    sf::RenderTexture rTexture;
+    rTexture.create((unsigned int)bounds.width, (unsigned int)bounds.height);
+    rTexture.clear(Color::Transparent);
+    rTexture.display();
+    return rTexture.getTexture();
+}
+
+/// Sets the BlendMode of the ShapeRenderer
+void ShapeRenderer::setBlendMode(BlendMode mode) {
+    m_states.blendMode = mode;
+}
+
+/// Gets the BlendMode of the ShapeRenderer
+BlendMode ShapeRenderer::getBlendMode(BlendMode mode) const {
+    return m_states.blendMode;
+}
+
 //==============================================================================
 // PRIVATE
 //==============================================================================
 
+void ShapeRenderer::checkUpdate() const {
+    if (true) {
+        // Update shape geometry
+        shape->update();
+        // Update vertex array
+        updateVertexArray();
+        // Updaate texture coordinates
+        updateTexCoords();
+        // Fill color (solid)
+        updateFillColors();
+}
+}
+
 void ShapeRenderer::updateVertexArray() const {
     // make earcut polygon
-    std::vector<Points> polygon(1 + shape->m_holes.size());
+    std::vector<std::vector<Vector2f>> polygon(1 + shape->m_holes.size());
     polygon[0] = shape->m_vertices;
     std::size_t n_vertices = polygon[0].size();
     if (n_vertices < 3)
@@ -124,7 +166,7 @@ void ShapeRenderer::updateVertexArray() const {
 }
 
 void ShapeRenderer::updateTexCoords() const {
-    auto bounds = shape->m_bounds;
+    auto bounds = shape->m_verticesBounds;
     float invWidth = 1.0f / bounds.width;
     float invHeight = 1.0f / bounds.height;
     for (std::size_t i = 0; i < m_vertexArray.size(); ++i) {
@@ -150,28 +192,14 @@ void ShapeRenderer::updateFillColors() const
 }
 
 void ShapeRenderer::render(RenderTarget& target) const {
-    static Id whiteId = ID::getId("__texture_white");
-    m_states.transform = gameObject.transform.getWorldMatrix();
-    if (shape->m_needsUpdate) {
-        // Update shape geometry
-        shape->update();
-        // Update vertex array
-        updateVertexArray();
-        // Updaate texture coordinates
-        updateTexCoords();
-        // Fill color (solid)
-        if (!m_effect)
-            updateFillColors();
-    }
-    m_states.transform *= shape->getTransform();
-    if (m_texture)
-        m_states.texture = m_texture.get();
-    else
-        m_states.texture = &Engine::textures.get(whiteId);
+    m_states.transform = gameObject.transform.getWorldMatrix() * shape->getTransform();
+    checkUpdate();
+    // update effect shader
     if (m_effect)
         m_states.shader = m_effect->shader();
     else
         m_states.shader = nullptr;
+    // draw
     if (m_vertexArray.size() > 0)
         target.draw(&m_vertexArray[0], m_vertexArray.size(), sf::Triangles, m_states);
 }
@@ -205,7 +233,7 @@ void ShapeRenderer::onGizmo() {
             wireframe.push_back(T.transformPoint(m_vertexArray[i + 2].position));
             wireframe.push_back(T.transformPoint(m_vertexArray[i].position    ));
         }
-        Debug::drawLines(wireframe, Debug::gizmoColor(wireframeId));
+        Debug::drawLines(wireframe, Debug::getGizmoColor(wireframeId));
     }
 }
 

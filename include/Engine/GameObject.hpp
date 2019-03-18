@@ -95,15 +95,27 @@ public:
     /// Removes the first Component of a specific type
     void removeComponent(std::size_t index);
 
-private:
+protected:
 
     friend class Engine;
     friend class Transform;
+    friend class Trigger;
+
+    //==========================================================================
+    // Virtual Callbacks
+    //==========================================================================
+
+    /// Called by a Trigger when the mouse enters it
+    virtual void onMouseEnter();
+    /// Called by a Trigger when the mouse exits it
+    virtual void onMouseExit();
+    /// Called by a Trigger when a mouse is inside of it
+    virtual void onMouseStay();
+
+private:
 
     /// Attaches a Component to this GameObject
     Handle<Component> attachComponent(Ptr<Component> component);
-    /// Sets the Engine pointer of the GameObject. Called by owning Engine.
-    // void setEngine(Engine* engine);
     /// Updates the m_index member variable of all children
     void updateChildIndices();
     /// Updates the m_index member variable of all components

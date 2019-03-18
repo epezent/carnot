@@ -104,11 +104,15 @@ ResourceManager<Font>        Engine::fonts    = ResourceManager<Font>();
 ResourceManager<SoundBuffer> Engine::sounds   = ResourceManager<SoundBuffer>();
 ResourceManager<Shader>      Engine::shaders  = ResourceManager<Shader>();
 
-void Engine::init() {
-    init(sf::VideoMode::getDesktopMode().width, sf::VideoMode::getDesktopMode().height, WindowStyle::Fullscreen);
+void Engine::init(const std::string& title) {
+    init(sf::VideoMode::getDesktopMode().width, sf::VideoMode::getDesktopMode().height, WindowStyle::Fullscreen, title);
 }
 
-void Engine::init(unsigned int width, unsigned int height, unsigned int style) {
+void Engine::init(unsigned int width, unsigned int height, const std::string& title) {
+    init(width, height, WindowStyle::Default, title);
+}
+
+void Engine::init(unsigned int width, unsigned int height, unsigned int style, const std::string& title) {
     // asserts
     assert(!g_initialized);
     assert(!g_running);
@@ -121,7 +125,7 @@ void Engine::init(unsigned int width, unsigned int height, unsigned int style) {
     // create Window and set settings
     sf::ContextSettings settings;
     settings.antialiasingLevel = 8;
-    window->create(sf::VideoMode((unsigned int)(width * g_dpiFactor), (unsigned int)(height * g_dpiFactor)), "", style, settings);
+    window->create(sf::VideoMode((unsigned int)(width * g_dpiFactor), (unsigned int)(height * g_dpiFactor)), title, style, settings);
     window->setFramerateLimit(60);
 
     // set user icon from RC file

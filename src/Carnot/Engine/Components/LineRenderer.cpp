@@ -21,7 +21,7 @@ namespace carnot {
         return m_vertexArray.size();
     }
 
-    void LineRenderer::setPoint(std::size_t index, Point position) {
+    void LineRenderer::setPoint(std::size_t index, Vector2f position) {
         m_vertexArray[index] = position;
         m_needsUpdate   = true;
     }
@@ -30,7 +30,7 @@ namespace carnot {
         setPoint(index, sf::Vector2f(x,y));
     }
 
-    Point LineRenderer::getPoint(std::size_t index) const {
+    Vector2f LineRenderer::getPoint(std::size_t index) const {
         return m_vertexArray[index].position;
     }
 
@@ -47,7 +47,7 @@ namespace carnot {
 
     void LineRenderer::fromShape(const Shape &shape) {
         setPointCount(shape.getVerticesCount());
-        const Points& verts = shape.getVertices();
+        const std::vector<Vector2f>& verts = shape.getVertices();
         for (std::size_t i = 0; i < shape.getVerticesCount(); ++i)
             m_vertexArray[i].position = verts[i];
         addPoint(getPoint(0));
@@ -61,7 +61,6 @@ namespace carnot {
     const sf::Color& LineRenderer::getColor() const {
         return m_color;
     }
-
 
     sf::FloatRect LineRenderer::getLocalBounds() const {
         return m_bounds;

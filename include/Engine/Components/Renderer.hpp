@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Common/Imports.hpp>
+#include <Common/Types.hpp>
 #include <Engine/Component.hpp>
 
 namespace carnot {

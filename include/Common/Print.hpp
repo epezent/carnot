@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Common/Imports.hpp>
+#include <Common/Types.hpp>
 #include <Graphics/Color.hpp>
 #include <iostream>
 #include <sstream>

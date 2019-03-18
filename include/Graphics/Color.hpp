@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Common/Imports.hpp>
+#include <Common/Types.hpp>
 #include <string>
 
 namespace carnot {
@@ -48,6 +48,10 @@ Color hexCode(std::string hex);
 // Color Functions
 //==============================================================================
 
+/// Convenienve function to add alpha to a color
+Color withAlpha(Color color, float a);
+
+/// Returns the luminance of a Color
 float luminance(const Color& color);
 
 } // namespace carnot

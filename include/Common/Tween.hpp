@@ -1,8 +1,7 @@
 #pragma once
 
 #include <Common/Math.hpp>
-#include <SFML/Graphics/Color.hpp>
-#include <Graphics/Gradient.hpp>
+#include <Graphics/Color.hpp>
 
 namespace carnot {
 

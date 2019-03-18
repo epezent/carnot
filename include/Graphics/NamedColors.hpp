@@ -185,6 +185,7 @@ namespace Grays
     const Color SlateGray(112,128,144);
     const Color DarkSlateGray(47,79,79);
     const Color Black(0,0,0);
+    const Color Gray5(13,13,13);
     const Color Gray10(26,26,26);
     const Color Gray20(51,51,51);
     const Color Gray30(77,77,77);
@@ -194,6 +195,7 @@ namespace Grays
     const Color Gray70(179,179,179);
     const Color Gray80(204,204,204);
     const Color Gray90(230,230,230);
+    const Color Gray95(242,242,242);
 }
 
 } // namespace carnot

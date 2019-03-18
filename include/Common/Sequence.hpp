@@ -14,14 +14,17 @@ public:
     /// Default constructor
     Sequence(T (*tweenFunc)(const T&, const T&, float) = Tween::Linear);
 
-    /// Sets a keyframe in the sequence
-    T& operator[](float position);
+    /// Sets a keyframe value in the sequence
+    T& operator[](float t);
 
-    /// Retrieves an interpolated sample
-    T operator()(float position);
+    /// Retrieves an interpolated value
+    T operator()(float t) const;
 
     /// Sets the tweening function to be used
     void setTween(T (*tweenFunc)(const T&, const T&, float));
+    
+    /// Gets keyframe stops and values
+    void getKeys(std::vector<float>& stopsOut, std::vector<T>& valuesOut) const;
 
 private:
 
@@ -46,7 +49,7 @@ T& Sequence<T>::operator[](float t) {
 }
 
 template <typename T>
-T Sequence<T>::operator()(float t) {
+T Sequence<T>::operator()(float t) const {
     assert(m_keys.count(0.0f) && m_keys.count(1.0f));
     assert(t >= 0.0f && t <= 1.0f);
     auto b = m_keys.lower_bound(t);
@@ -62,4 +65,15 @@ void Sequence<T>::setTween(T (*tweenFunc)(const T&, const T&, float)) {
     m_tweenFunc = tweenFunc;
 }
 
+template <typename T>
+void Sequence<T>::getKeys(std::vector<float>& stopsOut, std::vector<T>& valuesOut) const {
+    stopsOut.clear(); stopsOut.reserve(m_keys.size());
+    valuesOut.clear(); valuesOut.reserve(m_keys.size());   
+    for (auto it = m_keys.begin(); it != m_keys.end(); ++it) {
+        stopsOut.push_back(it->first);
+        valuesOut.push_back(it->second);
+    }
+    
 }
+
+} // namespace carnot

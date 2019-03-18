@@ -117,15 +117,16 @@ float getScroll() {
 }
 
 Vector2i getRawMousePosition() {
-    return g_mousePosition;
+    // return g_mousePosition;
+    return sf::Mouse::getPosition(*Engine::window);
 }
 
 Vector2f getMousePosition() {
-    return g_worldPosition;
+    return Engine::window->mapPixelToCoords(getRawMousePosition(), Engine::getView(0));
 }
 
 Vector2f getMousePosition(const View& view) {
-    return Engine::window->mapPixelToCoords(g_mousePosition, view);
+    return Engine::window->mapPixelToCoords(getRawMousePosition(), view);
 }
 
 const sf::String& getTextEntered() {

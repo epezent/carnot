@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Geometry/Points.hpp>
+#include <Common/Types.hpp>
 
 namespace carnot {
 
@@ -9,13 +9,13 @@ class Path;
 class Anchor {
 public:
     Anchor();
-    Anchor(const Point& position);
-    Anchor(const Point& position, const Point& ctrl1, const Point& ctrl2);
+    Anchor(const Vector2f& position);
+    Anchor(const Vector2f& position, const Vector2f& ctrl1, const Vector2f& ctrl2);
 private:
     friend class Path;
-    Point m_position;
-    Point m_ctrl1;
-    Point m_ctrl2;
+    Vector2f m_position;
+    Vector2f m_ctrl1;
+    Vector2f m_ctrl2;
 };
 
 } // namespace carnot

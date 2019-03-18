@@ -140,8 +140,8 @@ bool XboxController::Impl::isConnected() {
 }
 
 void XboxController::Impl::vibrate(float left_motor, float right_motor) {
-    left_motor = clamp01(left_motor);
-    right_motor = clamp01(right_motor);
+    left_motor = Math::clamp01(left_motor);
+    right_motor = Math::clamp01(right_motor);
     XINPUT_VIBRATION vibration;
     ZeroMemory(&vibration, sizeof(XINPUT_VIBRATION));
     vibration.wLeftMotorSpeed  = static_cast<WORD>(65535 * left_motor);

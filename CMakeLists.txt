@@ -16,8 +16,8 @@ add_library(Carnot::carnot ALIAS carnot)
 # add source files to target
 add_subdirectory(src)
 
-file(GLOB_RECURSE EE_INCLUDE "include/Carnot/*.hpp" "include/Carnot/*.inl")
-target_sources(carnot PRIVATE ${EE_INCLUDE})
+file(GLOB_RECURSE CARNOT_INCLUDE "include/*.hpp" "include/*.inl" "include/*.h")
+target_sources(carnot PRIVATE ${CARNOT_INCLUDE})
 
 # find SFML
 set(SFML_STATIC_LIBRARIES TRUE)
@@ -117,3 +117,4 @@ export(EXPORT carnot-targets
 	   FILE ${CMAKE_CURRENT_BINARY_DIR}/CarnotTargets.cmake)
 
 add_subdirectory(examples)
+add_subdirectory(tests)

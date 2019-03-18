@@ -162,10 +162,13 @@ public:
         static auto id = Debug::gizmoId("Grid");
         if (Debug::gizmoActive(id)) {
             for (int i = 0; i < 16; ++i) {
-                for (int j = 0; j < 16; ++j)
-                    Debug::drawText(str(i)+","+str(j), coordPosition(Vector2i(i,j)), Whites::White);
-                Debug::drawLine(coordPosition(-1, i), coordPosition(16, i), Debug::gizmoColor(id));
-                Debug::drawLine(coordPosition(i, -1), coordPosition(i, 16), Debug::gizmoColor(id));
+                // for (int j = 0; j < 16; ++j)
+                //     Debug::drawText(str(i)+","+str(j), coordPosition(Vector2i(i,j)), Whites::White);
+                Debug::drawLine(coordPosition(-1, i), coordPosition(16, i), Debug::getGizmoColor(id));
+                Debug::drawLine(coordPosition(i, -1), coordPosition(i, 16), Debug::getGizmoColor(id));
+                Debug::drawText("R"+str(i),coordPosition(Vector2i(i,-2)),Whites::White);
+                Debug::drawText("C"+str(i),coordPosition(Vector2i(17,i)),Whites::White);
+
             }
         }
     }
@@ -180,9 +183,10 @@ class Board : public GameObject
   public:
 
     Handle<ShapeRenderer> sr;
-    Handle<LineRenderer> lr1, lr2;
+    Handle<StrokeRenderer> lr1, lr2;
+    Handle<Trigger> tr;
 
-    Board() : GameObject("board"), matrix(g_matBoard), color(Grays::Gray80)
+    Board() : GameObject("board"), matrix(g_matBoard), color(Grays::Gray50)
     {
         addComponent<GridGizmo>();
 
@@ -192,22 +196,39 @@ class Board : public GameObject
         sr->shape->setPoint(1, coordPosition(-2,9));
         sr->shape->setPoint(2, coordPosition(6,17));
         sr->shape->setPoint(3, coordPosition(17,6));
+        tr = addComponent<Trigger>();
+        tr->mode = Trigger::Vertices;
 
-        auto alpha = color;;
-        alpha.a = 128;
-        sr->setEffect(make<Gradient>(color,alpha, 45.0f));
+        auto alpha1 = color;
+        auto alpha2 = color;
+        alpha1.a = 64;
+        alpha2.a = 128;
+        sr->setEffect(make<Gradient>(alpha1,alpha2, 45.0f));
         sr->shape->setRadii(g_gridSize);
         sr->shape->setHoleCount(1);
+        print(sr->shape->getVerticesCount());
 
-        lr1 = addComponent<LineRenderer>();
-        lr2 = addComponent<LineRenderer>();
+        lr1 = addComponent<StrokeRenderer>();
+        lr2 = addComponent<StrokeRenderer>();
+        lr1->setThickness(1.0f);
+        lr2->setThickness(1.0f);
 
-        lr1->setColor(Whites::White);
-        lr2->setColor(Whites::White);
+        lr1->setColor(Grays::Gray80);
+        lr2->setColor(Grays::Gray80);
         
         lr1->fromShape(*sr->shape);
 
         startCoroutine(makeShape());
+    }
+
+    void onMouseEnter() override {
+        lr1->setThickness(5.0f);
+        lr2->setThickness(5.0f);
+    }
+
+    void onMouseExit() override {
+        lr1->setThickness(1.0f);
+        lr2->setThickness(1.0f);
     }
 
     Enumerator makeShape()
@@ -255,6 +276,7 @@ class Board : public GameObject
         shape = Shape::offsetShape(shape, 2.0f);
         sr->shape->setHole(0, shape);
         lr2->fromShape(shape);
+        tr->shape = sr->shape;
     }
 
     void update()
@@ -275,43 +297,44 @@ class Piece : public GameObject
 {
   public:
     Handle<ShapeRenderer> sr;
-    Handle<LineRenderer> lr;
+    Handle<StrokeRenderer> lr;
+    Handle<Trigger> tr;
 
     Piece(const Matrix &mat, const Color &col) : matrix(mat),
                                                  color(col)
     {
         sr = addComponent<ShapeRenderer>();
-        auto alpha = color;;
-        alpha.a = 128;
-        sr->setEffect(make<Gradient>(alpha,color,45.0f));
-        lr = addComponent<LineRenderer>();
-        lr->setColor(Whites::White);
+        tr = addComponent<Trigger>();
+        tr->mode = Trigger::Vertices;
+        auto alpha1 =color;
+        auto alpha2 =color;
+        alpha1.a = 64;
+        alpha2.a = 128;
+        sr->setEffect(make<Gradient>(alpha1,alpha2,45.0f));
+        lr = addComponent<StrokeRenderer>();
+        lr->setColor(Grays::Gray80);
         startCoroutine(makeShape());
     }
 
-    void update()
-    {
-        auto localPos = transform.worldToLocal(Input::getMousePosition());
-        if (inBounds(localPos, sr->getLocalBounds()) &&  sr->shape->isInside(localPos))
-        {
-            sr->setColor(Whites::White);
-            auto scale = transform.getScale();
-            if (Input::getKeyDown(Key::Left) || Input::getKeyDown(Key::Right))
-                flipLR();
-            if (Input::getKeyDown(Key::Up) || Input::getKeyDown(Key::Down))
-                flipUD();
-            if (Input::getKeyDown(Key::Q))
-                printMat(matrix);
-        }
-        else
-        {
-            auto alpha = color;;
-            alpha.a = 128;
-            sr->setEffect(make<Gradient>(color,alpha,45.0f));
-        }
+    void onMouseEnter() override {
+        lr->setColor(color);
+        lr->setThickness(5.0f);
+    }
 
+    void onMouseStay() override {
+        if (Input::getKeyDown(Key::Left) || Input::getKeyDown(Key::Right))
+            flipLR();
+        if (Input::getKeyDown(Key::Up) || Input::getKeyDown(Key::Down))
+            flipUD();
+        if (Input::getKeyDown(Key::Q))
+            printMat(matrix);
         if (Input::getKeyDown(Key::P))
             startCoroutine(makeShape());
+    }
+
+    void onMouseExit() override  {
+        lr->setColor(Grays::Gray80);
+        lr->setThickness(1.0f);
     }
 
     Enumerator makeShape()
@@ -357,7 +380,9 @@ class Piece : public GameObject
                 shapes.push_back(toMerge);
         }
         *sr->shape = Shape::offsetShape(shape, -2.0f);
+        tr->shape = sr->shape;
         lr->fromShape(*sr->shape);
+
     }
 
     void setCoordinate(const Vector2i& coord) {
@@ -390,20 +415,10 @@ class Puzzometry : public GameObject
     Puzzometry() : GameObject("puzzometry")
     {
 
-        // init background
-        auto bg = makeChild<GameObject>();
-        std::size_t n = 100;
-        float s = 1000.0f/n;
-        for (std::size_t i = 0; i < n/2; ++i) {
-            for (std::size_t j = 0; j < n; ++j) {
-                auto check = bg->addComponent<ShapeRenderer>();
-                check->shape = make<SquareShape>(s);
-                check->shape->setPosition(s*(j%2) + s/2.0f  + 2*i * s, s/2  + j * s);
-                check->setColor(Grays::Gray10);
-                check->setLayer(0);
-            }
-        }
-        bg->transform.setPosition((size(g_matBoard,0)-1) * g_gridSize / 2.0f-500, (size(g_matBoard,1)-1) * g_gridSize / 2.0f-500);
+        sr = addComponent<ShapeRenderer>(make<SquareShape>(2500));
+        sr->setEffect(make<Checkerboard>(Grays::Gray10, Grays::Black,250));
+        sr->shape->setPosition((size(g_matBoard,0)-1) * g_gridSize / 2.0f, (size(g_matBoard,1)-1) * g_gridSize / 2.0f);
+        sr->shape->setScale(-1,1);
 
         board = makeChild<Board>();
         for (std::size_t i = 0; i < g_numPieces; ++i) {
@@ -416,10 +431,12 @@ class Puzzometry : public GameObject
 
     void update() override {
         if (Input::getKeyDown(Key::Space) && !spinning)
-            startCoroutine(spin(0.25f));
+            startCoroutine(toggleView(0.25f));
     }
 
-    Enumerator spin(float spinTime) {        
+    Enumerator toggleView(float spinTime) {
+        toggled = !toggled;
+        Debug::show(toggled);        
         spinning = true;
         float t = 0.0f;
         float rBegin = Engine::getView(0).getRotation() == 315.0f ? 45.0f : 0;
@@ -427,6 +444,7 @@ class Puzzometry : public GameObject
         while (t < spinTime) {
             auto r = Tween::Smootheststep(rBegin, rEnd, t/spinTime);
             Engine::getView(0).setRotation(-r);
+            sr->shape->setRotation(-r);
             t += Engine::deltaTime();
             co_yield nullptr;
         }
@@ -437,21 +455,17 @@ class Puzzometry : public GameObject
     Handle<Board> board;
     std::vector<Handle<Piece>> pieces;
     bool spinning = false;
+    bool toggled = true;
 };
 
 int main(int argc, char const *argv[])
 {
    
-    Engine::init(1000,1000);
-    Engine::window->setTitle("Puzzometry");
-    Engine::window->setFramerateLimit(144);
-    // Engine::window->setVerticalSyncEnabled(true);
+    Engine::init(1000,1000,"Puzzometry");
     Debug::addGizmo("Grid", Grays::Gray50);
     Debug::setGizmoActive(Debug::gizmoId("Grid"), true);
-    Debug::setGizmoActive(Debug::gizmoId("Wireframe"), true);
-    Debug::setGizmoActive(Debug::gizmoId("Transform"), true);
-    // Debug::show(true);
     Engine::getView(0).setCenter((size(g_matBoard,0)-1) * g_gridSize / 2.0f, (size(g_matBoard,1)-1) * g_gridSize / 2.0f);
+    Debug::show(true);
     Engine::makeRoot<Puzzometry>();
     Engine::run();
     return 0;

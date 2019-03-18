@@ -39,12 +39,21 @@ public:
 
     /// Gets the Texture Rect of the Shape
     const IntRect& getTextureRect() const;
+
+    /// Sets the BlendMode of the ShapeRenderer
+    void setBlendMode(BlendMode mode);
+
+    /// Gets the BlendMode of the ShapeRenderer
+    BlendMode getBlendMode(BlendMode mode) const;
     
     /// Gets the local bounding rectangle of the Shape
     virtual FloatRect getLocalBounds() const override;
 
     /// Gets the global bounding rectangle of the Shape
     virtual FloatRect getWorldBounds() const override;
+
+    /// Converts the ShapeRenderer to a texture (TODO)
+    Texture toTexture() const;
 
 public:
 
@@ -59,6 +68,7 @@ protected:
 
 private:
 
+    void checkUpdate() const;
     void updateVertexArray() const;
     void updateTexCoords() const;
     void updateFillColors() const;

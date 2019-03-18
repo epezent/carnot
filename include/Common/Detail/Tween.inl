@@ -25,8 +25,8 @@ inline T Linear(const T& a, const T& b, float t) {
 }
 
 template <>
-inline sf::Color Linear(const sf::Color& a, const sf::Color& b, float t) {
-    return sf::Color(
+inline Color Linear(const Color& a, const Color& b, float t) {
+    return Color(
         static_cast<sf::Uint8>(Linear(static_cast<float>(a.r), static_cast<float>(b.r), t)),
         static_cast<sf::Uint8>(Linear(static_cast<float>(a.g), static_cast<float>(b.g), t)),
         static_cast<sf::Uint8>(Linear(static_cast<float>(a.b), static_cast<float>(b.b), t)),
@@ -35,11 +35,23 @@ inline sf::Color Linear(const sf::Color& a, const sf::Color& b, float t) {
 }
 
 template <>
-inline Gradient Linear(const Gradient& a, const Gradient& b, float t) {
-    return Gradient(Linear(a.colors[0], b.colors[0], t),
-                    Linear(a.colors[1], b.colors[1], t),
-                    Linear(a.angle, b.angle, t)
-    );
+inline RGB Linear(const RGB& a, const RGB& b, float t) {
+    return RGB {
+        Linear(static_cast<float>(a.r), static_cast<float>(b.r), t),
+        Linear(static_cast<float>(a.g), static_cast<float>(b.g), t),
+        Linear(static_cast<float>(a.b), static_cast<float>(b.b), t),
+        Linear(static_cast<float>(a.a), static_cast<float>(b.a), t)
+    };
+}
+
+template <>
+inline HSV Linear(const HSV& a, const HSV& b, float t) {
+    return HSV {
+        Linear(static_cast<float>(a.h), static_cast<float>(b.h), t),
+        Linear(static_cast<float>(a.s), static_cast<float>(b.s), t),
+        Linear(static_cast<float>(a.v), static_cast<float>(b.v), t),
+        Linear(static_cast<float>(a.a), static_cast<float>(b.a), t)
+    };
 }
 
 template <typename T>

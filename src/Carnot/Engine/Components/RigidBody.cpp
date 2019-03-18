@@ -269,7 +269,7 @@ void RigidBody::onPhysics() {
     auto position = cpBodyGetPosition(m_body);
     auto angle = cpBodyGetAngle(m_body);
     gameObject.transform.setPosition((float) position.x, (float) position.y);
-    gameObject.transform.setRotation((float) angle * RAD2DEG);
+    gameObject.transform.setRotation((float) angle * Math::RAD2DEG);
 }
 
 void RigidBody::onGizmo() {
@@ -284,15 +284,15 @@ void RigidBody::onGizmo() {
             if (m_mask[i] == RBShapeTypePolygon) {
                 int n = cpPolyShapeGetCount(m_shapes[i]);
                 for (int j = 0; j < n; ++j) {
-                    Point a = cp2sf(cpBodyLocalToWorld(body,cpPolyShapeGetVert(m_shapes[i], j)));
-                    Point b = cp2sf(cpBodyLocalToWorld(body,cpPolyShapeGetVert(m_shapes[i], ((j+1)%n))));
-                    Debug::drawLine(a, b, Debug::gizmoColor(phyShapesId));
+                    Vector2f a = cp2sf(cpBodyLocalToWorld(body,cpPolyShapeGetVert(m_shapes[i], j)));
+                    Vector2f b = cp2sf(cpBodyLocalToWorld(body,cpPolyShapeGetVert(m_shapes[i], ((j+1)%n))));
+                    Debug::drawLine(a, b, Debug::getGizmoColor(phyShapesId));
                 }
             }
             else if (m_mask[i] == RBShapeTypeCircle) {
                 float r = (float)cpCircleShapeGetRadius(m_shapes[i]);
-                Point pos = cp2sf(cpBodyLocalToWorld(body,cpCircleShapeGetOffset(m_shapes[i])));
-                Debug::drawCircle(pos, r, Debug::gizmoColor(phyShapesId));
+                Vector2f pos = cp2sf(cpBodyLocalToWorld(body,cpCircleShapeGetOffset(m_shapes[i])));
+                Debug::drawCircle(pos, r, Debug::getGizmoColor(phyShapesId));
             }
             else if (m_mask[i] == RBShapeTypeSegment) {
 
@@ -302,9 +302,9 @@ void RigidBody::onGizmo() {
     // draw center of gravity
     if (Debug::gizmoActive(phyCogId)) {
         Vector2f cog = getCOG();
-        Debug::drawCircle(cog, 5, Debug::gizmoColor(phyCogId));
-        Debug::drawPoint(cog + Vector2f(2,2), Debug::gizmoColor(phyCogId));
-        Debug::drawPoint(cog - Vector2f(2,2), Debug::gizmoColor(phyCogId));
+        Debug::drawCircle(cog, 5, Debug::getGizmoColor(phyCogId));
+        Debug::drawPoint(cog + Vector2f(2,2), Debug::getGizmoColor(phyCogId));
+        Debug::drawPoint(cog - Vector2f(2,2), Debug::getGizmoColor(phyCogId));
 
     }
 }

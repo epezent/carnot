@@ -1,5 +1,6 @@
 target_sources(carnot
-	PRIVATE
+        PRIVATE
+        Checkerboard.cpp
         Color.cpp
         Effect.cpp
         Gradient.cpp

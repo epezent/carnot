@@ -30,10 +30,10 @@ std::size_t CircleShape::getSmoothness() const {
 
 void CircleShape::updateCircleShape() {
     setPointCount(m_smoothness);
-    float angleIncrement = 2.0f * PI / m_smoothness;
+    float angleIncrement = 2.0f * Math::PI / m_smoothness;
     for (std::size_t i = 0; i < m_smoothness; i++) {
-        float angle = i * angleIncrement - 0.5f * PI;
-        setPoint(i, Point(std::cos(angle) * m_circleRadius, std::sin(angle) * m_circleRadius));
+        float angle = i * angleIncrement - 0.5f * Math::PI;
+        setPoint(i, Vector2f(std::cos(angle) * m_circleRadius, std::sin(angle) * m_circleRadius));
     }
 }
 

@@ -104,8 +104,12 @@ Id gizmoId(const std::string& name) {
     return ID::getId(intern);
 }
 
-const Color& gizmoColor(Id id) {
+const Color& getGizmoColor(Id id) {
     return g_gizmoColors[id];
+}
+
+void setGizmoColor(Id id, const Color& color) {
+    g_gizmoColors[id] = color;
 }
 
 void setPaused(bool pause) {
@@ -131,7 +135,7 @@ void drawLine(const Vector2f& start, const Vector2f& end, const Color& color) {
 }
 
 void drawLines(const std::vector<Vector2f> &points, const Color& color) {
-    if (isEven((int)points.size())) {
+    if (Math::isEven((int)points.size())) {
         for (std::size_t i = 0; i < points.size(); ++i)
             g_lines.emplace_back(points[i], color);
     }
@@ -165,10 +169,10 @@ void drawRectangle(const Vector2f& position, float width, float height,  const C
 
 void drawCircle(const Vector2f &position, float radius, const Color& color) {
     std::size_t smoothness = 36;
-    float angleIncrement = 2.0f * PI / smoothness;
+    float angleIncrement = 2.0f * Math::PI / smoothness;
     std::vector<Vector2f> polyline(smoothness + 1);
     for (std::size_t i = 0; i < smoothness + 1; i++) {
-        float angle = i * angleIncrement - 0.5f * PI;
+        float angle = i * angleIncrement - 0.5f * Math::PI;
         polyline[i] = position + Vector2f(std::cos(angle) * radius, std::sin(angle) * radius);
     }
     drawPolyline(polyline,color);

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Common/Imports.hpp>
+#include <Common/Types.hpp>
 #include <Engine/GameObject.hpp>
 #include <Engine/ResourceManager.hpp>
 #include <Engine/Systems/DebugSystem.hpp>
@@ -15,10 +15,12 @@ public:
 // GENERAL
 //=============================================================================
 
-/// Initialize Engine (Fullscreen)
-static void init();
-/// Initialize Engine (Windowed Mode)
-static void init(unsigned int windowWidth, unsigned int windowHeight, unsigned int style = WindowStyle::Default);
+/// Initialize Engine (fullscreen style)
+static void init(const std::string& title = "");
+/// Initialize Engine (default window style)
+static void init(unsigned int windowWidth, unsigned int windowHeight, const std::string& title = "");
+/// Initialize Engine (custom window style)
+static void init(unsigned int windowWidth, unsigned int windowHeight, unsigned int style, const std::string& title = "");
 
 /// Starts running the Engine
 static void run();

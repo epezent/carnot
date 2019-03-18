@@ -174,7 +174,7 @@ void Transform::setRotation(float angle) {
 
 float Transform::getRotation() const {
     auto m = getWorldMatrix().getMatrix();
-    float angle = std::atan2(m[1] , m[5]) * carnot::RAD2DEG;
+    float angle = std::atan2(m[1] , m[5]) * Math::RAD2DEG;
     angle = static_cast<float>(fmod(angle, 360));
     if (angle < 0)
         angle += 360.f;
@@ -240,10 +240,10 @@ void Transform::onGizmo() {
         auto x = localToWorld(Vector2f(20.0f,0.0f) + getLocalOrigin());
         auto y = localToWorld(Vector2f(0.0f,20.0f) + getLocalOrigin());
 
-        if (magnitude(Input::getMousePosition() - getPosition()) < 20.0f)
-            Debug::drawText(gameObject.getName(), Input::getMousePosition() - Vector2f(5,5), Debug::gizmoColor(transformId));
+        if (Math::magnitude(Input::getMousePosition() - getPosition()) < 20.0f)
+            Debug::drawText(gameObject.getName(), Input::getMousePosition() - Vector2f(5,5), Debug::getGizmoColor(transformId));
 
-        Debug::drawPoint(getPosition(), Debug::gizmoColor(transformId));
+        Debug::drawPoint(getPosition(), Debug::getGizmoColor(transformId));
         Debug::drawPoint(x, Reds::FireBrick);
         Debug::drawPoint(y, Greens::LightGreen);
         Debug::drawLine(getPosition(), x, Reds::FireBrick);

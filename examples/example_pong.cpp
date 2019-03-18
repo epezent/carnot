@@ -35,7 +35,7 @@ public:
 
     void reset() {
         transform.setPosition(500,250);
-        rb->setVelocity(unit(Vector2f(random(-10.0f,10.0f),random(-2.0f,2.0f)))*750.0f);
+        rb->setVelocity(Math::unit(Vector2f(Random::range(-10.0f,10.0f),Random::range(-2.0f,2.0f)))*750.0f);
     }
 
     Handle<RigidBody> rb;

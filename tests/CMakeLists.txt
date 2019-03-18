@@ -1,5 +1,7 @@
-macro(ee_test EE_TEST_NAME)
-    add_executable(${EE_TEST_NAME} test_${EE_TEST_NAME}.cpp)
-    target_link_libraries(${EE_TEST_NAME} PRIVATE carnot::carnot)
-    set_target_properties(${EE_TEST_NAME} PROPERTIES FOLDER "Tests")
+macro(carnot_test CARNOT_TEST_NAME )
+    add_executable(${CARNOT_TEST_NAME} "test_${CARNOT_TEST_NAME}.cpp")
+    target_link_libraries(${CARNOT_TEST_NAME} carnot)
 endmacro()
+
+carnot_test(stroke)
+
