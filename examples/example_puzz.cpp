@@ -1,5 +1,5 @@
-// #define CARNOT_USE_DISCRETE_GPU
-// #define CARNOT_NO_CONSOLE
+#define CARNOT_USE_DISCRETE_GPU
+#define CARNOT_NO_CONSOLE
 
 #include <carnot>
 #include <deque>
@@ -161,6 +161,41 @@ Vector2f coordPosition(int i, int j) {
     return coordPosition(Vector2i(i,j));
 }
 
+Shape makeShape(const Matrix& mat) {
+        // create square and octagon primitives
+        auto sqr = SquareShape(g_sideLength);
+        auto oct = PolygonShape(8, PolygonShape::SideLength, g_sideLength);
+        oct.rotate(360.0f / 16.0f); oct.applyTransform();
+        // create que of shapes to merge
+        std::deque<Shape> shapes;
+        for (auto & r : range(size(mat,0))) {
+            for (auto & c : range(size(mat,1))) {
+                if (mat[r][c] == 4)
+                    shapes.push_back(sqr);
+                else if (mat[r][c] == 8)
+                    shapes.push_back(oct);
+                oct.move(g_gridSize, 0);  oct.applyTransform();
+                sqr.move(g_gridSize, 0);  sqr.applyTransform();
+            }
+            oct.move(-g_gridSize * size(mat,1), g_gridSize);
+            oct.applyTransform();
+            sqr.move(-g_gridSize * size(mat,1), g_gridSize);
+            sqr.applyTransform();
+        }
+        // marge shapes
+        Shape shape;
+        while (!shapes.empty()) {
+            auto toMerge = shapes.front();
+            shapes.pop_front();
+            auto merged = Shape::clipShapes(shape, toMerge, Shape::Union);
+            if (merged.size() == 1)
+                shape = merged[0];
+            else
+                shapes.push_back(toMerge);
+        }
+        return shape;
+};
+
 //==============================================================================
 // GRID GIZMO
 //==============================================================================
@@ -196,34 +231,34 @@ class Board : public GameObject
     Handle<StrokeRenderer> lr1, lr2;
     Handle<Trigger> tr;
 
-    Board() : GameObject("board"), matrix(g_matBoard), color(Grays::Gray50)
-    {
+    Board() : GameObject("board"), matrix(g_matBoard), color(Grays::Gray50) {
         addComponent<GridGizmo>();
-
+        // board shape
         sr = addComponent<ShapeRenderer>();
+        sr->setEffect(make<Gradient>(withAlpha(color,0.25f), withAlpha(color,0.5f), 45.0f));
         sr->shape->setPointCount(4);
         sr->shape->setPoint(0, coordPosition(9,-2));
         sr->shape->setPoint(1, coordPosition(-2,9));
         sr->shape->setPoint(2, coordPosition(6,17));
         sr->shape->setPoint(3, coordPosition(17,6));
-        tr = addComponent<Trigger>();
-        tr->mode = Trigger::Vertices;
-
-        sr->setEffect(make<Gradient>(withAlpha(color,0.25f), withAlpha(color,0.5f), 45.0f));
         sr->shape->setRadii(g_gridSize);
-        sr->shape->setHoleCount(1);
-
+        // board shape hole
+        auto hole = makeShape(matrix);
+        hole = Shape::offsetShape(hole, 2.0f);
+        sr->shape->addHole(hole);
+        // outlines
         lr1 = addComponent<StrokeRenderer>();
         lr2 = addComponent<StrokeRenderer>();
         lr1->setThickness(1.0f);
         lr2->setThickness(1.0f);
-
         lr1->setColor(Grays::Gray80);
-        lr2->setColor(Grays::Gray80);
-        
+        lr2->setColor(Grays::Gray80);        
         lr1->fromShape(*sr->shape);
-
-        startCoroutine(makeShape());
+        lr2->fromShape(sr->shape->getHole(0));
+        // trigger
+        tr = addComponent<Trigger>();
+        tr->mode = Trigger::Vertices;
+        tr->shape = sr->shape;
     }
 
     void onMouseEnter() override {
@@ -234,60 +269,6 @@ class Board : public GameObject
     void onMouseExit() override {
         lr1->setThickness(1.0f);
         lr2->setThickness(1.0f);
-    }
-
-    Enumerator makeShape()
-    {
-        auto sqr = SquareShape(g_sideLength);
-        auto oct = PolygonShape(8, PolygonShape::SideLength, g_sideLength);
-        oct.rotate(360.0f / 16.0f);
-        oct.applyTransform();
-        auto R = matrix.size();
-        auto C = matrix[0].size();
-        std::deque<Shape> shapes;
-        for (std::size_t r = 0; r < R; ++r)
-        {
-            for (std::size_t c = 0; c < C; ++c)
-            {
-                if (matrix[r][c] == 4)
-                    shapes.push_back(sqr);
-                else if (matrix[r][c] == 8)
-                    shapes.push_back(oct);
-                oct.move(g_gridSize, 0);
-                oct.applyTransform();
-                sqr.move(g_gridSize, 0);
-                sqr.applyTransform();
-            }
-            oct.move(-g_gridSize * C, g_gridSize);
-            oct.applyTransform();
-            sqr.move(-g_gridSize * C, g_gridSize);
-            sqr.applyTransform();
-        }
-        Shape shape;
-        while (!shapes.empty())
-        {
-            auto toMerge = shapes.front();
-            shapes.pop_front();
-            auto merged = Shape::clipShapes(shape, toMerge, Shape::Union);
-            if (merged.size() == 1)
-            {
-                shape = merged[0];
-                sr->shape->setHole(0, shape);
-                co_yield nullptr;
-            }
-            else
-                shapes.push_back(toMerge);
-        }
-        shape = Shape::offsetShape(shape, 2.0f);
-        sr->shape->setHole(0, shape);
-        lr2->fromShape(shape);
-        tr->shape = sr->shape;
-    }
-
-    void update()
-    {
-        if (Input::getKeyDown(Key::B))
-            startCoroutine(makeShape());
     }
 
     Matrix matrix;
@@ -308,13 +289,19 @@ class Piece : public GameObject
     Piece(const Matrix &mat, const Color &col) : matrix(mat),
                                                  color(col)
     {
+        // piece shape
         sr = addComponent<ShapeRenderer>();
-        tr = addComponent<Trigger>();
-        tr->mode = Trigger::Vertices;
         sr->setEffect(make<Gradient>(withAlpha(color,0.25f), withAlpha(color,0.5f) ,45.0f));
+        auto shape = makeShape(matrix);
+        *sr->shape = Shape::offsetShape(shape, -2.0f);
+        // outline
         lr = addComponent<StrokeRenderer>();
         lr->setColor(Grays::Gray80);
-        startCoroutine(makeShape());
+        lr->fromShape(*sr->shape);
+        // trigger
+        tr = addComponent<Trigger>();
+        tr->mode = Trigger::Vertices;
+        tr->shape = sr->shape;
     }
 
     void onMouseEnter() override {
@@ -329,60 +316,11 @@ class Piece : public GameObject
             flipUD();
         if (Input::getKeyDown(Key::Q))
             printMat(matrix);
-        if (Input::getKeyDown(Key::P))
-            startCoroutine(makeShape());
     }
 
     void onMouseExit() override  {
         lr->setColor(Grays::Gray80);
         lr->setThickness(1.0f);
-    }
-
-    Enumerator makeShape()
-    {
-        auto sqr = SquareShape(g_sideLength);
-        auto oct = PolygonShape(8, PolygonShape::SideLength, g_sideLength);
-        oct.rotate(360.0f / 16.0f);
-        oct.applyTransform();
-        auto R = matrix.size();
-        auto C = matrix[0].size();
-        std::deque<Shape> shapes;
-        for (std::size_t r = 0; r < R; ++r)
-        {
-            for (std::size_t c = 0; c < C; ++c)
-            {
-                if (matrix[r][c] == 4)
-                    shapes.push_back(sqr);
-                else if (matrix[r][c] == 8)
-                    shapes.push_back(oct);
-                oct.move(g_gridSize, 0);
-                oct.applyTransform();
-                sqr.move(g_gridSize, 0);
-                sqr.applyTransform();
-            }
-            oct.move(-g_gridSize * C, g_gridSize);
-            oct.applyTransform();
-            sqr.move(-g_gridSize * C, g_gridSize);
-            sqr.applyTransform();
-        }
-        Shape shape;
-        while (!shapes.empty())
-        {
-            auto toMerge = shapes.front();
-            shapes.pop_front();
-            auto merged = Shape::clipShapes(shape, toMerge, Shape::Union);
-            if (merged.size() == 1)
-            {
-                shape = merged[0];
-                *sr->shape = shape;
-                co_yield new WaitForSeconds(0.1f);
-            }
-            else
-                shapes.push_back(toMerge);
-        }
-        *sr->shape = Shape::offsetShape(shape, -2.0f);
-        tr->shape = sr->shape;
-        lr->fromShape(*sr->shape);
     }
 
     void setCoordinate(const Vector2i& coord) {
@@ -481,6 +419,7 @@ int main(int argc, char const *argv[])
     g_exactCoverMatrix = buildExactCoverMatrix();
     exportExactCoverMatrix(g_exactCoverMatrix);
     Engine::init(1000,1000,"Puzzometry");
+    Engine::window->setFramerateLimit(0);
     Debug::addGizmo("Grid", Grays::Gray50);
     Debug::setGizmoActive(Debug::gizmoId("Grid"), true);
     Engine::getView(0).setCenter((size(g_matBoard,0)-1) * g_gridSize / 2.0f, (size(g_matBoard,1)-1) * g_gridSize / 2.0f);
@@ -493,6 +432,24 @@ int main(int argc, char const *argv[])
 //============================================================================//
 //|||||||||||||||||||||||||||||||| DLX SOLVER ||||||||||||||||||||||||||||||||//
 //============================================================================//
+
+struct Node;
+
+struct Column {
+    std::size_t size;
+};
+
+struct Header {
+    
+};
+
+struct Node {
+    Header* C;
+    Node* L;
+    Node* R;
+    Node* U;
+    Node* D;
+};
 
 void permute(Matrix& mat, int permutation) {
     switch(permutation) {
