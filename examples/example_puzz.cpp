@@ -459,8 +459,8 @@ class Puzzometry : public GameObject
 };
 
 int main(int argc, char const *argv[])
-{
-   
+{   
+    print("hmm");
     Engine::init(1000,1000,"Puzzometry");
     Debug::addGizmo("Grid", Grays::Gray50);
     Debug::setGizmoActive(Debug::gizmoId("Grid"), true);

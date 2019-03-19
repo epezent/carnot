@@ -314,7 +314,8 @@ void StrokeRenderer::render(sf::RenderTarget& target) const {
         // reset update flag
         m_needsUpdate = false;
     }
-    target.draw(&m_vertexArray[0], m_vertexArray.size(), sf::Triangles, m_states);
+    if (m_vertexArray.size()>0)
+        target.draw(&m_vertexArray[0], m_vertexArray.size(), sf::Triangles, m_states);
 }
 
 void StrokeRenderer::onGizmo()

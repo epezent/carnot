@@ -45,7 +45,7 @@ namespace {
     bool g_advance;
     bool g_panTool;
 
-    Text g_text;
+    Ptr<Text> g_text;
 
     std::vector<Vertex> g_triangles;
     std::vector<Vertex> g_lines;
@@ -377,9 +377,10 @@ void init()
 
     g_windowDistance = 10.0f;
 
-    g_text.setFont(Engine::fonts.get(ID::getId("RobotoMonoBold")));
-    g_text.setCharacterSize((unsigned int)(10 * Engine::getDpiFactor()));
-    g_text.setScale(1.0f / Engine::getDpiFactor(), 1.0f / Engine::getDpiFactor());
+    g_text = make<Text>();
+    g_text->setFont(Engine::fonts.get(ID::getId("RobotoMonoBold")));
+    g_text->setCharacterSize((unsigned int)(10 * Engine::getDpiFactor()));
+    g_text->setScale(1.0f / Engine::getDpiFactor(), 1.0f / Engine::getDpiFactor());
 
     addGizmo("Transform", DEBUG_TRANSFORM_COLOR);
     addGizmo("Local Bounds", DEBUG_LOCAL_BOUNDS_COLOR);
@@ -431,11 +432,11 @@ void update() {
         if (g_lines.size() > 0)
             Engine::window->draw(&g_lines[0], g_lines.size(), sf::Lines);
         for (auto& text : g_texts) {
-            g_text.setString(std::get<0>(text));
-            g_text.setPosition(std::get<1>(text));
-            g_text.setFillColor(std::get<2>(text));
-            alignCenter(g_text);
-            Engine::window->draw(g_text);
+            g_text->setString(std::get<0>(text));
+            g_text->setPosition(std::get<1>(text));
+            g_text->setFillColor(std::get<2>(text));
+            alignCenter(*g_text);
+            Engine::window->draw(*g_text);
         }
     }
     clearDrawables();

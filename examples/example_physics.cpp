@@ -17,7 +17,9 @@ class RectObject : public GameObject {
 public:
     RectObject() {
         sr = addComponent<ShapeRenderer>();
-        sr->setColor(color = Random::color());
+        color = Random::color();
+        color.a = 128;
+        sr->setColor(color);
         start = Input::getMousePosition();
     }
 
@@ -64,6 +66,9 @@ public:
         makeChild<Wall>(750,50,0,-375);
         makeChild<Wall>(50,750,-375,0);
         makeChild<Wall>(50,750,375,0);
+
+        auto bg = addComponent<ShapeRenderer>(make<SquareShape>(750));
+        bg->setEffect(make<Checkerboard>(Grays::Gray10, Grays::Black, 50));
     }
 
     void update() {
@@ -90,7 +95,6 @@ int main(int argc, char const *argv[]) {
     Engine::getView(0).setCenter(0, 0);
     Engine::setLayerCount(2);
     Debug::show(true);
-    Engine::setBackgroundColor(Grays::Gray10);
     Engine::window->setKeyRepeatEnabled(false);
     Engine::makeRoot<Player>();
     Engine::window->setTitle("Evan's Engine");
