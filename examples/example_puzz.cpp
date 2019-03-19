@@ -416,12 +416,8 @@ void exportExactCoverMatrix(const Matrix& mat);
 
 int main(int argc, char const *argv[])
 {   
-<<<<<<< HEAD
-    print("hmm");
-=======
     g_exactCoverMatrix = buildExactCoverMatrix();
     exportExactCoverMatrix(g_exactCoverMatrix);
->>>>>>> 64a97ef7217ff86b6fbd2e080f48c2fabf4c7f8b
     Engine::init(1000,1000,"Puzzometry");
     Engine::window->setFramerateLimit(0);
     Debug::addGizmo("Grid", Grays::Gray50);
