@@ -9,10 +9,11 @@ public:
     Handle<ShapeRenderer> sr;
 
     TriggerTester() {
-        sr = addComponent<ShapeRenderer>(make<SquareShape>(100));
+        sr = addComponent<ShapeRenderer>(make<StarShape>());
         sr->setColor(Random::color());
         tr = addComponent<Trigger>(sr->shape);
         sr->shape->setPosition(100,100);
+        sr->shape->addHole(CircleShape(40));
     }
 
     void onMouseEnter() {
