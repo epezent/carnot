@@ -4,4 +4,4 @@ macro(carnot_test CARNOT_TEST_NAME )
 endmacro()
 
 carnot_test(stroke)
-
+carnot_test(trigger)

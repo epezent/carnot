@@ -416,7 +416,7 @@ void update() {
             Engine::getView(0).zoom(1.0f/1.1f);
         }
         auto drag = Input::dragDeltaRaw(MouseButton::Left);
-        Engine::getView(0).move(-drag.x, -drag.y); // TODO: doesn't work when paused
+        Engine::getView(0).move((float)-drag.x, (float)-drag.y); // TODO: doesn't work when paused
     }    
     // udate info
     updateInfo();

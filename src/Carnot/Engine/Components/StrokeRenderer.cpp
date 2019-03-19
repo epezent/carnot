@@ -10,13 +10,13 @@
     m_vertexArray.push_back(static_cast<Vector2f>(b)); \
     m_vertexArray.push_back(static_cast<Vector2f>(c));
 
-namespace VASEr
-{
-typedef carnot::Vector2d Vec2;
-typedef carnot::RGB Color;
-} // namespace VASEr
+// namespace VASEr
+// {
+// typedef carnot::Vector2d Vec2;
+// typedef carnot::RGB Color;
+// } // namespace VASEr
 
-#include "vaser/vaser.cpp"
+// #include "vaser/vaser.cpp"
 
 namespace carnot
 {
@@ -276,10 +276,10 @@ void StrokeRenderer::updateBounds() const
 {
     if (m_points.size() > 0)
     {
-        float left   = m_points[0].x;
-        float top    = m_points[0].y;
-        float right  = m_points[0].x;
-        float bottom = m_points[0].y;
+        double left   = m_points[0].x;
+        double top    = m_points[0].y;
+        double right  = m_points[0].x;
+        double bottom = m_points[0].y;
         for (std::size_t i = 1; i < m_points.size(); ++i)
         {
             // Update left and right
@@ -293,7 +293,7 @@ void StrokeRenderer::updateBounds() const
             else if (m_points[i].y > bottom)
                 bottom = m_points[i].y;
         }
-        m_bounds = FloatRect(left, top, right - left, bottom - top);
+        m_bounds = FloatRect((float)left, (float)top, (float)(right - left), (float)(bottom - top));
     }
     else
     {

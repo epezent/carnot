@@ -7,7 +7,7 @@ namespace carnot {
 
 Trigger::Trigger(GameObject& _gameObject) :
     Component(_gameObject),
-    shape(nullptr),
+    shape(new Shape()),
     mode(Points),
     m_inside(false)
 {
