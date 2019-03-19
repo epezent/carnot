@@ -45,7 +45,7 @@ Streamable& operator<<(Streamable& s, const std::vector<T>& c) {
         return s;
     for (std::size_t i = 0; i < c.size() - 1; ++i) {
         s << c[i];
-        s << ",";
+        s << " ";
     }
     s << c[c.size() - 1];
     return s;
@@ -58,7 +58,7 @@ Streamable& operator<<(Streamable& s, const std::array<T, N>& c) {
         return s;
     for (std::size_t i = 0; i < N - 1; ++i) {
         s << c[i];
-        s << ",";
+        s << " ";
     }
     s << c[N - 1] ;
     return s;

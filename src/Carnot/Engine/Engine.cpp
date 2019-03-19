@@ -115,27 +115,28 @@ void Engine::init(unsigned int width, unsigned int height, const std::string& ti
 void Engine::init(unsigned int width, unsigned int height, unsigned int style, const std::string& title) {
     // asserts
     assert(!g_initialized);
-    assert(!g_running);
-    
-    // load resources
+    assert(!g_running);    
+    // load Engine resources
     loadResources();
     // determine DPI
     determineDpi();
-
-    // create Window and set settings
+    // create context settings
     sf::ContextSettings settings;
     settings.antialiasingLevel = 8;
-    window->create(sf::VideoMode((unsigned int)(width * g_dpiFactor), (unsigned int)(height * g_dpiFactor)), title, style, settings);
+    // create VideoMode
+    sf::VideoMode vMode = sf::VideoMode((unsigned int)(width * g_dpiFactor), (unsigned int)(height * g_dpiFactor));
+    if (style & WindowStyle::Fullscreen)
+        vMode = sf::VideoMode::getDesktopMode();
+    // create window context
+    window->create(vMode, title, style, settings);
+    // set frame limit
     window->setFramerateLimit(60);
-
     // set user icon from RC file
     setUserIcon(window->getSystemHandle());
-
-    // set Window view
+    // set default Window view
     g_views[0] = window->getDefaultView();
     g_views[0].setCenter(g_views[0].getCenter() / g_dpiFactor);
     g_views[0].setSize(g_views[0].getSize() / g_dpiFactor);
-
     // initialize imgui
     ImGui::SFML::Init(*window, g_dpiFactor);
     ImGuiIO& io = ImGui::GetIO();
@@ -314,7 +315,7 @@ void Engine::addView() {
 }
 
 
-sf::Vector2f Engine::getWorldSize() {
+Vector2f Engine::getWorldSize() {
     return window->mapPixelToCoords(sf::Vector2i(window->getSize()), g_views[0]);
 }
 
@@ -375,13 +376,8 @@ void Engine::processEvents() {
                 window->close();
                 break;
             }
-            case Event::Resized: {
-                
-                // FloatRect size(0.0f, 0.0f, (float)event.size.width, (float)event.size.height);
-
-                // g_views[0].setCenter(g_views[0].getCenter() / g_dpiFactor);
+            case Event::Resized: {              
                 g_views[0].setSize((float)event.size.width / g_dpiFactor, (float)event.size.height / g_dpiFactor);
-                // g_views[0].setSize(g_views[0].getSize() / g_dpiFactor);
                 break;
             }
             default:

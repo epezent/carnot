@@ -3,6 +3,8 @@
 
 #include <carnot>
 #include <deque>
+#include <set>
+#include <fstream>
 
 using namespace carnot;
 
@@ -10,7 +12,7 @@ using namespace carnot;
 // BASIC MATRIX OPERATIONS
 //==============================================================================
 
-typedef std::vector<std::vector<char>> Matrix;
+typedef std::vector<std::vector<int>> Matrix;
 
 std::size_t size(const Matrix& mat, int dim) {
     if (dim == 0)
@@ -22,24 +24,24 @@ std::size_t size(const Matrix& mat, int dim) {
 
 inline Matrix ones(std::size_t r, std::size_t c)
 {
-    return Matrix(r, std::vector<char>(c, 1));
+    return Matrix(r, std::vector<int>(c, 1));
 }
 
 inline Matrix zeros(std::size_t r, std::size_t c)
 {
-    return Matrix(r, std::vector<char>(c, 0));
+    return Matrix(r, std::vector<int>(c, 0));
 }
 
-inline void flipMat(Matrix &mat, int dim) {
-    if (dim == 0)
+inline void flipud(Matrix &mat) {
         std::reverse(mat.begin(), mat.end());
-    else if (dim == 1) {
-        for (auto &row : mat)
-            std::reverse(row.begin(), row.end());
-    }
 }
 
-inline void rotate(Matrix& mat) {
+inline void fliplr(Matrix& mat) {
+    for (auto &row : mat)
+        std::reverse(row.begin(), row.end());
+}
+
+inline void rot90(Matrix& mat) {
     auto temp = mat;
     mat.resize(size(temp,1));
     for (auto j : range(size(temp,1))) {
@@ -47,13 +49,18 @@ inline void rotate(Matrix& mat) {
         for (auto i : range(size(temp,0)))
             mat[j][i] = temp[i][j];
     }
-    flipMat(mat,1);
+    fliplr(mat);
 }
 
 void printMat(const Matrix& mat) {
     for (auto i : range(size(mat,0))) {
-        for (auto j : range(size(mat,1)))
-            std::cout << (int)mat[i][j] << " ";
+        for (auto j : range(size(mat,1))) {
+            auto val = mat[i][j];
+            if (val == 0)
+                std::cout << ".  ";
+            else
+                std::cout << val << "  ";
+        }
         std::cout << std::endl;
     }
     std::cout << std::endl;
@@ -87,22 +94,25 @@ const Matrix g_matBoard {
     {0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 };
 
+const std::size_t g_boardRows = 16;
+const std::size_t g_boardCols = 16;
+
 const std::vector<Matrix> g_matPieces
 {
-    {{8, 4, 8, 4}, {0, 8, 4, 8}},                                           // RED        {9 0} 
-    {{0, 4, 8}, {4, 8, 4}, {8, 4, 8}},                                      // ORANGE     {6 1} 
-    {{8, 4, 0}, {4, 8, 4}, {8, 4, 0}},                                      // GOLD       {5 4} 
-    {{0, 4, 0}, {4, 8, 4}, {8, 4, 8}, {4, 8, 4}, {8, 4, 0}},                // YELLOW     {1 6} 
-    {{4, 8, 0, 0}, {8, 4, 8, 0}, {0, 8, 4, 8}, {0, 4, 8, 4}, {0, 8, 4, 0}}, // CHARTREUSE {0 8} 
-    {{4, 8, 0}, {8, 4, 8}, {0, 8, 4}},                                      // LIME       {11 3}
-    {{4, 0, 0, 0}, {8, 4, 0, 0}, {4, 8, 4, 0}, {0, 4, 8, 4}},               // GREEN      {8 4} 
-    {{0, 0, 0, 8, 4}, {0, 0, 8, 4, 8}, {0, 8, 4, 8, 0}, {8, 4, 0, 0, 0}},   // TURQUOISE  {5 5} 
-    {{0, 0, 0, 4, 0}, {0, 8, 4, 8, 4}, {8, 4, 8, 4, 8}, {0, 8, 4, 8, 4}},   // AQUA       {6 7} 
-    {{0, 8, 4, 8}, {8, 4, 8, 0}, {4, 8, 4, 0}, {8, 0, 0, 0}},               // DODGERBLUE {4 10}
-    {{0, 4, 8}, {0, 8, 4}, {8, 4, 0}, {0, 8, 0}},                           // BLUE       {12 5}
-    {{8, 4, 8}, {4, 8, 0}, {8, 0, 0}},                                      // VIOLET     {11 8}
-    {{4, 8, 0}, {8, 4, 8}, {4, 8, 0}, {8, 0, 0}},                           // PURPLE     {7 11}
-    {{4, 8, 0}, {8, 4, 8}, {4, 8, 0}},                                      // MAGENTA    {5 13}
+    {{8, 4, 8, 4}, {0, 8, 4, 8}},                                          
+    {{0, 4, 8}, {4, 8, 4}, {8, 4, 8}},                                     
+    {{8, 4, 0}, {4, 8, 4}, {8, 4, 0}},                                     
+    {{0, 4, 0}, {4, 8, 4}, {8, 4, 8}, {4, 8, 4}, {8, 4, 0}},               
+    {{4, 8, 0, 0}, {8, 4, 8, 0}, {0, 8, 4, 8}, {0, 4, 8, 4}, {0, 8, 4, 0}},
+    {{4, 8, 0}, {8, 4, 8}, {0, 8, 4}},                                     
+    {{4, 0, 0, 0}, {8, 4, 0, 0}, {4, 8, 4, 0}, {0, 4, 8, 4}},              
+    {{0, 0, 0, 8, 4}, {0, 0, 8, 4, 8}, {0, 8, 4, 8, 0}, {8, 4, 0, 0, 0}},  
+    {{0, 0, 0, 4, 0}, {0, 8, 4, 8, 4}, {8, 4, 8, 4, 8}, {0, 8, 4, 8, 4}},  
+    {{0, 8, 4, 8}, {8, 4, 8, 0}, {4, 8, 4, 0}, {8, 0, 0, 0}},              
+    {{0, 4, 8}, {0, 8, 4}, {8, 4, 0}, {0, 8, 0}},                          
+    {{8, 4, 8}, {4, 8, 0}, {8, 0, 0}},                                     
+    {{4, 8, 0}, {8, 4, 8}, {4, 8, 0}, {8, 0, 0}},                          
+    {{4, 8, 0}, {8, 4, 8}, {4, 8, 0}},                                     
 };
 
 const std::vector<Vector2i> g_solutions {
@@ -123,20 +133,20 @@ const std::vector<Vector2i> g_solutions {
 };
 
 const std::vector<Color> g_colors {
-    Reds::Red,
-    Oranges::Orange,
-    Yellows::Gold,
+    Reds::FireBrick,
+    Reds::LightCoral,
+    Oranges::OrangeRed,
     Yellows::Yellow,
+    Greens::YellowGreen,
     Greens::Chartreuse,
-    Greens::Lime,
-    Greens::Green,
-    Cyans::Turquoise,
-    Cyans::Aqua,
+    Greens::SpringGreen,
+    Cyans::LightSeaGreen,
     Blues::DeepSkyBlue,
-    Blues::Blue,
-    Purples::Violet,
-    Purples::Purple,
-    Purples::Magenta
+    Blues::DodgerBlue,
+    Blues::SteelBlue,
+    Purples::BlueViolet,
+    Purples::Magenta,
+    Pinks::DeepPink
 };
 
 //==============================================================================
@@ -199,14 +209,9 @@ class Board : public GameObject
         tr = addComponent<Trigger>();
         tr->mode = Trigger::Vertices;
 
-        auto alpha1 = color;
-        auto alpha2 = color;
-        alpha1.a = 64;
-        alpha2.a = 128;
-        sr->setEffect(make<Gradient>(alpha1,alpha2, 45.0f));
+        sr->setEffect(make<Gradient>(withAlpha(color,0.25f), withAlpha(color,0.5f), 45.0f));
         sr->shape->setRadii(g_gridSize);
         sr->shape->setHoleCount(1);
-        print(sr->shape->getVerticesCount());
 
         lr1 = addComponent<StrokeRenderer>();
         lr2 = addComponent<StrokeRenderer>();
@@ -306,11 +311,7 @@ class Piece : public GameObject
         sr = addComponent<ShapeRenderer>();
         tr = addComponent<Trigger>();
         tr->mode = Trigger::Vertices;
-        auto alpha1 =color;
-        auto alpha2 =color;
-        alpha1.a = 64;
-        alpha2.a = 128;
-        sr->setEffect(make<Gradient>(alpha1,alpha2,45.0f));
+        sr->setEffect(make<Gradient>(withAlpha(color,0.25f), withAlpha(color,0.5f) ,45.0f));
         lr = addComponent<StrokeRenderer>();
         lr->setColor(Grays::Gray80);
         startCoroutine(makeShape());
@@ -382,7 +383,6 @@ class Piece : public GameObject
         *sr->shape = Shape::offsetShape(shape, -2.0f);
         tr->shape = sr->shape;
         lr->fromShape(*sr->shape);
-
     }
 
     void setCoordinate(const Vector2i& coord) {
@@ -390,12 +390,12 @@ class Piece : public GameObject
     }
 
     void flipLR() {
-        flipMat(matrix,1);
+        fliplr(matrix);
         transform.setScale(transform.getScale().x * -1, transform.getScale().y );
     }
 
     void flipUD() {
-        flipMat(matrix,0);
+        flipud(matrix);
         transform.setScale(transform.getScale().x , transform.getScale().y * -1);
     }
 
@@ -404,7 +404,7 @@ class Piece : public GameObject
 };
 
 //==============================================================================
-// PUZZ
+// PUZZOMETRY (ROOT OBJECT)
 //==============================================================================
 
 class Puzzometry : public GameObject
@@ -419,6 +419,7 @@ class Puzzometry : public GameObject
         sr->setEffect(make<Checkerboard>(Grays::Gray10, Grays::Black,250));
         sr->shape->setPosition((size(g_matBoard,0)-1) * g_gridSize / 2.0f, (size(g_matBoard,1)-1) * g_gridSize / 2.0f);
         sr->shape->setScale(-1,1);
+        sr->showGizmos = false;
 
         board = makeChild<Board>();
         for (std::size_t i = 0; i < g_numPieces; ++i) {
@@ -458,9 +459,27 @@ class Puzzometry : public GameObject
     bool toggled = true;
 };
 
+//==============================================================================
+// MAIN
+//==============================================================================
+
+struct RowHeader {
+    int piece;
+    int perm;
+    int row;
+    int col;
+};
+
+Matrix g_exactCoverMatrix;
+std::vector<RowHeader> g_exactCoverRowHeaders;
+
+Matrix buildExactCoverMatrix();
+void exportExactCoverMatrix(const Matrix& mat);
+
 int main(int argc, char const *argv[])
-{
-   
+{   
+    g_exactCoverMatrix = buildExactCoverMatrix();
+    exportExactCoverMatrix(g_exactCoverMatrix);
     Engine::init(1000,1000,"Puzzometry");
     Debug::addGizmo("Grid", Grays::Gray50);
     Debug::setGizmoActive(Debug::gizmoId("Grid"), true);
@@ -469,4 +488,97 @@ int main(int argc, char const *argv[])
     Engine::makeRoot<Puzzometry>();
     Engine::run();
     return 0;
+}
+
+//============================================================================//
+//|||||||||||||||||||||||||||||||| DLX SOLVER ||||||||||||||||||||||||||||||||//
+//============================================================================//
+
+void permute(Matrix& mat, int permutation) {
+    switch(permutation) {
+        case 0 : { break; }
+        case 1 : { rot90(mat); break; }
+        case 2 : { rot90(mat); rot90(mat); break;}
+        case 3 : { rot90(mat); rot90(mat); rot90(mat); break;}
+        case 5 : { fliplr(mat); break;}
+        case 6 : { fliplr(mat); rot90(mat); break;}
+        case 7 : { fliplr(mat); rot90(mat); rot90(mat); break;}
+        case 8 : { fliplr(mat); rot90(mat); rot90(mat); rot90(mat); break;}
+    }
+}
+
+Matrix g_idxMatrix;
+std::size_t g_numIdx = 0;
+
+void buildIdxMatrix() {
+    g_idxMatrix = zeros(g_boardRows,g_boardCols);
+    for (auto r : range(g_boardRows)) {
+        for (auto c : range(g_boardCols))
+        {
+            if (g_matBoard[r][c] != 0)
+                g_idxMatrix[r][c] = (int)g_numIdx++;
+        }
+    }
+}
+
+bool place(const Matrix& mat, std::size_t row, std::size_t col, std::vector<int>& ecRowOut) {
+    auto height = size(mat,0);
+    auto width  = size(mat,1);
+    if ((row + height) > g_boardRows || (col + width) > g_boardCols) 
+        return false;
+    else {
+        for (std::size_t r = 0; r < height; ++r) {
+            for (std::size_t c = 0; c < width; ++c) {
+                if (mat[r][c] == 0)
+                    continue;
+                auto diff = mat[r][c] - g_matBoard[row + r][col + c];
+                if  (diff != 0)
+                    return false;
+                ecRowOut[g_numPieces + g_idxMatrix[row + r][col + c]] = 1;
+            }
+        }
+    }
+    return true;   
+}
+
+std::set<Matrix> uniquePerms(const Matrix& mat) {
+    std::set<Matrix> perms;
+    for (int perm = 0; perm < 8; ++perm) {
+        auto temp = mat;
+        permute(temp, perm);
+        perms.insert(temp);
+    }
+    return perms;
+}
+
+Matrix buildExactCoverMatrix() {
+    std::vector<int> ecRow;
+    Matrix ecMatrix;
+    ecMatrix.reserve(2500);
+    buildIdxMatrix();
+    for (auto p : range(g_numPieces)) {
+        std::set<Matrix> perms = uniquePerms(g_matPieces[p]);
+        for (auto& perm : perms) {
+            for (auto row : range(g_boardRows)) {
+                for (auto col : range(g_boardCols)) {
+                    ecRow.assign(g_numPieces + g_numIdx, 0);
+                    ecRow[p] = 1;
+                    if (place(perm, row, col, ecRow)) {
+                        ecMatrix.push_back(ecRow);
+                        
+                    }
+                }
+            }
+        }
+    }
+    return ecMatrix;
+}
+
+void exportExactCoverMatrix(const Matrix& mat) {
+    std::ofstream file;
+    file.open("exact_cover_matrix.txt");
+    file << size(mat,1) << std::endl;
+    for (auto r : range(size(mat,0)))
+        file << mat[r] << std::endl;
+    file.close();
 }
