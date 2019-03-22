@@ -344,5 +344,14 @@ inline int winding(const Vector2<T>& a, const Vector2<T>& b, const Vector2<T>& c
     return winding((b - a), (c - b));
 }
 
+//==============================================================================
+// GEOMETRY
+//==============================================================================
+
+template <typename T>
+inline T perlin(T x, T y) {
+    // TODO
+}
+
 }  // namespace Math
 }  // namespace carnot

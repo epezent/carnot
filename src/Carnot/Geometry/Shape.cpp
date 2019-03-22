@@ -6,7 +6,7 @@
 #include <limits>
 #include "clipper/clipper.hpp"
 
-#define CLIPPER_PREC 1000.0f
+#define CLIPPER_PREC     1000.0f
 #define INV_CLIPPER_PREC 0.001f
 
 namespace carnot {
@@ -39,8 +39,7 @@ std::vector<Vector2f> fromClipper(const ClipperLib::Path& clipper) {
 //==============================================================================
 
 Shape::Shape(std::size_t pointCount) :
-    m_holes(0),
-    m_needsUpdate(true)
+    m_holes(0)
 {
     setPointCount(pointCount);
 }
@@ -51,7 +50,7 @@ void Shape::setPointCount(std::size_t count) {
     m_points.resize(count);
     m_radii.resize(count);
     m_smoothness.resize(count);
-    m_needsUpdate = true;
+    makeCacheStale();
 }
 
 std::size_t Shape::getPointCount() const {
@@ -60,7 +59,7 @@ std::size_t Shape::getPointCount() const {
 
 void Shape::setPoint(std::size_t index, Vector2f position) {
     m_points[index] = position;
-    m_needsUpdate   = true;
+    makeCacheStale();
 }
 
 void Shape::setPoint(std::size_t index, float x, float y) {
@@ -84,7 +83,7 @@ void Shape::addPoint(Vector2f position) {
     m_points.push_back(position);
     m_radii.push_back(float());
     m_smoothness.push_back(std::size_t());
-    m_needsUpdate    = true;
+    makeCacheStale();
 }
 
 void Shape::addPoint(float x, float y) {
@@ -95,7 +94,7 @@ void Shape::setRadius(std::size_t index, float radius, std::size_t smoothness) {
     if (radius >= 0.0f) {
         m_radii[index] = radius;
         m_smoothness[index] = smoothness;
-        m_needsUpdate = true;
+        makeCacheStale();
     }
 }
 
@@ -109,37 +108,35 @@ void Shape::setRadii(float radius, std::size_t smoothness) {
             m_radii[i] = radius;
             m_smoothness[i] = smoothness;
         }
-        m_needsUpdate = true;
+        makeCacheStale();
     }
 }
 
 void Shape::setRadii(const std::vector<float> &radii) {
     assert(m_radii.size() == radii.size());
     m_radii = radii;
-    m_needsUpdate = true;
+    makeCacheStale();
 }
 
-std::vector<float> Shape::getRadii() const {
+const std::vector<float>& Shape::getRadii() const {
     return m_radii;
 }
 
 std::size_t Shape::getVerticesCount() const {
-    if (m_needsUpdate)
-        update();
+    updateCacheIfStale();
     return m_vertices.size();
 }
 
 const std::vector<Vector2f>& Shape::getVertices() const {
-    if (m_needsUpdate)
-        update();
+    updateCacheIfStale();
     return m_vertices;
 }
 
-void Shape::flatten() {
-    if (m_needsUpdate)
-        updateVertices();
+void Shape::applyRadii() {
+    updateCacheIfStale();
     setPoints(m_vertices);
     setRadii(0.0f);
+    makeCacheStale();
 }
 
 void Shape::applyTransform() {
@@ -155,12 +152,12 @@ void Shape::applyTransform() {
             m_holes[i].m_points[j] = transform.transformPoint(m_holes[i].m_points[j]);
         }
     }
-    m_needsUpdate = true;
+    makeCacheStale();
 }
 
 void Shape::setHoleCount(std::size_t count) {
     m_holes.resize(count);
-    m_needsUpdate = true;
+    makeCacheStale();
 }
 
 std::size_t Shape::getHoleCount() const {
@@ -168,22 +165,23 @@ std::size_t Shape::getHoleCount() const {
 }
 
 void Shape::setHole(std::size_t index, const Shape& hole) {
+    hole.updateCacheIfStale();
     m_holes[index] = hole;
-    m_needsUpdate = true;
+    makeCacheStale();
 }
 
-Shape Shape::getHole(std::size_t index) const {
+const Shape& Shape::getHole(std::size_t index) const {
     return m_holes[index];
 }
 
 void Shape::addHole(const Shape &hole) {
+    hole.updateCacheIfStale();
     m_holes.push_back(hole);
-    m_needsUpdate = true;
+    makeCacheStale();
 }
 
 FloatRect Shape::getLocalBounds(QueryMode mode) const {
-    if (m_needsUpdate)
-        update();
+    updateCacheIfStale();
     if (mode == Points)
         return m_pointsBounds;
     else
@@ -191,8 +189,7 @@ FloatRect Shape::getLocalBounds(QueryMode mode) const {
 }
 
 FloatRect Shape::getGlobalBounds(QueryMode mode) const {
-    if (m_needsUpdate)
-        update();
+    updateCacheIfStale();
     if (mode == Points)
         return getTransform().transformRect(m_pointsBounds);
     else
@@ -200,8 +197,7 @@ FloatRect Shape::getGlobalBounds(QueryMode mode) const {
 }
 
 bool Shape::isInside(const Vector2f& point, QueryMode mode) const {
-    if (m_needsUpdate)
-        update();
+    updateCacheIfStale();
     // test holes
     for (auto& hole : m_holes) {
         if (hole.isInside(point, mode))
@@ -214,8 +210,7 @@ bool Shape::isInside(const Vector2f& point, QueryMode mode) const {
 }
 
 float Shape::getArea(QueryMode mode) const {
-    if (m_needsUpdate)
-        update();
+    updateCacheIfStale();
     float area = 0.0f;
     if (mode == Points)
         area = Math::polygonArea(m_points);
@@ -363,12 +358,9 @@ void Shape::updateBounds() const {
     }    
 }
 
-void Shape::update() const {
-    // update outer vertices
+void Shape::onCacheUpdate() const {
     updateVertices();
-    // update bounds
     updateBounds();
-    m_needsUpdate = false;
 }
 
 //==============================================================================

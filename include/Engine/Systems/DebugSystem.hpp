@@ -63,6 +63,7 @@ void drawText(const std::string& text, const Vector2f& position, const Color& co
 // Implementation details [internal use only]
 namespace detail {
 void init();
+void shutdown();
 void update();
 bool proceed();
 } // namespace detail

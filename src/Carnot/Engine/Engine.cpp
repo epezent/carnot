@@ -280,6 +280,7 @@ void Engine::run() {
     // shutdown systems
     ImGui::SFML::Shutdown();
     Physics::detail::shutdown();
+    Debug::detail::shutdown();
     g_initialized = false;    
 }
 

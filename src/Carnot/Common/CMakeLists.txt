@@ -1,5 +1,6 @@
 target_sources(carnot
-	PRIVATE
+        PRIVATE
+        Cacheable.cpp
         Print.cpp
         Random.cpp
 )

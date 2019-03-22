@@ -1,5 +1,4 @@
 {
-    "C_Cpp.default.configurationProvider": "vector-of-bool.cmake-tools",
     "cmake.buildDirectory": "${workspaceRoot}/build-${buildKit}-${variant:buildType}",
     "files.associations": {
         "*.in": "cmake",
@@ -80,5 +79,6 @@
         "set": "cpp",
         "variant": "cpp",
         "carnot": "cpp"
-    }
+    },
+    "C_Cpp.default.configurationProvider": "vector-of-bool.cmake-tools"
 }

@@ -1,17 +1,13 @@
 #pragma once
 
-#include <SFML/Graphics/Drawable.hpp>
-#include <SFML/Graphics/Transformable.hpp>
 #include <Common/Types.hpp>
+#include <Common/Cacheable.hpp>
 #include <vector>
 
 namespace carnot {
 
-class ShapeRenderer;
-class RigidBody;
-
 /// Encapsulates an advanced vector graphics object
-class Shape : public Transformable {
+class Shape : public Transformable, public Cacheable  {
 public:
 
     /// Mode by which to query shape information
@@ -68,7 +64,7 @@ public:
     void setRadii(const std::vector<float>& radii);
 
     /// Gets the radii for all poiints
-    std::vector<float> getRadii() const;
+    const std::vector<float>& getRadii() const;
 
     /// Gets the number of vertices making up the Shape's outer contour after
     /// all radii have been applied
@@ -78,8 +74,8 @@ public:
     // have been applied.
     const std::vector<Vector2f>& getVertices() const;
 
-    /// Permantly applies all radii
-    void flatten();
+    /// Permantly applies all radii (i.e. converts vertices to points)
+    void applyRadii();
 
     /// Applies the Shape's current transform to the local positions of the
     /// Shape's points and resets the transform.
@@ -95,7 +91,7 @@ public:
     void setHole(std::size_t index, const Shape& hole);
 
     /// Gets the Shape of a hole
-    Shape getHole(std::size_t index) const;
+    const Shape& getHole(std::size_t index) const;
 
     /// Adds a new hole and increments to hole count
     void addHole(const Shape& hole);
@@ -134,12 +130,9 @@ public:
 
 private:
 
-    friend class ShapeRenderer;
-    friend class Trigger;
-
+    virtual void onCacheUpdate() const override;
     void updateVertices() const;
     void updateBounds() const;
-    void update() const;
 
 private:
     std::vector<Vector2f> m_points;
@@ -149,7 +142,6 @@ private:
     mutable std::vector<Vector2f> m_vertices;
     mutable FloatRect m_pointsBounds;
     mutable FloatRect m_verticesBounds;
-    mutable bool m_needsUpdate;
 };
 
 } // namespace carnot

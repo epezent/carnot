@@ -33,8 +33,6 @@ void Trigger::update() {
     /// check shape
     if (!shape)
         return;
-    if (shape->m_needsUpdate)
-        shape->update();
     // get mouse position in shape's local coordinates
     auto localPos = shape->getInverseTransform().transformPoint(gameObject.transform.worldToLocal(Input::getMousePosition()));
     // test shape

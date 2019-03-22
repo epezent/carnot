@@ -234,6 +234,14 @@ inline int winding(const Vector2<T>& a, const Vector2<T> b);
 template <typename T>
 inline int winding(const Vector2<T>& a, const Vector2<T>& b, const Vector2<T>& c);
 
+//==============================================================================
+// NOISE
+//==============================================================================
+
+/// Genrates 2D perlin noise
+template <typename T>
+inline T perlin(T x, T y);
+
 }  // namespace Math
 }  // namespace carnot
 

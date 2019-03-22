@@ -26,7 +26,8 @@ namespace carnot {
 
 ShapeRenderer::ShapeRenderer(GameObject& _gameObject) :
     Renderer(_gameObject),
-    shape(new Shape()),
+    m_shape(new Shape()),
+    m_cacheAge(0),
     m_texture(nullptr),
     m_textureRect(),
     m_effect(nullptr),
@@ -36,10 +37,24 @@ ShapeRenderer::ShapeRenderer(GameObject& _gameObject) :
     setTexture(nullptr);
 }
 
-ShapeRenderer::ShapeRenderer(GameObject& _gameObject, Ptr<Shape> _shape) :
+ShapeRenderer::ShapeRenderer(GameObject& _gameObject, Ptr<Shape> shape) :
     ShapeRenderer(_gameObject)
 {
-    shape = std::move(_shape);
+    setShape(std::move(shape));
+}
+
+void ShapeRenderer::setShape(const Shape& shape) {
+    *m_shape = shape;
+    m_cacheAge = 0;
+}
+
+void ShapeRenderer::setShape(Ptr<Shape> shape) {
+    m_shape = std::move(shape);
+    m_cacheAge = 0;
+}
+
+Ptr<Shape> ShapeRenderer::getShape() const {
+    return m_shape;
 }
 
 void ShapeRenderer::setEffect(Ptr<Effect> effect) {
@@ -117,32 +132,18 @@ BlendMode ShapeRenderer::getBlendMode(BlendMode mode) const {
 // PRIVATE
 //==============================================================================
 
-void ShapeRenderer::checkUpdate() const {
-    if (true) {
-        // Update shape geometry
-        shape->update();
-        // Update vertex array
-        updateVertexArray();
-        // Updaate texture coordinates
-        updateTexCoords();
-        // Fill color (solid)
-        updateFillColors();
-}
-}
-
 void ShapeRenderer::updateVertexArray() const {
     // make earcut polygon
-    std::vector<std::vector<Vector2f>> polygon(1 + shape->m_holes.size());
-    polygon[0] = shape->m_vertices;
+    std::vector<std::vector<Vector2f>> polygon(1 + m_shape->getHoleCount());
+    polygon[0] = m_shape->getVertices();
     std::size_t n_vertices = polygon[0].size();
     if (n_vertices < 3)
         return;
     // generate vertices for holes
-    for (std::size_t i = 0; i < shape->m_holes.size(); ++i) {
-        if (shape->m_holes[i].m_needsUpdate)
-            shape->m_holes[i].update();
-        polygon[i+1] = shape->m_holes[i].m_vertices;
+    for (std::size_t i = 0; i < m_shape->getHoleCount(); ++i) {
+        polygon[i+1] = m_shape->getHole(i).getVertices();
         n_vertices += polygon[i+1].size();
+
     }
     // generate indices
     std::vector<std::size_t> indices = mapbox::earcut<std::size_t>(polygon);
@@ -166,7 +167,7 @@ void ShapeRenderer::updateVertexArray() const {
 }
 
 void ShapeRenderer::updateTexCoords() const {
-    auto bounds = shape->m_verticesBounds;
+    auto bounds = m_shape->getLocalBounds(Shape::Vertices);
     float invWidth = 1.0f / bounds.width;
     float invHeight = 1.0f / bounds.height;
     for (std::size_t i = 0; i < m_vertexArray.size(); ++i) {
@@ -192,8 +193,16 @@ void ShapeRenderer::updateFillColors() const
 }
 
 void ShapeRenderer::render(RenderTarget& target) const {
-    m_states.transform = gameObject.transform.getWorldMatrix() * shape->getTransform();
-    checkUpdate();
+    m_states.transform = gameObject.transform.getWorldMatrix() * m_shape->getTransform();
+    // check if our cache age is stale
+    if (!m_shape->cacheCurrent(m_cacheAge)) {
+        // Update vertex array
+        updateVertexArray();
+        // Updaate texture coordinates
+        updateTexCoords();
+        // Fill color (solid)
+        updateFillColors();
+    }    
     // update effect shader
     if (m_effect)
         m_states.shader = m_effect->shader();
@@ -205,7 +214,7 @@ void ShapeRenderer::render(RenderTarget& target) const {
 }
 
 FloatRect ShapeRenderer::getLocalBounds() const {
-    return shape->getTransform().transformRect(shape->getLocalBounds());
+    return m_shape->getTransform().transformRect(m_shape->getLocalBounds());
 }
 
 FloatRect ShapeRenderer::getWorldBounds() const {
@@ -219,7 +228,7 @@ void ShapeRenderer::onGizmo() {
 
     static Id wireframeId = Debug::gizmoId("Wireframe");
 
-    Matrix3x3 T = gameObject.transform.getWorldMatrix() * shape->getTransform();
+    Matrix3x3 T = gameObject.transform.getWorldMatrix() * m_shape->getTransform();
 
     // wireframe
     if (Debug::gizmoActive(wireframeId)) {

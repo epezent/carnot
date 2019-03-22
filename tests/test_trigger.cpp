@@ -11,9 +11,9 @@ public:
     TriggerTester() {
         sr = addComponent<ShapeRenderer>(make<StarShape>());
         sr->setColor(Random::color());
-        tr = addComponent<Trigger>(sr->shape);
-        sr->shape->setPosition(100,100);
-        sr->shape->addHole(CircleShape(40));
+        tr = addComponent<Trigger>(sr->getShape());
+        sr->getShape()->setPosition(100,100);
+        sr->getShape()->addHole(CircleShape(40));
     }
 
     void onMouseEnter() {
@@ -26,7 +26,7 @@ public:
 
     void onMouseStay() {
         transform.rotate(90*Engine::deltaTime());
-        sr->shape->rotate(90*Engine::deltaTime());
+        sr->getShape()->rotate(90*Engine::deltaTime());
     }
     
 };

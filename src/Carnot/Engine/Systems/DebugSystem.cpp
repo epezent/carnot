@@ -390,6 +390,12 @@ void init()
     addGizmo("Physics Shape", DEBUG_PHYSICS_SHAPE_COLOR);
 }
 
+void shutdown() {
+    g_lines.clear();
+    g_triangles.clear();
+    g_text.reset();
+}
+
 void update() {
     // check for user input
     if (Input::getKeyDown(Key::F1))

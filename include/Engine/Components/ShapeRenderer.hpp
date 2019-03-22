@@ -16,6 +16,15 @@ public:
     /// Constructor which takes a Shape
     ShapeRenderer(GameObject& gameObject, Ptr<Shape> shape);
 
+    /// Sets the shape to be rendered by reference
+    void setShape(const Shape& shape);
+
+    /// Sets the shape to be rendered by the ShapeRenderer by Ptr
+    void setShape(Ptr<Shape> shape);
+
+    /// Gets the shape rendered by the ShapeRenderer
+    Ptr<Shape> getShape() const;
+
     /// Sets the fill of a shape to a solid Color
     void setColor(const Color& color);
 
@@ -55,10 +64,6 @@ public:
     /// Converts the ShapeRenderer to a texture (TODO)
     Texture toTexture() const;
 
-public:
-
-    Ptr<Shape> shape;  ///< Shape to be rendered
-
 protected:
 
     /// Renders the Shape to RenderTarget
@@ -68,13 +73,14 @@ protected:
 
 private:
 
-    void checkUpdate() const;
     void updateVertexArray() const;
     void updateTexCoords() const;
     void updateFillColors() const;
 
 private:
 
+    Ptr<Shape> m_shape; 
+    mutable std::size_t m_cacheAge;
     mutable std::vector<Vertex> m_vertexArray;
     Ptr<Texture> m_texture;
     IntRect m_textureRect;
