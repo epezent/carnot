@@ -15,7 +15,7 @@ public:
     Cell(float size) {
         sr = addComponent<ShapeRenderer>();
         sr->setColor(Whites::White);
-        sr->shape = make<SquareShape>(size);
+        sr->setShape(make<SquareShape>(size));
         sr->setEnabled(false);
     }
 
@@ -78,11 +78,11 @@ public:
         cells.resize(R);
         loadBg = addComponent<ShapeRenderer>(make<RectangleShape>(500,20));
         loadBg->setColor(Grays::Gray50);
-        loadBg->shape->setPosition(960,540);
+        loadBg->getShape()->setPosition(960,540);
         loadRect = make<RectangleShape>(0,20);
         loadFg = addComponent<ShapeRenderer>(loadRect);
         loadFg->setColor(Whites::White);
-        loadFg->shape->setPosition(960,540);
+        loadFg->getShape()->setPosition(960,540);
         startCoroutine(load());
     }
 

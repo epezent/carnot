@@ -13,8 +13,8 @@ public:
         for (std::size_t i = 0; i < n/2; ++i) {
             for (std::size_t j = 0; j < n; ++j) {
                 auto check = bg->addComponent<ShapeRenderer>();
-                check->shape = make<SquareShape>(s);
-                check->shape->setPosition(s*(j%2) + s/2.0f  + 2*i * s, s/2  + j * s);
+                check->setShape(make<SquareShape>(s));
+                check->getShape()->setPosition(s*(j%2) + s/2.0f  + 2*i * s, s/2  + j * s);
                 check->setColor(Grays::Gray50);
                 check->setLayer(0);
             }
@@ -24,9 +24,9 @@ public:
         stroke->setLayer(1);
         sr = addComponent<ShapeRenderer>();
         sr->setLayer(1);
-        sr->shape = make<SquareShape>(50);
+        sr->setShape(make<SquareShape>(50));
         sr->setColor(Grays::Gray50);
-        sr->shape->setPosition(250,250);
+        sr->getShape()->setPosition(250,250);
 
         auto b = Blues::DeepSkyBlue;
         b.a = 128;
@@ -70,10 +70,10 @@ public:
 
     void start() {
         sr = addComponent<ShapeRenderer>();
-        sr->shape = make<CircleShape>(50.0f);
+        sr->setShape(make<CircleShape>(50.0f));
         sr->setColor(Blues::Blue);
         col.resize(4);
-        sr->shape->setPosition(250,250);
+        sr->getShape()->setPosition(250,250);
     }
 
     void update() override {

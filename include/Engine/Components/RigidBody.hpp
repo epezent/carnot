@@ -2,8 +2,8 @@
 
 #include <Engine/Component.hpp>
 
-struct cpBody;
-struct cpShape;
+class b2Body;
+class b2Fixture;
 
 namespace carnot {
 
@@ -23,10 +23,7 @@ public:
 public:
 
     /// Constructor
-    RigidBody(GameObject& gameObject,
-              BodyType type = Dynamic,
-              float mass    = 1.0f,
-              float moment  = 1.0f);
+    RigidBody(GameObject& gameObject, BodyType type = Dynamic);
     /// Destructor
     ~RigidBody();
 
@@ -57,9 +54,9 @@ public:
     float getMass() const;
 
     /// Set RigidBody moment
-    void setMoment(float moment);
+    void setInertia(float inertia);
     /// Get RigidBody moment
-    float getMoment() const;
+    float getInertia() const;
 
     /// Get RigidBody center of gravity
     Vector2f getCOG() const;
@@ -69,44 +66,42 @@ public:
     //==============================================================================
 
     /// Add a generic shape (must be convex)
-    void addShape(Ptr<Shape> shape, float skin = 0.0f);
+    void addShape(Ptr<Shape> shape, float density = 1.0f, float friction = 0.1f, float resitution = 0.0f);
     /// Adds a centered box shape to the RigidBody
-    void addBoxShape(float width, float height, const Vector2f& offset = Vector2f(), float skin = 0.0f);
+    void addBoxShape(float width, float height, float density = 1.0f, float friction = 0.1f, float resitution = 0.0f);
     /// Adds a cenetered circle shape to the RigidBody
-    void addCircleShape(float radius, const Vector2f& offset = Vector2f());
+    void addCircleShape(float radius, const Vector2f& offset = Vector2f(), float density = 1.0f, float friction = 0.1f, float resitution = 0.0f);
 
     /// Gets the number of shapes attached to RigidBody
     std::size_t getShapeCount() const;
 
-    /// Set a shape's mass
-    void setShapeMass(std::size_t index, float mass);
     /// Set a shape's density
     void setShapeDensity(std::size_t index, float density);
     /// Set a shape's friction
     void setShapeFriction(std::size_t index, float friction);
     /// Set a shape's elasticity
-    void setShapeElasticity(std::size_t index, float elasticity);
+    void setShapeRestitution(std::size_t index, float restitution);
 
     /// Get a shape's mass
     float getShapeMass(std::size_t index) const;
+    /// Get a shape's inertia
+    float getShapeInertia(std::size_t index) const;
     /// Get a shape's density
     float getShapeDensity(std::size_t index) const;
-    /// Get a shape's moment
-    float getShapeMoment(std::size_t index) const;
     /// Get a shape's friction
     float getShapeFriction(std::size_t index) const;
     /// Get a shape's elasticity
-    float getShapeElasticity(std::size_t index) const;
+    float getShapeRestitution(std::size_t index) const;
 
     //==============================================================================
     // KINEMATIC
     //==============================================================================
 
-    /// Set RigidBody velocity
+    /// Set RigidBody linear velocity
     void setVelocity(const Vector2f& velocity);
-    /// Set RigidBody velocity
+    /// Set RigidBody linear velocity
     void setVelocity(float vx, float vy);
-    /// Get RigidBody velocity
+    /// Get RigidBody linear velocity
     Vector2f getVelocity() const;
 
     //==============================================================================
@@ -131,15 +126,12 @@ private:
     void syncWithTransform();
     /// Updates GameObject transform
     void onPhysics() override;
-    /// Draws Shapes and RigidBody info
-    void onGizmo() override;
 
 private:
 
     friend class Collider;
 
-    cpBody* m_body;                 ///< Chipmunk body
-    std::vector<cpShape*> m_shapes; ///< Chipmunk shapes
+    b2Body* m_body;                 ///< Physics system body
     std::vector<char>     m_mask;   ///< Shape type mask
 };
 

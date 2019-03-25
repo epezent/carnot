@@ -1,8 +1,13 @@
 #pragma once
 
 #include <Common/Types.hpp>
+#include <Common/Handle.hpp>
+
 
 struct cpSpace;
+class b2World;
+
+typedef b2World PhysicsWorld;
 
 namespace carnot {
 namespace Physics {
@@ -15,17 +20,14 @@ void setGravity(const Vector2f& g);
 /// Gets the global gravity vector
 Vector2f getGravity();
 
-/// Set global damping for 0 to 1 (default = 0.9)
-void setDamping(float damping);
-/// Get global damping
-float getDamping();
-
 // Implementation details [internal use only]
 namespace detail {
 void init();
 void update();
 void shutdown();
-cpSpace* space();
+PhysicsWorld* world();
+float scale();
+float invScale();
 } // namespace detail
 } // namespace Physics
 } // namespace carnot

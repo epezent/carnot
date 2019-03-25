@@ -45,17 +45,20 @@ void drawLine(const Vector2f& start, const Vector2f& end, const Color& color);
 /// Draws unconnected lines between every two points in global coordinates
 void drawLines(const std::vector<Vector2f>& points, const Color& color);
 
-/// Draws a connected polyline between a series of poits in global coordinates
+/// Draws a connected polyline between a series of points in global coordinates
 void drawPolyline(const std::vector<Vector2f>& points, const Color& color);
 
 /// Draws a triangle in global coordinates
-void drawTriangle(const Vector2f& a, const Vector2f& b, const Vector2f& c, const Color& color);
+void drawTriangle(const Vector2f& a, const Vector2f& b, const Vector2f& c, const Color& color, bool fill = false);
 
 /// Draws a centered rectangle in global coordinates
-void drawRectangle(const Vector2f& position, float width, float height, const Color& color);
+void drawRectangle(const Vector2f& position, float width, float height, const Color& color, bool fill = false);
+
+/// Draws a polygon composed of vertices in global coordinates
+void drawPolygon(const std::vector<Vector2f>& vertices, const Color& color, bool fill = false);
 
 /// Draws a circle in global coordinates
-void drawCircle(const Vector2f& position, float radius, const Color& color);
+void drawCircle(const Vector2f& position, float radius, const Color& color, bool fill = false);
 
 /// Draws a debug text label in global coordinates
 void drawText(const std::string& text, const Vector2f& position, const Color& color);

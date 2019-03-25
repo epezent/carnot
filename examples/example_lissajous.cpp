@@ -18,7 +18,7 @@ public:
         path->setColor(color);
         path->fromShape(CircleShape(40.0f));
         dot = addComponent<ShapeRenderer>();
-        dot->shape = make<CircleShape>(5.0f);
+        dot->setShape(make<CircleShape>(5.0f));
         dot->setColor(Color::White);
     }
 
@@ -30,7 +30,7 @@ public:
             guide->setPoint(1,dotPos.x,800);
         else
             guide->setPoint(1,800,dotPos.y);
-        dot->shape->setPosition(dotPos);
+        dot->getShape()->setPosition(dotPos);
     }
 
     Handle<LineRenderer> guide;
@@ -51,7 +51,7 @@ public:
         path->setColor(Tween::Linear(r->color, c->color, 0.5f));
 
         dot = addComponent<ShapeRenderer>();
-        dot->shape = make<CircleShape>(3.0f);
+        dot->setShape(make<CircleShape>(3.0f));
         dot->setColor(Color::White);
     }
 
@@ -59,7 +59,7 @@ public:
         Vector2f pos;
         pos.y = r->transform.getPosition().y + r->dotPos.y;
         pos.x = c->transform.getPosition().x + c->dotPos.x;
-        dot->shape->setPosition(pos);
+        dot->getShape()->setPosition(pos);
         path->addPoint(pos);
         if (Input::getKeyDown(Key::Space))
             path->setPointCount(0);

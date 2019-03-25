@@ -14,7 +14,7 @@
 #include <Engine/Engine.hpp>
 #include <Engine/FontAwesome5.hpp>
 #include <Engine/GameObject.hpp>
-#include <Engine/Handle.hpp>
+#include <Common/Handle.hpp>
 #include <Engine/Id.hpp>
 #include <Engine/Macros.hpp>
 #include <Engine/Object.hpp>

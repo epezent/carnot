@@ -6,11 +6,10 @@ public:
     Wall(float width, float height, float x, float y) {
         transform.setLocalPosition(x,y);
         auto sr = addComponent<ShapeRenderer>();
-        sr->shape = make<RectangleShape>(width,height);
+        sr->setShape(make<RectangleShape>(width,height));
         sr->setColor(Color::White);
         auto rb = addComponent<RigidBody>(RigidBody::Static);
         rb->addBoxShape(width,height);
-        rb->setShapeElasticity(0, 1.0f);
     }
 };
 
@@ -19,12 +18,10 @@ public:
     Ball() {
         transform.setPosition(500,250);
         auto sr = addComponent<ShapeRenderer>();
-        sr->shape = make<CircleShape>(10);
+        sr->setShape(make<CircleShape>(10));
         sr->setColor(Reds::FireBrick);
         rb = addComponent<RigidBody>();
         rb->addCircleShape(10);
-        rb->setShapeMass(0, 10.0f);
-        rb->setShapeElasticity(0, 1.0f);
         reset();
     }
 
@@ -46,11 +43,10 @@ public:
     Paddle() {
         auto sr = addComponent<ShapeRenderer>();
         sr->setColor(Color::White);
-        sr->shape = make<RectangleShape>(10,100);
+        sr->setShape(make<RectangleShape>(10,100));
         transform.setPosition(125,250);
         rb = addComponent<RigidBody>(RigidBody::Kinematic);
         rb->addBoxShape(10, 100);
-        rb->setShapeElasticity(0, 1.0f);
     }
 
     void update() override {
@@ -83,7 +79,6 @@ int main(int argc, char const *argv[])
     Engine::init(1000,500);
     Engine::makeRoot<Pong>();
     Physics::setGravity(Vector2f(0,0));
-    Physics::setDamping(1);
     Engine::run();
     
     return 0;

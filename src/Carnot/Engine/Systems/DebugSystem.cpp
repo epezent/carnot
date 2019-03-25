@@ -16,6 +16,7 @@
 #include <array>
 #include <map>
 #include <tuple>
+#include <Carnot/Glue/earcut.inl>
 
 #define DEBUG_COLOR               Greens::Chartreuse
 #define DEBUG_XAXIS_COLOR         Reds::Red
@@ -24,8 +25,7 @@
 #define DEBUG_LOCAL_BOUNDS_COLOR  Blues::Blue
 #define DEBUG_WORLD_BOUNDS_COLOR  Cyans::Cyan
 #define DEBUG_WIREFRAME_COLOR     Yellows::Yellow
-#define DEBUG_PHYSICS_COG_COLOR   Purples::Magenta
-#define DEBUG_PHYSICS_SHAPE_COLOR Purples::Magenta
+#define DEBUG_PHYSICS_COLOR       Purples::Magenta
 
 namespace carnot {
     
@@ -150,46 +150,72 @@ void drawPolyline(const std::vector<Vector2f> &points, const Color& color) {
         drawLine(points[i],points[i+1],color);
 }
 
-void drawTriangle(const Vector2f& a, const Vector2f& b, const Vector2f& c, const Color& color) {
-    drawLine(a,b,color);
-    drawLine(b,c,color);
-    drawLine(c,a,color);
+void drawTriangle(const Vector2f& a, const Vector2f& b, const Vector2f& c, const Color& color, bool fill) {
+    if (fill) {
+        g_triangles.emplace_back(a, color);
+        g_triangles.emplace_back(b, color);
+        g_triangles.emplace_back(c, color);
+    }
+    else {
+        drawLine(a,b,color);
+        drawLine(b,c,color);
+        drawLine(c,a,color);
+    }
 }
 
-void drawRectangle(const Vector2f& position, float width, float height,  const Color& color) {
+void drawRectangle(const Vector2f& position, float width, float height,  const Color& color, bool fill) {
     auto a = position + Vector2f(-width, -height) * 0.5f;
     auto b = position + Vector2f( width, -height) * 0.5f;
     auto c = position + Vector2f( width,  height) * 0.5f;
     auto d = position + Vector2f(-width,  height) * 0.5f;
-    drawLine(a,b,color);
-    drawLine(b,c,color);
-    drawLine(c,d,color);
-    drawLine(d,a,color);
+    if (fill) {
+        drawTriangle(a,b,c,color,true);
+        drawTriangle(a,c,d,color,true);
+    }
+    else {
+        drawLine(a,b,color);
+        drawLine(b,c,color);
+        drawLine(c,d,color);
+        drawLine(d,a,color);
+    }
 }
 
-void drawCircle(const Vector2f &position, float radius, const Color& color) {
+/// Draws a polygon composed of vertices in global coordinates
+void drawPolygon(const std::vector<Vector2f>& vertices, const Color& color, bool fill) {
+    if (vertices.size() < 3)
+        return;
+    if (fill) {
+        std::vector<std::vector<Vector2f>> polygon(1);
+        polygon[0] = vertices;
+        auto indices = mapbox::earcut<std::size_t>(polygon);
+        for (auto& index : indices)
+            g_triangles.emplace_back(vertices[index], color);
+    }
+    else {
+        for (std::size_t i = 0; i < vertices.size(); ++i)
+            drawLine(vertices[i],vertices[(i+1)%vertices.size()],color);
+    }
+}
+
+void drawCircle(const Vector2f &position, float radius, const Color& color, bool fill) {
     std::size_t smoothness = 36;
     float angleIncrement = 2.0f * Math::PI / smoothness;
-    std::vector<Vector2f> polyline(smoothness + 1);
-    for (std::size_t i = 0; i < smoothness + 1; i++) {
-        float angle = i * angleIncrement - 0.5f * Math::PI;
-        polyline[i] = position + Vector2f(std::cos(angle) * radius, std::sin(angle) * radius);
+    for (std::size_t i = 1; i < smoothness + 1; i++) {
+        float angle1 = (i-1) * angleIncrement - 0.5f * Math::PI;
+        float angle2 = (i) * angleIncrement   - 0.5f * Math::PI;
+        auto p1 = position + Vector2f(std::cos(angle1) * radius, std::sin(angle1) * radius);
+        auto p2 = position + Vector2f(std::cos(angle2) * radius, std::sin(angle2) * radius);
+        if (fill)
+            drawTriangle(position,p1,p2,color,true);
+        else
+            drawLine(p1,p2,color);
     }
-    drawPolyline(polyline,color);
 }
 
 void drawText(const std::string& text,
                const Vector2f& position,
                const Color& color)
 {
-    // Text text;
-    // text.setFont(Engine::fonts.get("RobotoMonoBold"));
-    // text.setPosition(position);
-    // text.setCharacterSize((unsigned int)(10 * Engine::getDpiFactor()));
-    // text.setScale(1.0f / Engine::getDpiFactor(), 1.0f / Engine::getDpiFactor());
-    // text.setFillColor(color);
-    // text.setString(_text);
-    // alignCenter(text);
     g_texts.push_back({text, position, color});
 }
 
@@ -386,8 +412,7 @@ void init()
     addGizmo("Local Bounds", DEBUG_LOCAL_BOUNDS_COLOR);
     addGizmo("World Bounds", DEBUG_WORLD_BOUNDS_COLOR);
     addGizmo("Wireframe", DEBUG_WIREFRAME_COLOR);
-    addGizmo("Physics COG", DEBUG_PHYSICS_COG_COLOR);
-    addGizmo("Physics Shape", DEBUG_PHYSICS_SHAPE_COLOR);
+    addGizmo("Physics", DEBUG_PHYSICS_COLOR);
 }
 
 void shutdown() {

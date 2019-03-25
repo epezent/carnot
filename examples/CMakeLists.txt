@@ -9,6 +9,7 @@ set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:WINDOWS /ENTRY:
 
 # carnot_example(coroutine)
 carnot_example(engine carnot.rc)
+carnot_example(debug carnot.rc)
 # carnot_example(online)
 carnot_example(physics carnot.rc)
 carnot_example(pong carnot.rc)
