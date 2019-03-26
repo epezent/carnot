@@ -36,7 +36,7 @@ public:
         std::vector<Vector2f> v(vertexCount);
         for (std::size_t i = 0; i < vertexCount; ++i)
             v[i] = fromB2D(vertices[i]);
-        Debug::drawPolygon(v, withAlpha(fromB2D(color),0.5f), true);
+        Debug::drawPolygon(v, withAlpha(fromB2D(color),0.75f), true);
         Debug::drawPolygon(v, fromB2D(color), false);
     }
 
@@ -47,7 +47,7 @@ public:
 
 	/// Draw a solid circle.
 	virtual void DrawSolidCircle(const b2Vec2& center, float32 radius, const b2Vec2& axis, const b2Color& color) override  {
-        Debug::drawCircle(fromB2D(center), g_invScale * radius, withAlpha(fromB2D(color),0.5f), true);
+        Debug::drawCircle(fromB2D(center), g_invScale * radius, withAlpha(fromB2D(color),0.75f), true);
         Debug::drawCircle(fromB2D(center), g_invScale * radius, fromB2D(color), false);
     }
 

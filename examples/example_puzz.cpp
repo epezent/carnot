@@ -124,7 +124,7 @@ inline void printMat(const Matrix& mat) {
 // GLOBAL DEFINITIONS
 //==============================================================================
 
-const float g_sideLength = 25.0f;
+const float g_sideLength = 30.0f;
 const float g_gridSize   = (2.0f + sqrt(2.0f)) * 0.5f * g_sideLength * 0.999f;
 
 const Matrix g_board {
@@ -473,7 +473,7 @@ Shape makeShape(const Matrix& mat) {
         // create square and octagon primitives
         auto sqr = SquareShape(g_sideLength);
         auto oct = PolygonShape(8, PolygonShape::SideLength, g_sideLength);
-        oct.rotate(360.0f / 16.0f); oct.applyTransform();
+        oct.rotate(360.0f / 16.0f);
         // create que of shapes to merge
         std::deque<Shape> shapes;
         for (auto & r : range(size(mat,0))) {
@@ -482,13 +482,11 @@ Shape makeShape(const Matrix& mat) {
                     shapes.push_back(sqr);
                 else if (mat[r][c] == 8)
                     shapes.push_back(oct);
-                oct.move(g_gridSize, 0);  oct.applyTransform();
-                sqr.move(g_gridSize, 0);  sqr.applyTransform();
+                oct.move(g_gridSize, 0);  
+                sqr.move(g_gridSize, 0);
             }
             oct.move(-g_gridSize * size(mat,1), g_gridSize);
-            oct.applyTransform();
             sqr.move(-g_gridSize * size(mat,1), g_gridSize);
-            sqr.applyTransform();
         }
         // marge shapes
         Shape shape;
@@ -515,10 +513,10 @@ public:
         static auto id = Debug::gizmoId("Grid");
         if (Debug::gizmoActive(id)) {
             for (int i = 0; i < 16; ++i) {
-                Debug::drawLine(coordPosition(-1, i), coordPosition(16, i), Debug::getGizmoColor(id));
-                Debug::drawLine(coordPosition(i, -1), coordPosition(i, 16), Debug::getGizmoColor(id));
-                Debug::drawText("R"+str(i),coordPosition(Vector2i(i,-2)),Whites::White);
-                Debug::drawText("C"+str(i),coordPosition(Vector2i(17,i)),Whites::White);
+                Debug::drawLine(gameObject.transform.localToWorld(coordPosition(-1, i)), gameObject.transform.localToWorld(coordPosition(16, i)), Debug::getGizmoColor(id));
+                Debug::drawLine(gameObject.transform.localToWorld(coordPosition(i, -1)), gameObject.transform.localToWorld(coordPosition(i, 16)), Debug::getGizmoColor(id));
+                Debug::drawText("R"+str(i),gameObject.transform.localToWorld(coordPosition(Vector2i(i,-2))),Whites::White);
+                Debug::drawText("C"+str(i),gameObject.transform.localToWorld(coordPosition(Vector2i(17,i))),Whites::White);
 
             }
         }
@@ -714,13 +712,12 @@ class Puzzometry : public GameObject
         auto sqr = make<SquareShape>(2500);
         sr = addComponent<ShapeRenderer>(sqr);
         sr->setEffect(make<Checkerboard>(Grays::Gray10, Grays::Black, 250));
-        sr->getShape()->setPosition((size(g_board,0)-1) * g_gridSize / 2.0f, (size(g_board,1)-1) * g_gridSize / 2.0f);
-        sr->getShape()->setScale(-1,1);
         sr->showGizmos = false;
 
         board = makeChild<Board>();
+        board->transform.setLocalOrigin((size(g_board,0)-1) * g_gridSize / 2.0f, (size(g_board,1)-1) * g_gridSize / 2.0f);
         for (size_t i = 0; i < g_pieces.size(); ++i) {
-            auto p = makeChild<Piece>(g_pieces[i], g_colors[i]);
+            auto p = board->makeChild<Piece>(g_pieces[i], g_colors[i]);
             p->setName(str("Piece",i));
             p->setCoordinate(g_solutions[i]);
             pieces.push_back(p);
@@ -767,16 +764,15 @@ class Puzzometry : public GameObject
         Debug::show(toggled);        
         spinning = true;
         float t = 0.0f;
-        float rBegin = Engine::getView(0).getRotation() == 315.0f ? 45.0f : 0;
-        float rEnd = rBegin == 45.0f ? 0.0f : 45.0f;
+        float rBegin = board->transform.getRotation();
+        float rEnd = 45.0f - rBegin;
         while (t < spinTime) {
             auto r = Tween::Smootheststep(rBegin, rEnd, t/spinTime);
-            Engine::getView(0).setRotation(-r);
-            sr->getShape()->setRotation(-r);
+            board->transform.setRotation(r);
             t += Engine::deltaTime();
             co_yield nullptr;
         }
-        Engine::getView(0).setRotation(-rEnd);
+        board->transform.setRotation(rEnd);
         spinning = false;
     }
 
@@ -799,7 +795,7 @@ int main(int argc, char const *argv[])
     Engine::setLayerCount(2);
     Debug::addGizmo("Grid", Grays::Gray50);
     Debug::setGizmoActive(Debug::gizmoId("Grid"), true);
-    Engine::getView(0).setCenter((size(g_board,0)-1) * g_gridSize / 2.0f, (size(g_board,1)-1) * g_gridSize / 2.0f);
+    Engine::getView(0).setCenter(0,0);
     Debug::show(true);
     Engine::makeRoot<Puzzometry>();
     Engine::run();

@@ -6,27 +6,13 @@ public:
 
     TestObject()
     {
-        // init background
-        bg = makeChild<GameObject>();
-        std::size_t n = 50;
-        float s = 500.0f/n;
-        for (std::size_t i = 0; i < n/2; ++i) {
-            for (std::size_t j = 0; j < n; ++j) {
-                auto check = bg->addComponent<ShapeRenderer>();
-                check->setShape(make<SquareShape>(s));
-                check->getShape()->setPosition(s*(j%2) + s/2.0f  + 2*i * s, s/2  + j * s);
-                check->setColor(Grays::Gray50);
-                check->setLayer(0);
-            }
-        }
-
         stroke = addComponent<StrokeRenderer>();
         stroke->setLayer(1);
         sr = addComponent<ShapeRenderer>();
         sr->setLayer(1);
         sr->setShape(make<SquareShape>(50));
         sr->setColor(Grays::Gray50);
-        sr->getShape()->setPosition(250,250);
+        sr->getShape()->move(250,250);
 
         auto b = Blues::DeepSkyBlue;
         b.a = 128;
@@ -67,13 +53,12 @@ private:
 class MyObject : public GameObject {
 public:
 
-
     void start() {
         sr = addComponent<ShapeRenderer>();
         sr->setShape(make<CircleShape>(50.0f));
         sr->setColor(Blues::Blue);
         col.resize(4);
-        sr->getShape()->setPosition(250,250);
+        sr->getShape()->move(250,250);
     }
 
     void update() override {

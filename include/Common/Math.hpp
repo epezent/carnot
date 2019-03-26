@@ -87,7 +87,7 @@ inline T wrapTo2Pi(T angle);
 
 /// Determines if two floats a and b are approximately equal
 template <typename T>
-inline T approximately(T a, T b, T delta = EPS);
+inline bool approximately(T a, T b, T delta = EPS);
 
 /// Determins sign of a number (-1 negative, +1 positive, or 0)
 template <typename T>
@@ -216,6 +216,10 @@ inline bool insidePolygon(const std::vector<Vector2<T>>& polygon, const Vector2<
 /// Computes the area of polygon defined by vector of outer vertices
 template <typename T>
 inline T polygonArea(const std::vector<Vector2<T>>& polygon);
+
+/// Returns true if a list of simple polygon vertice is convex
+template <typename T>
+inline bool isConvex(const std::vector<Vector2<T>>& polygon);
 
 /// Computes the angle of a vector (i.e atan2(V.y,V.x))
 template <typename T>

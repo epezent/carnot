@@ -325,6 +325,24 @@ inline T polygonArea(const std::vector<Vector2<T>>& polygon) {
 }
 
 template <typename T>
+inline bool isConvex(const std::vector<Vector2<T>>& polygon) {
+    bool negative = false;
+    bool positive = false;
+    for (std::size_t a = 0; a < polygon.size(); ++a) {
+        auto b = (a+1)%polygon.size();
+        auto c = (b+1)%polygon.size();
+        auto prod = cross(polygon[b]-polygon[a],polygon[c]-polygon[b]);
+        if (prod < 0)
+            negative = true;
+        else if (prod > 0)
+            positive = true;
+        if (negative && positive)
+            return false;        
+    }
+    return true;
+}
+
+template <typename T>
 inline T angle(const Vector2<T>& V) {
     return atan2(V.y, V.x);
 }

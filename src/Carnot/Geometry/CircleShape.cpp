@@ -4,6 +4,7 @@
 namespace carnot {
 
 CircleShape::CircleShape(float radius, std::size_t smoothness) :
+    m_center(0,0),
     m_circleRadius(radius),
     m_smoothness(smoothness)
 {
@@ -19,6 +20,10 @@ float CircleShape::getCircleRadius() const {
     return m_circleRadius;
 }
 
+const Vector2f& CircleShape::getCenter() const {
+    return m_center;
+}
+
 void CircleShape::setSmoothness(std::size_t smoothness) {
     m_smoothness = smoothness;
     updateCircleShape();
@@ -26,6 +31,11 @@ void CircleShape::setSmoothness(std::size_t smoothness) {
 
 std::size_t CircleShape::getSmoothness() const {
     return m_smoothness;
+}
+
+void CircleShape::transform(const Matrix3x3& matrix) {
+    m_center = matrix.transformPoint(m_center);
+    Shape::transform(matrix);
 }
 
 void CircleShape::updateCircleShape() {

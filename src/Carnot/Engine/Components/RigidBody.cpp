@@ -149,10 +149,11 @@ void RigidBody::addCircleShape(float radius, const Vector2f& offset, float densi
 void RigidBody::addShape(Ptr<Shape> shape, float density, float friction, float restitution) {
     Ptr<CircleShape> maybeCircle = std::dynamic_pointer_cast<CircleShape>(shape);
     if (maybeCircle)
-       addCircleShape(maybeCircle->getCircleRadius(), maybeCircle->getPosition(), density, friction, restitution);        
+        addCircleShape(maybeCircle->getCircleRadius(), maybeCircle->getCenter(), density, friction, restitution);
     else {
         // shape
-        assert(_shape->getPointCount() <= b2_maxPolygonVertices);
+        assert(shape->getPointCount() <= b2_maxPolygonVertices);
+        assert(shape->isConvex());
         std::vector<b2Vec2> verts(shape->getPointCount());
         for (std::size_t i = 0; i < shape->getPointCount(); ++i)
             verts[i] = toB2D(shape->getPoint(i));

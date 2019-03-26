@@ -18,8 +18,10 @@ public:
         path->setColor(color);
         path->fromShape(CircleShape(40.0f));
         dot = addComponent<ShapeRenderer>();
-        dot->setShape(make<CircleShape>(5.0f));
-        dot->setColor(Color::White);
+        dot = makeChild<GameObject>();
+        dot->addComponent<ShapeRenderer>();
+        dot->getComponent<ShapeRenderer>()->setShape(make<CircleShape>(5.0f));
+        dot->getComponent<ShapeRenderer>()->setColor(Color::White);
     }
 
     void update() {
@@ -30,12 +32,12 @@ public:
             guide->setPoint(1,dotPos.x,800);
         else
             guide->setPoint(1,800,dotPos.y);
-        dot->getShape()->setPosition(dotPos);
+        dot->transform.setLocalPosition(dotPos);
     }
 
     Handle<LineRenderer> guide;
     Handle<LineRenderer> path;
-    Handle<ShapeRenderer> dot;
+    Handle<GameObject> dot;
     bool column;
     Color color;
     float f;
@@ -50,16 +52,17 @@ public:
         path = addComponent<LineRenderer>();
         path->setColor(Tween::Linear(r->color, c->color, 0.5f));
 
-        dot = addComponent<ShapeRenderer>();
-        dot->setShape(make<CircleShape>(3.0f));
-        dot->setColor(Color::White);
+        dot = makeChild<GameObject>();
+        dot->addComponent<ShapeRenderer>();
+        dot->getComponent<ShapeRenderer>()->setShape(make<CircleShape>(3.0f));
+        dot->getComponent<ShapeRenderer>()->setColor(Color::White);
     }
 
     void update() {
         Vector2f pos;
         pos.y = r->transform.getPosition().y + r->dotPos.y;
         pos.x = c->transform.getPosition().x + c->dotPos.x;
-        dot->getShape()->setPosition(pos);
+        dot->transform.setPosition(pos);
         path->addPoint(pos);
         if (Input::getKeyDown(Key::Space))
             path->setPointCount(0);
@@ -67,7 +70,7 @@ public:
 
     Handle<LissaCircle> r, c;
     Handle<LineRenderer> path;
-    Handle<ShapeRenderer> dot;
+    Handle<GameObject> dot;
 };
 
 class LissaRoot : public GameObject {

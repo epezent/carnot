@@ -34,9 +34,9 @@ void Trigger::update() {
     if (!shape)
         return;
     // get mouse position in shape's local coordinates
-    auto localPos = shape->getInverseTransform().transformPoint(gameObject.transform.worldToLocal(Input::getMousePosition()));
+    auto localPos = gameObject.transform.worldToLocal(Input::getMousePosition());
     // test shape
-    bool insideBounds = Math::inBounds(localPos, shape->getLocalBounds());
+    bool insideBounds = Math::inBounds(localPos, shape->getBounds());
     if (!insideBounds || mode == Bounds)
         updateState(insideBounds);
     else if (mode == Points) {

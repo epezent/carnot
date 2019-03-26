@@ -42,9 +42,7 @@ public:
         if (rb) {
             Debug::drawText(str("mass = ",rb->getMass()), transform.getPosition(), Whites::White);
             auto localPos = transform.worldToLocal(Input::getMousePosition());
-            if (Math::inBounds(localPos, sr->getShape()->getLocalBounds()) && Input::getKeyDown(Key::D))
-                destroy();
-            
+           
         }
     }
 
@@ -58,13 +56,31 @@ public:
 class CompoundBody : public GameObject {
 public:
     Handle<RigidBody> rb;
+    Handle<ShapeRenderer> sr;
 
     CompoundBody() {
         transform.setPosition(Input::getMousePosition());
         rb = addComponent<RigidBody>();
-        rb->addBoxShape(100,25);
-        rb->addCircleShape(25, Vector2f(50,0));
-        rb->addCircleShape(25, Vector2f(-50,0));
+        auto box = make<SquareShape>(25);
+        rb->addShape(box);
+        box->move(0,-25);
+        rb->addShape(box);
+        box->move(25,25);
+        rb->addShape(box);
+        box->move(-25,25);
+        rb->addShape(box);
+        box->move(-25,-25);
+        rb->addShape(box);
+
+        auto vert = RectangleShape(25,75);
+        auto horz = RectangleShape(75,25);
+        auto comb = Shape::clipShapes(vert,horz,Shape::ClipType::Union);
+        sr = addComponent<ShapeRenderer>();
+        sr->setColor(Grays::Gray10);
+        auto T = comb[0];
+        T.addHole(Shape::offsetShape(comb[0],-5.0f));
+        sr->setShape(T);
+
     }
 
     void update() override {

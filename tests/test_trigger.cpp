@@ -12,8 +12,8 @@ public:
         sr = addComponent<ShapeRenderer>(make<StarShape>());
         sr->setColor(Random::color());
         tr = addComponent<Trigger>(sr->getShape());
-        sr->getShape()->setPosition(100,100);
         sr->getShape()->addHole(CircleShape(40));
+        sr->getShape()->move(100,100);
     }
 
     void onMouseEnter() {

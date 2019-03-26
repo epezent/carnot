@@ -90,6 +90,40 @@ void Shape::addPoint(float x, float y) {
     addPoint(sf::Vector2f(x,y));
 }
 
+void Shape::move(float x, float y) {
+    move(Vector2f(x,y));
+}
+
+void Shape::move(const Vector2f& offset) {
+    Matrix3x3 matrix = Matrix3x3::Identity;
+    matrix.translate(offset);
+    transform(matrix);
+}
+
+void Shape::scale(float x, float y) {
+    scale(Vector2f(x,y));
+}
+
+void Shape::scale(const Vector2f& scale) {
+    Matrix3x3 matrix = Matrix3x3::Identity;
+    matrix.scale(scale);
+    transform(matrix);
+}
+
+void Shape::rotate(float angle) {
+    Matrix3x3 matrix = Matrix3x3::Identity;
+    matrix.rotate(angle);
+    transform(matrix);
+}
+
+void Shape::transform(const Matrix3x3& matrix) {
+    for (std::size_t i = 0; i < m_points.size(); ++i)
+        m_points[i] = matrix.transformPoint(m_points[i]);
+    for (auto& hole : m_holes)
+        hole.transform(matrix);
+    makeCacheStale();
+}
+
 void Shape::setRadius(std::size_t index, float radius, std::size_t smoothness) {
     if (radius >= 0.0f) {
         m_radii[index] = radius;
@@ -139,21 +173,6 @@ void Shape::applyRadii() {
     makeCacheStale();
 }
 
-void Shape::applyTransform() {
-    auto transform = getTransform();
-    for (std::size_t i = 0; i < m_points.size(); ++i) {
-        m_points[i] = transform.transformPoint(m_points[i]);
-    }
-    setPosition(0.0f, 0.0f);
-    setRotation(0.0f);
-    setScale(1.0f, 1.0f);
-    for (std::size_t i = 0; i < m_holes.size(); ++i) {
-        for (std::size_t j = 0; j < m_holes[i].m_points.size(); ++j) {
-            m_holes[i].m_points[j] = transform.transformPoint(m_holes[i].m_points[j]);
-        }
-    }
-    makeCacheStale();
-}
 
 void Shape::setHoleCount(std::size_t count) {
     m_holes.resize(count);
@@ -180,20 +199,12 @@ void Shape::addHole(const Shape &hole) {
     makeCacheStale();
 }
 
-FloatRect Shape::getLocalBounds(QueryMode mode) const {
+FloatRect Shape::getBounds(QueryMode mode) const {
     updateCacheIfStale();
     if (mode == Points)
         return m_pointsBounds;
     else
         return m_verticesBounds;
-}
-
-FloatRect Shape::getGlobalBounds(QueryMode mode) const {
-    updateCacheIfStale();
-    if (mode == Points)
-        return getTransform().transformRect(m_pointsBounds);
-    else
-        return getTransform().transformRect(m_verticesBounds);
 }
 
 bool Shape::isInside(const Vector2f& point, QueryMode mode) const {
@@ -219,6 +230,10 @@ float Shape::getArea(QueryMode mode) const {
     for (auto& hole : m_holes)
         area -= hole.getArea(mode);
     return area;
+}
+
+bool Shape::isConvex() const {
+    return Math::isConvex(m_points);
 }
 
 //==============================================================================

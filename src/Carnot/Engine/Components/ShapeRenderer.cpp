@@ -124,7 +124,6 @@ void ShapeRenderer::updateVertexArray() const {
     for (std::size_t i = 0; i < m_shape->getHoleCount(); ++i) {
         polygon[i+1] = m_shape->getHole(i).getVertices();
         n_vertices += polygon[i+1].size();
-
     }
     // generate indices
     std::vector<std::size_t> indices = mapbox::earcut<std::size_t>(polygon);
@@ -148,7 +147,7 @@ void ShapeRenderer::updateVertexArray() const {
 }
 
 void ShapeRenderer::updateTexCoords() const {
-    auto bounds = m_shape->getLocalBounds(Shape::Vertices);
+    auto bounds = m_shape->getBounds(Shape::Vertices);
     float invWidth = 1.0f / bounds.width;
     float invHeight = 1.0f / bounds.height;
     for (std::size_t i = 0; i < m_vertexArray.size(); ++i) {
@@ -174,7 +173,7 @@ void ShapeRenderer::updateFillColors() const
 }
 
 void ShapeRenderer::render(RenderTarget& target) const {
-    m_states.transform = gameObject.transform.getWorldMatrix() * m_shape->getTransform();
+    m_states.transform = gameObject.transform.getWorldMatrix();
     // check if our cache age is stale
     if (!m_shape->cacheCurrent(m_cacheAge)) {
         // Update vertex array
@@ -195,7 +194,7 @@ void ShapeRenderer::render(RenderTarget& target) const {
 }
 
 FloatRect ShapeRenderer::getLocalBounds() const {
-    return m_shape->getTransform().transformRect(m_shape->getLocalBounds());
+    return m_shape->getBounds();
 }
 
 FloatRect ShapeRenderer::getWorldBounds() const {
@@ -209,7 +208,7 @@ void ShapeRenderer::onGizmo() {
 
     static Id wireframeId = Debug::gizmoId("Wireframe");
 
-    Matrix3x3 T = gameObject.transform.getWorldMatrix() * m_shape->getTransform();
+    Matrix3x3 T = gameObject.transform.getWorldMatrix();
 
     // wireframe
     if (Debug::gizmoActive(wireframeId)) {

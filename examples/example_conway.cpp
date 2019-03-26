@@ -78,11 +78,11 @@ public:
         cells.resize(R);
         loadBg = addComponent<ShapeRenderer>(make<RectangleShape>(500,20));
         loadBg->setColor(Grays::Gray50);
-        loadBg->getShape()->setPosition(960,540);
+        loadBg->getShape()->move(960,540);
         loadRect = make<RectangleShape>(0,20);
         loadFg = addComponent<ShapeRenderer>(loadRect);
         loadFg->setColor(Whites::White);
-        loadFg->getShape()->setPosition(960,540);
+        loadFg->getShape()->move(960,540);
         startCoroutine(load());
     }
 

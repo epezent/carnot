@@ -5,3 +5,4 @@ endmacro()
 
 carnot_test(stroke)
 carnot_test(trigger)
+carnot_test(shape)

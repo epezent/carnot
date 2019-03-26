@@ -7,7 +7,7 @@
 namespace carnot {
 
 /// Encapsulates an advanced vector graphics object
-class Shape : public Transformable, public Cacheable  {
+class Shape : public Cacheable  {
 public:
 
     /// Mode by which to query shape information
@@ -51,6 +51,24 @@ public:
     /// Adds a new point and increments the point count
     void addPoint(float x, float y);
 
+    /// Translates all points
+    void move(float offsetX, float offsetY);
+
+    /// Translate all points
+    void move(const Vector2f& offset);
+
+    /// Rotates all points about a particular point
+    void rotate(float angle);
+
+    /// Translates all points
+    void scale(float scaleX, float scaleY);
+
+    /// Translate all points
+    void scale(const Vector2f& scale);
+
+    /// Transform all points
+    virtual void transform(const Matrix3x3& matrix);
+
     /// Sets the radius associated with a point
     void setRadius(std::size_t index, float radius, std::size_t smoothness = 10);
 
@@ -77,10 +95,6 @@ public:
     /// Permantly applies all radii (i.e. converts vertices to points)
     void applyRadii();
 
-    /// Applies the Shape's current transform to the local positions of the
-    /// Shape's points and resets the transform.
-    void applyTransform();
-
     /// Sets the number of holes in the Shape
     void setHoleCount(std::size_t count);
 
@@ -97,16 +111,16 @@ public:
     void addHole(const Shape& hole);
 
     /// Gets the local bounding rectangle of the Shape
-    FloatRect getLocalBounds(QueryMode mode = Points) const;
-
-    /// Gets the global bounding rectangle of the Shape
-    FloatRect getGlobalBounds(QueryMode mode = Points) const;
+    FloatRect getBounds(QueryMode mode = Points) const;
 
     /// Tests if a point is inside of a Shape
     bool isInside(const Vector2f& point, QueryMode mode = Points) const;
 
     /// Returns area of shape including radii and holes
     float getArea(QueryMode mode = Points) const;
+
+    /// Returns true if the Shape is convex, false if concave
+    bool isConvex() const;
 
 public:
 
