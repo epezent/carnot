@@ -9,7 +9,12 @@
 #include <Engine/FontAwesome5.hpp>
 #include <windows.h>
 #include <winuser.h>
+#include <atomic>
+#include <thread>
 #include <ShellScalingAPI.h>
+#include "SPSCQueue.hpp"
+
+using namespace rigtorp;
 
 namespace carnot {
 
@@ -18,8 +23,8 @@ namespace carnot {
 //==============================================================================
 namespace {   
 
-bool              g_initialized = false;
-bool              g_running     = false; 
+std::atomic<bool> g_initialized = false;
+std::atomic<bool> g_running     = false; 
 float             g_time        = 0.0f;
 float             g_delta       = 0.0f;
 std::size_t       g_frame       = 0;
@@ -29,6 +34,7 @@ RenderQue         g_renderQue   = RenderQue(1);
 Color             g_bgColor     = Color();
 Clock             g_clock       = Clock();
 Ptr<GameObject>   g_root;
+SPSCQueue<Event>  g_eventQue(256);          
 
 unsigned char white_pixel[] = {
     0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00, 0x00, 0x0d,
@@ -80,8 +86,6 @@ void determineDpi() {
     g_dpiFactor = 1.0f;
 #endif
 }
-
-
 
 //==============================================================================
 // WINDOWS
@@ -155,7 +159,6 @@ void Engine::init(const std::string& title) {
 void Engine::init(unsigned int width, unsigned int height, const std::string& title) {
     init(width, height, WindowStyle::Default, title);
 }
-
 
 void Engine::init(unsigned int width, unsigned int height, unsigned int style, const std::string& title) {
     // asserts
@@ -276,13 +279,17 @@ void Engine::init(unsigned int width, unsigned int height, unsigned int style, c
     window->requestFocus();
 }
 
+void Engine::eventThread() {
+    Event event;
+    while (g_running) {
+        while (window->pollEvent(event))
+            g_eventQue.try_push(event);
+        sleep(milliseconds(2));
+    }
+}
 
-void Engine::run() {
-    assert(g_root != nullptr);
-    assert(!g_running);
-    g_running = true;
-    g_clock.restart();
-    // run game
+void Engine::renderThread() {
+    window->setActive(true);
     while (window->isOpen() && g_running) {
         // input update
         Input::detail::update();
@@ -306,7 +313,6 @@ void Engine::run() {
             // increment frame
             g_frame++;
         }
-
         // clear window
         window->clear(g_bgColor);
         // render
@@ -321,6 +327,19 @@ void Engine::run() {
         // display window
         window->display();
     }
+    g_running = false;
+}
+
+void Engine::run() {
+    assert(g_root != nullptr);
+    assert(!g_running);
+    g_running = true;
+    g_clock.restart();
+    // run game
+    window->setActive(false);
+    std::thread rt(renderThread);
+    eventThread();
+    rt.join();
     // free resources
     freeResources();
     // delete root GameObject
@@ -415,9 +434,30 @@ void Engine::render() {
     }
 }
 
+// void Engine::processEvents() {
+//     Event event;
+//     while (window->pollEvent(event)) {
+//         Input::detail::processEvent(event);
+//         ImGui::SFML::ProcessEvent(event);
+//         switch (event.type) {
+//             case Event::Closed: {
+//                 window->close();
+//                 break;
+//             }
+//             case Event::Resized: {              
+//                 g_views[0].setSize((float)event.size.width / g_dpiFactor, (float)event.size.height / g_dpiFactor);
+//                 break;
+//             }
+//             default:
+//                 break;
+//         }
+//     }
+// }
+
 void Engine::processEvents() {
     Event event;
-    while (window->pollEvent(event)) {
+    while (g_eventQue.front()) {
+        event = *g_eventQue.front();
         Input::detail::processEvent(event);
         ImGui::SFML::ProcessEvent(event);
         switch (event.type) {
@@ -432,6 +472,7 @@ void Engine::processEvents() {
             default:
                 break;
         }
+        g_eventQue.pop();
     }
 }
 

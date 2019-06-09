@@ -78,7 +78,9 @@
         "queue": "cpp",
         "set": "cpp",
         "variant": "cpp",
-        "carnot": "cpp"
+        "carnot": "cpp",
+        "filesystem": "cpp",
+        "mutex": "cpp"
     },
     "C_Cpp.default.configurationProvider": "vector-of-bool.cmake-tools",
     "cSpell.enabled": false

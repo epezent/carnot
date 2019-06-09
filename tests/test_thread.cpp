@@ -18,9 +18,6 @@ void renderingThread(sf::RenderWindow* window)
         circle.setPosition(100*sin(2*Math::PI*t),0);
         window->clear();
         window->draw(circle);
-
-
-
         // end the current frame
         window->display();
     }

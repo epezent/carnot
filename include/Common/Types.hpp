@@ -71,6 +71,7 @@ using Matrix3x3   = sf::Transform;
 using sf::seconds;
 using sf::milliseconds;
 using sf::microseconds;
+using sf::sleep;
 
 namespace WindowStyle = sf::Style;
 

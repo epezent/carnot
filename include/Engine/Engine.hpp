@@ -76,6 +76,8 @@ static ResourceManager<Shader>      shaders;  ///< shaders
 
 private:
 
+    static void eventThread();
+    static void renderThread();
     static void render();
     static void processEvents();
 
