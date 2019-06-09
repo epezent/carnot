@@ -9,8 +9,8 @@ set(SFML_STATIC_LIBRARIES TRUE)
 find_package(SFML 2.5 REQUIRED COMPONENTS audio graphics window system network)
 list(REMOVE_AT CMAKE_MODULE_PATH -1)
 
-if(NOT TARGET Carnot::carnot)
-    include("${CARNOT_CMAKE_DIR}/CARNOTTargets.cmake")
+if(NOT TARGET carnot::carnot)
+    include("${CARNOT_CMAKE_DIR}/CarnotTargets.cmake")
 endif()
 
-set(CARNOT_LIBRARIES Carnot::carnot)
+set(CARNOT_LIBRARIES carnot::carnot)

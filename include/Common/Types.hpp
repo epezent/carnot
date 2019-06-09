@@ -62,6 +62,7 @@ using sf::Music;
 using sf::Shader;
 using sf::Vertex;
 using sf::BlendMode;
+using sf::Clipboard;
 
 using Key         = sf::Keyboard::Key;
 using MouseButton = sf::Mouse::Button;

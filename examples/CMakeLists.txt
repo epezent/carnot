@@ -2,6 +2,10 @@ macro(carnot_example CARNOT_EXAMPLE_NAME ICON)
     add_executable(${CARNOT_EXAMPLE_NAME} "example_${CARNOT_EXAMPLE_NAME}.cpp" "resources/icons/${ICON}")
     target_link_libraries(${CARNOT_EXAMPLE_NAME} carnot)
     set_target_properties(${CARNOT_EXAMPLE_NAME} PROPERTIES LINK_FLAGS "/ENTRY:mainCRTStartup")
+    set_target_properties(${CARNOT_EXAMPLE_NAME} PROPERTIES DEBUG_POSTFIX -d)
+    install(TARGETS ${CARNOT_EXAMPLE_NAME}
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    )
 endmacro()
 
 # disable console
@@ -22,3 +26,4 @@ carnot_example(tfx tfx.rc)
 carnot_example(puzz carnot.rc)
 carnot_example(effects carnot.rc)
 carnot_example(planets carnot.rc)
+carnot_example(melscope melscope.rc)

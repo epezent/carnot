@@ -81,6 +81,50 @@ void determineDpi() {
 #endif
 }
 
+
+
+//==============================================================================
+// WINDOWS
+//==============================================================================
+
+LONG_PTR g_originalSfmlCallback = 0x0;
+
+LRESULT CALLBACK fileDropCallback(HWND handle, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    if(message == WM_DROPFILES)
+    {
+        HDROP hdrop = reinterpret_cast<HDROP>(wParam);
+        POINT p;
+        p.x = 0;
+        p.y = 0;
+        if(DragQueryPoint(hdrop, &p))
+            std::printf("Point is %d, %d\n", p.x, p.y);
+        else
+            std::cout << "Failed to get point" << std::endl;
+
+        const UINT filescount = DragQueryFile(hdrop, 0xFFFFFFFF, NULL, 0);
+        for(UINT i = 0; i < filescount; ++i)
+        {
+            const UINT bufsize = DragQueryFile(hdrop, i, NULL, 0);
+            std::string str;
+            str.resize(bufsize + 1);
+            if(DragQueryFile(hdrop, i, (&str[0]), bufsize + 1))
+            {
+
+                std::cout << str << std::endl;
+            }
+        }
+        DragFinish(hdrop);
+        std::cout << "-------------" << std::endl;
+    }//if WM_DROPFILES
+    return CallWindowProcW(reinterpret_cast<WNDPROC>(g_originalSfmlCallback), handle, message, wParam, lParam);
+}
+
+void enableFileDrop(sf::WindowHandle handle) {
+    DragAcceptFiles(handle, TRUE);
+    g_originalSfmlCallback = SetWindowLongPtrW(handle, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(fileDropCallback));
+}
+
 void setUserIcon(sf::WindowHandle handle) {
 #ifdef _WIN32
     HANDLE hIcon = LoadIconW(GetModuleHandleW(NULL), L"CARNOT_ICON");
@@ -112,6 +156,7 @@ void Engine::init(unsigned int width, unsigned int height, const std::string& ti
     init(width, height, WindowStyle::Default, title);
 }
 
+
 void Engine::init(unsigned int width, unsigned int height, unsigned int style, const std::string& title) {
     // asserts
     assert(!g_initialized);
@@ -133,6 +178,8 @@ void Engine::init(unsigned int width, unsigned int height, unsigned int style, c
     window->setFramerateLimit(60);
     // set user icon from RC file
     setUserIcon(window->getSystemHandle());
+    // enable file drop
+    enableFileDrop(window->getSystemHandle());
     // set default Window view
     g_views[0] = window->getDefaultView();
     g_views[0].setCenter(g_views[0].getCenter() / g_dpiFactor);
@@ -228,6 +275,7 @@ void Engine::init(unsigned int width, unsigned int height, unsigned int style, c
     g_initialized = true;
     window->requestFocus();
 }
+
 
 void Engine::run() {
     assert(g_root != nullptr);

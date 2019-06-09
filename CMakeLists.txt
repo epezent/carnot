@@ -1,30 +1,33 @@
 cmake_minimum_required(VERSION 3.13.0)
 
 # create project
-project(Carnot VERSION 1.0.0 LANGUAGES CXX)
+project(carnot VERSION 1.0.0 LANGUAGES CXX)
 
 # add modules
 list(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_SOURCE_DIR}/cmake)
-
-# enable C++17
-set(CMAKE_CXX_STANDARD 17)
+include(GNUInstallDirs)
 
 # create target and add an alias
 add_library(carnot "")
-add_library(Carnot::carnot ALIAS carnot)
+add_library(carnot::carnot ALIAS carnot)
+set_target_properties(carnot PROPERTIES DEBUG_POSTFIX -d)
+target_compile_features(carnot PUBLIC cxx_std_17 PRIVATE)
+if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+    target_compile_options(carnot PUBLIC "/await" PRIVATE) # COROUTINES
+elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    target_compile_options(carnot PUBLIC "-fcoroutines-ts -stdlib=libc++" PRIVATE) # COROUTINES
+endif()
 
 # add source files to target
 add_subdirectory(src)
 
+# add include files
 file(GLOB_RECURSE CARNOT_INCLUDE "include/*.hpp" "include/*.inl" "include/*.h")
 target_sources(carnot PRIVATE ${CARNOT_INCLUDE})
 
 # find SFML
 set(SFML_STATIC_LIBRARIES TRUE)
 find_package(SFML 2.5 REQUIRED COMPONENTS audio graphics window system network)
-
-# find Chipmunk
-find_package(Chipmunk REQUIRED)
 
 # add dependcies
 target_link_libraries(carnot
@@ -36,7 +39,6 @@ target_link_libraries(carnot
 		XInput
 		Shcore
 		sfml-audio sfml-graphics sfml-window sfml-system sfml-network
-		${CHIPMUNK_LIBRARIES}
 	PRIVATE
 )
 
@@ -52,7 +54,6 @@ target_include_directories(carnot
 	PUBLIC
 		$<INSTALL_INTERFACE:include>
 		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-		${CHIPMUNK_INCLUDE_DIRS}
 	PRIVATE
 		${CMAKE_CURRENT_SOURCE_DIR}/src
 )
@@ -61,31 +62,42 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wall -O3") # ALL WARNINGS
 elseif(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
     set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} /MP")    # MULTICORE BUILDS
-    set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} /await") # COROUTINES
-elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -fcoroutines-ts -stdlib=libc++") # COROUTINES
 endif()
 
+#===============================================================================
+# EXAMPLES/TESTS
+#===============================================================================
+
+add_subdirectory(examples)
+add_subdirectory(tests)
+
+#===============================================================================
+# INSTALL
+#===============================================================================
+
 # install the library
-include(GNUInstallDirs)
-set(INSTALL_CONFIGDIR ${CMAKE_INSTALL_LIBDIR}/cmake/Carnot)
+set(INSTALL_CONFIGDIR ${CMAKE_INSTALL_LIBDIR}/cmake/carnot)
 install(TARGETS carnot
 	EXPORT carnot-targets
 	LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
 	ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
 
-set_target_properties(carnot PROPERTIES EXPORT_NAME Carnot)
-set_target_properties(carnot PROPERTIES FOLDER "Carnot")
+set_target_properties(carnot PROPERTIES EXPORT_NAME carnot)
+set_target_properties(carnot PROPERTIES FOLDER "carnot")
 
+# install headers
 install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+
+# set where we want to install our config
+set(INSTALL_CONFIGDIR ${CMAKE_INSTALL_LIBDIR}/cmake/carnot)
 
 # export the targets to a script
 install(EXPORT carnot-targets
 	FILE
 		CarnotTargets.cmake
-	NAMESPACE
-		carnot::
+	# NAMESPACE
+	# 	carnot::
 	DESTINATION
 		${INSTALL_CONFIGDIR}
 )
@@ -113,8 +125,6 @@ install(FILES
 
 # export from the build tree
 export(EXPORT carnot-targets
-	   NAMESPACE carnot::
+	#    NAMESPACE carnot::
 	   FILE ${CMAKE_CURRENT_BINARY_DIR}/CarnotTargets.cmake)
 
-add_subdirectory(examples)
-add_subdirectory(tests)
