@@ -333,6 +333,28 @@ void Update(sf::Window& window, sf::RenderTarget& target, sf::Time dt)
     }
 }
 
+void Update(sf::Window& window, sf::RenderTarget& target, const sf::Vector2u& windowSize, sf::Time dt)
+{
+    auto io = ImGui::GetIO();
+
+    if (!s_mouseMoved) {
+        if (sf::Touch::isDown(0))
+            s_touchPos = sf::Touch::getPosition(0, window);
+
+        Update(s_touchPos, static_cast<sf::Vector2f>(windowSize), dt);
+    } else {
+        auto pos = sf::Mouse::getPosition(window);
+        pos.x = (int)((float)pos.x / io.DisplayFramebufferScale.x);
+        pos.y = (int)((float)pos.y / io.DisplayFramebufferScale.y);
+        Update(pos, static_cast<sf::Vector2f>(windowSize), dt);
+    }
+
+    if (io.MouseDrawCursor) {
+        // Hide OS mouse cursor if imgui is drawing it
+        window.setMouseCursorVisible(false);
+    }
+}
+
 void Update(const sf::Vector2i& mousePos, const sf::Vector2f& displaySize, sf::Time dt)
 {
     ImGuiIO& io = ImGui::GetIO();

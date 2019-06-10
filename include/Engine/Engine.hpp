@@ -51,6 +51,8 @@ static void setLayerCount(std::size_t count);
 static std::size_t getLayerCount();
 /// Get the DPI scaling factor
 static float getDpiFactor();
+/// Get the realtime window size
+static Vector2u getWindowSize();
 
 //=============================================================================
 // ROOT OBJECT

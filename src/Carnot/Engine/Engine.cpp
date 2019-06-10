@@ -139,6 +139,8 @@ void setUserIcon(sf::WindowHandle handle) {
 #endif
 }
 
+
+
 } // private namespace
 
 //==============================================================================
@@ -288,6 +290,15 @@ void Engine::eventThread() {
     }
 }
 
+Vector2u Engine::getWindowSize() {
+    RECT rect;
+    GetClientRect(window->getSystemHandle(), &rect);  
+    Vector2u out;
+    out.x = rect.right - rect.left;
+    out.y = rect.bottom - rect.top;
+    return out;
+}
+
 void Engine::renderThread() {
     window->setActive(true);
     while (window->isOpen() && g_running) {
@@ -295,10 +306,14 @@ void Engine::renderThread() {
         Input::detail::update();
         processEvents();
         // update delta time
-        auto deltaTimeTime = g_clock.restart();
-        g_delta = deltaTimeTime.asSeconds();
+        auto deltaTime = g_clock.restart();
+        g_delta = deltaTime.asSeconds();
+        // get realtime window size
+        auto windowSize = getWindowSize();
+        // print(windowSize);
+        g_views[0].setSize(windowSize.x / g_dpiFactor, windowSize.y / g_dpiFactor);
         // upate imgui
-        ImGui::SFML::Update(*window, deltaTimeTime);
+        ImGui::SFML::Update(*window, *window, windowSize, deltaTime);
         // game update
         if (Debug::detail::proceed()) {
             // update continous time
@@ -348,7 +363,7 @@ void Engine::run() {
     ImGui::SFML::Shutdown();
     Physics::detail::shutdown();
     Debug::detail::shutdown();
-    g_initialized = false;    
+    g_initialized = false;   
 }
 
 void Engine::stop() {
@@ -465,7 +480,7 @@ void Engine::processEvents() {
                 window->close();
                 break;
             }
-            case Event::Resized: {              
+            case Event::Resized: {     
                 g_views[0].setSize((float)event.size.width / g_dpiFactor, (float)event.size.height / g_dpiFactor);
                 break;
             }

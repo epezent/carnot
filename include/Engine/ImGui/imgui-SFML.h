@@ -28,6 +28,7 @@ namespace SFML
 
     void Update(sf::RenderWindow& window, sf::Time dt);
     void Update(sf::Window& window, sf::RenderTarget& target, sf::Time dt);
+    void Update(sf::Window& window, sf::RenderTarget& target, const sf::Vector2u& windowSize, sf::Time dt);
     void Update(const sf::Vector2i& mousePos, const sf::Vector2f& displaySize, sf::Time dt);
 
     void Render(sf::RenderTarget& target);

@@ -1,5 +1,5 @@
 #define CARNOT_USE_DISCRETE_GPU
-#define CARNOT_NO_CONSOLE
+// #define CARNOT_NO_CONSOLE
 
 #include <carnot>
 using namespace carnot;
