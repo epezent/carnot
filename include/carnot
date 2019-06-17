@@ -8,6 +8,7 @@
 #include <Common/Range.hpp>
 #include <Common/Sequence.hpp>
 #include <Common/Tween.hpp>
+#include <Common/Util.hpp>
 
 #include <Engine/Component.hpp>
 #include <Engine/Coroutine.hpp>
