@@ -21,7 +21,7 @@ public:
 
     /// Constructor which takes a Shape
     Trigger(GameObject& gameObject, Ptr<Shape> shape, Mode mode = Points);
-    
+  
 public:
 
     Mode mode;         ///< Trigger query mode
