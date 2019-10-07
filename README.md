@@ -13,7 +13,7 @@ git clone https://github.com/SFML/SFML
 cd SFML
 mkdir build
 cd build
-cmake .. -G "Visual Studio 15 2017 Win64" -DBUILD_SHARED_LIBS=OFF
+cmake .. -A x64 -DBUILD_SHARED_LIBS=OFF
 cmake --build . --target install --config Release
 
 cd ../..
@@ -21,6 +21,6 @@ git clone https://github.com/epezent/carnot
 cd carnot
 mkdir build
 cd build
-cmake .. -G "Visual Studio 15 2017 Win64"
+cmake .. -A x64
 cmake --build . --target install --config Release
 ```
