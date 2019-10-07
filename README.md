@@ -15,6 +15,7 @@ mkdir build
 cd build
 cmake .. -A x64 -DBUILD_SHARED_LIBS=OFF
 cmake --build . --target install --config Release
+cmake --build . --target install --config Debug
 
 cd ../..
 git clone https://github.com/epezent/carnot
@@ -23,4 +24,5 @@ mkdir build
 cd build
 cmake .. -A x64
 cmake --build . --target install --config Release
+cmake --build . --target install --config Debug
 ```
