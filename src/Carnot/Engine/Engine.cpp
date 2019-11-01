@@ -449,26 +449,6 @@ void Engine::render() {
     }
 }
 
-// void Engine::processEvents() {
-//     Event event;
-//     while (window->pollEvent(event)) {
-//         Input::detail::processEvent(event);
-//         ImGui::SFML::ProcessEvent(event);
-//         switch (event.type) {
-//             case Event::Closed: {
-//                 window->close();
-//                 break;
-//             }
-//             case Event::Resized: {              
-//                 g_views[0].setSize((float)event.size.width / g_dpiFactor, (float)event.size.height / g_dpiFactor);
-//                 break;
-//             }
-//             default:
-//                 break;
-//         }
-//     }
-// }
-
 void Engine::processEvents() {
     Event event;
     while (g_eventQue.front()) {

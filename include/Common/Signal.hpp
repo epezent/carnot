@@ -123,7 +123,8 @@ public:
     size_t connect(const CbFunction &cb) { return add_cb(cb); }
 
     template <class Class, class R, class... Args>
-    size_t connect(Class *object, R (Class::*method)(Args...)) {
+    size_t connect(Class *object, R (Class::*method)(Args...))
+    {
         auto f = [object, method](Args... args) { return (object->*method)(args...); };
         return connect(f);
     }
@@ -158,8 +159,7 @@ public:
         return collector.result();
     }
     // Number of connected slots.
-    std::size_t
-    size() const
+    std::size_t size() const
     {
         return callback_list_.size();
     }

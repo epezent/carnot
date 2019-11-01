@@ -268,7 +268,7 @@ void infoMenu() {
     if (corner != -1)
         ImGui::SetNextWindowPos(window_pos, ImGuiCond_Always, window_piv);
     ImGui::SetNextWindowContentWidth(150);
-    if (ImGui::Begin("Info", nullptr, (corner != -1 ? ImGuiWindowFlags_NoMove : 0) | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoNav))
+    if (ImGui::Begin("Info##CARNOT_DEBUG", nullptr, (corner != -1 ? ImGuiWindowFlags_NoMove : 0) | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoNav))
     {
         ImGui::Text("CLK: %.2f s", Engine::time());
         tooltip("Current time");
@@ -306,7 +306,7 @@ void gizmoMenu() {
     if (corner != -1)
         ImGui::SetNextWindowPos(window_pos, ImGuiCond_Always, window_piv);
     // ImGui::SetNextWindowContentWidth(150);
-    if (ImGui::Begin("Gizmos", nullptr, (corner != -1 ? ImGuiWindowFlags_NoMove : 0) | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoNav))
+    if (ImGui::Begin("Gizmos##CARNOT_DEBUG", nullptr, (corner != -1 ? ImGuiWindowFlags_NoMove : 0) | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoNav))
     {
         for (auto& id : g_gizmoIds) {
             auto color = g_gizmoColors[id];
@@ -329,7 +329,7 @@ void toolbarMenu() {
     ImVec2 window_pos = ImVec2(io.DisplaySize.x * 0.5f, g_windowDistance);
     ImVec2 window_piv = ImVec2(0.5f, 0.0f);
     ImGui::SetNextWindowPos(window_pos, ImGuiCond_Always, window_piv);
-    if (ImGui::Begin("Toolbar", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav))
+    if (ImGui::Begin("Toolbar##CARNOT_DEBUG", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav))
     {
 
         if (!g_paused) {
