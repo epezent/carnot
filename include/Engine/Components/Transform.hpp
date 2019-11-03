@@ -1,7 +1,7 @@
 #pragma once
 
 #include <Engine/Component.hpp>
-#include <Common/Signal.hpp>
+#include <Utility/Signal.hpp>
 
 namespace carnot {
 

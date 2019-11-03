@@ -3,8 +3,8 @@ using namespace carnot;
 
 int main(int argc, char const *argv[])
 {
-    Engine engine(500,500);
-    engine.makeRoot<GameObject>();
-    engine.run();
+    Engine::init(250,250,"Hello, World");
+    Engine::makeRoot<GameObject>();
+    Engine::run();
     return 0;
 }

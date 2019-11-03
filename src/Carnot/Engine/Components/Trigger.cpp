@@ -1,7 +1,7 @@
 #include <Engine/Components/Trigger.hpp>
 #include <Engine/Systems/InputSystem.hpp>
 #include <Engine/GameObject.hpp>
-#include <Common/Math.hpp>
+#include <Utility/Math.hpp>
 
 namespace carnot {
 

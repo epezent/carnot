@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Common/Math.hpp>
+#include <Utility/Math.hpp>
 #include <Graphics/Color.hpp>
 
 namespace carnot {
@@ -104,4 +104,4 @@ namespace Tween
 
 } // namespace carnot
 
-#include <Common/Detail/Tween.inl>
+#include <Utility/Detail/Tween.inl>

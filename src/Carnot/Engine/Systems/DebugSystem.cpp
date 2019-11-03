@@ -1,13 +1,13 @@
 #include <Engine/Systems/DebugSystem.hpp>
 #include <Engine/Engine.hpp>
-#include <Common/Alignment.hpp>
+#include <Utility/Alignment.hpp>
 #include <Engine/ProcessInfo.hpp>
 #include <sstream>
 #include <iomanip>
 #include <iostream>
 #include <Engine/Components/Renderer.hpp>
 #include <Engine/Components/RigidBody.hpp>
-#include <Common/Math.hpp>
+#include <Utility/Math.hpp>
 #include <Engine/ImGui/imgui.h>
 #include <Engine/ImGui/imgui-SFML.h>
 #include <Engine/FontAwesome5.hpp>

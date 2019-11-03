@@ -5,7 +5,7 @@
 #include <memory>
 #include <stdexcept>
 #include <string>
-#include <Common/Types.hpp>
+#include <Utility/Types.hpp>
 
 namespace carnot {
 

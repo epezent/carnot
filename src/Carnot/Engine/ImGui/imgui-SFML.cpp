@@ -1,6 +1,6 @@
 #include <Engine/ImGui/imgui-SFML.h>
 #include <Engine/ImGui/imgui.h>
-#include <Common/Print.hpp>
+#include <Utility/Print.hpp>
 
 #include <SFML/OpenGL.hpp>
 #include <SFML/Graphics/Color.hpp>

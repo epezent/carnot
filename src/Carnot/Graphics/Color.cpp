@@ -1,5 +1,5 @@
 #include <Graphics/Color.hpp>
-#include <Common/Math.hpp>
+#include <Utility/Math.hpp>
 #include <cmath>
 #include <cstdio>
 #include <iostream>

@@ -1,7 +1,7 @@
 #include <Engine/Components/Transform.hpp>
 #include <Engine/GameObject.hpp>
 #include <Engine/Engine.hpp>
-#include <Common/Math.hpp>
+#include <Utility/Math.hpp>
 #include <Engine/ImGui/imgui.h>
 #include <Graphics/NamedColors.hpp>
 

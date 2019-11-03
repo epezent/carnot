@@ -1,7 +1,7 @@
 #pragma once
 
-#include <Common/Types.hpp>
-#include <Common/Handle.hpp>
+#include <Utility/Types.hpp>
+#include <Utility/Handle.hpp>
 
 
 struct cpSpace;

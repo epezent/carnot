@@ -1,7 +1,7 @@
 #pragma once
 
-#include <Common/Types.hpp>
-#include <Common/Cacheable.hpp>
+#include <Utility/Types.hpp>
+#include <Utility/Cacheable.hpp>
 #include <vector>
 
 namespace carnot {
