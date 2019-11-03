@@ -256,24 +256,11 @@ void Transform::makeDirty() {
     m_invLocalTransformDirty = true;
     m_worldTransformDirty = true;
     m_invWorldTransformDirty = true;
-    callCallbacks();
-}
-
-//==============================================================================
-// Callbacks
-//==============================================================================
-
-void Transform::registerCallback(std::function<void(void)> callback) {
-    m_callbacks.push_back(callback);
-}
-
-void Transform::callCallbacks() {
     // call our callbacks
-    for (auto& c : m_callbacks)
-        c();
-    // call children callbacks
+    onChanged.emit();
+    // ditry children
     for (std::size_t i = 0; i < gameObject.getChildCount(); ++i)
-        gameObject.getChild(i)->transform.callCallbacks();
+        gameObject.getChild(i)->transform.makeDirty();
 }
 
 } // namespace carnot

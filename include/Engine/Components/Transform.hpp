@@ -1,7 +1,7 @@
 #pragma once
 
 #include <Engine/Component.hpp>
-#include <functional>
+#include <Common/Signal.hpp>
 
 namespace carnot {
 
@@ -95,20 +95,14 @@ public:
     /// Transform local rect to world rect
     FloatRect worldToLocal(const FloatRect& rect);
 
-    //==========================================================================
-    // Callbacks
-    //==========================================================================
+public:
 
-    /// Register a callback to be called when the Transform changes
-    void registerCallback(std::function<void(void)> callback);
+    ProtectedSignal<void(void), Transform> onChanged;  ///< emitted when Transform changes
 
 private:
 
-    /// Makes the transform dirty
+    /// Makes the transform and its children dirty
     void makeDirty();
-
-    /// Calls all callbacks
-    void callCallbacks();
 
     /// Renders the Transform axis handles during Debug mode
     void onGizmo() override;
@@ -129,8 +123,6 @@ private:
     mutable bool      m_worldTransformDirty;    ///< Does the transform need to be recomputed?
     mutable bool      m_invLocalTransformDirty; ///< Does the transform need to be recomputed?
     mutable bool      m_invWorldTransformDirty; ///< Does the transform need to be recomputed?
-
-    std::vector<std::function<void(void)>> m_callbacks;  ///< callbacks called when Transform changes
 
 };
 

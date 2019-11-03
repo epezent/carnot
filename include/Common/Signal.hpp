@@ -192,6 +192,21 @@ struct Signal /*final*/ : detail::ProtoSignal<SignalSignature, Collector>
     Signal(const CbFunction &method = CbFunction()) : ProtoSignal(method) {}
 };
 
+template <typename SignalSignature, class Friend, class Collector = detail::CollectorDefault<typename std::function<SignalSignature>::result_type>>
+struct ProtectedSignal /*final*/ : detail::ProtoSignal<SignalSignature, Collector>
+{
+    using ProtoSignal = detail::ProtoSignal<SignalSignature, Collector>;
+    using CbFunction = typename ProtoSignal::CbFunction;
+    /// ProtectedSignal constructor, supports a default callback as argument.
+    ProtectedSignal(const CbFunction &method = CbFunction()) : ProtoSignal(method) {}
+protected:
+    friend Friend;
+    using detail::ProtoSignal<SignalSignature, Collector>::emit;
+    // using detail::ProtoSignal<SignalSignature, Collector>::invoke;
+};
+
+
+
 /// This function creates a std::function by binding @a object to the member function pointer @a method.
 template <class Instance, class Class, class R, class... Args>
 std::function<R(Args...)>

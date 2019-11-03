@@ -83,6 +83,19 @@ public:
     bool isChildOf(Handle<GameObject> object);
 
     //==========================================================================
+    // Sibling Functions
+    //==========================================================================
+
+    /// Finds a child GameObject by Id and returns a handle to it
+    Handle<GameObject> findSibling(Id id);
+    /// Finds a child GameObject by Name and returns a handle to it
+    Handle<GameObject> findSibling(const Name& name);
+    /// Finds the first child GameObject by type and returns a handle to it
+    template <typename T> Handle<T> findSibling();
+    /// Returns true if this GameObject is a sibling of the passed GameObject
+    bool isSiblingOf(Handle<GameObject> object);
+
+    //==========================================================================
     // Component Functions
     //==========================================================================
 
@@ -192,6 +205,13 @@ Handle<T> GameObject::findChild() {
         if (ptr != nullptr)
             return Handle<T>(ptr);
     }
+    return Handle<T>();
+}
+
+template <typename T>
+Handle<T> GameObject::findSibling() {
+    if (hasParent())
+        return m_parent->findChild<T>();
     return Handle<T>();
 }
 

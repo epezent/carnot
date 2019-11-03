@@ -333,19 +333,19 @@ void toolbarMenu() {
     {
 
         if (!g_paused) {
-            if (ImGui::Button(ICON_FA_PAUSE))
+            if (ImGui::Button(ICON_FA_PAUSE"##CARNOT_DEBUG"))
                 g_paused = true;
             if (ImGui::IsItemHovered())
                 ImGui::SetTooltip("Pause (F2)");
         }
         else {
-            if (ImGui::Button(ICON_FA_PLAY))
+            if (ImGui::Button(ICON_FA_PLAY"##CARNOT_DEBUG"))
                 g_paused = false;
             if (ImGui::IsItemHovered())
                 ImGui::SetTooltip("Play (F2)");
         }
         ImGui::SameLine();
-        if (ImGui::Button(ICON_FA_STEP_FORWARD)) {
+        if (ImGui::Button(ICON_FA_STEP_FORWARD"##CARNOT_DEBUG")) {
             if (!g_paused)
                 g_paused = !g_paused;
             else
@@ -354,7 +354,7 @@ void toolbarMenu() {
         if (ImGui::IsItemHovered())
             ImGui::SetTooltip("Step (F3)");
         ImGui::SameLine();
-        if (ImGui::Button(ICON_FA_STOP)) {
+        if (ImGui::Button(ICON_FA_STOP"##CARNOT_DEBUG")) {
             Engine::stop();
         }
         if (ImGui::IsItemHovered())
@@ -362,7 +362,7 @@ void toolbarMenu() {
         ImGui::SameLine();
         if (g_panTool)
             ImGui::PushStyleColor(ImGuiCol_Text, Blues::LightSkyBlue);
-        if (ImGui::Button(ICON_FA_ARROWS_ALT)) {
+        if (ImGui::Button(ICON_FA_ARROWS_ALT"##CARNOT_DEBUG")) {
             if (g_panTool)
                 ImGui::PopStyleColor();
             g_panTool = !g_panTool;

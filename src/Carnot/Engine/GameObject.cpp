@@ -166,6 +166,28 @@ bool GameObject::isChildOf(Handle<GameObject> object) {
     return m_parent == object.get();
 }
 
+//==========================================================================
+// Sibling Functions
+//==========================================================================
+
+Handle<GameObject> GameObject::findSibling(Id id) {
+    if (hasParent())
+        return m_parent->findChild(id);
+    return Handle<GameObject>();
+}
+
+Handle<GameObject> GameObject::findSibling(const Name& name) {
+    if (hasParent())
+        return m_parent->findChild(name);
+    return Handle<GameObject>();
+}
+
+bool GameObject::isSiblingOf(Handle<GameObject> object) {
+    if (hasParent() && object->hasParent())
+        return object->m_parent == this->m_parent;
+    return false;
+}
+
 //==============================================================================
 // Component
 //==============================================================================

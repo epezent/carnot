@@ -12,9 +12,16 @@ public:
     Signal<void(float)> onSpace;
 
     void start() {
+
+        auto tr = addComponent<TextRenderer>();
+        tr->text.setString("Press Space");
+        alignCenter(tr->text);
+        transform.setPosition(125,125);
+
         onSpace.connect(method0);
         onSpace.connect(method1);
         onSpace.connect(this, &SignalsDemo::method2);
+        onSpace.connect([=](float t){print(getName(), "method3:", t);});
     }
 
     void update() {
