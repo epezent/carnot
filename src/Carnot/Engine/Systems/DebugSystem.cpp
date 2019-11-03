@@ -10,7 +10,7 @@
 #include <Utility/Math.hpp>
 #include <Engine/ImGui/imgui.h>
 #include <Engine/ImGui/imgui-SFML.h>
-#include <Engine/FontAwesome5.hpp>
+#include <Engine/IconsFontAwesome5.hpp>
 #include <Graphics/NamedColors.hpp>
 #include <sstream>
 #include <array>

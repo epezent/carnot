@@ -16,7 +16,8 @@
 #include <Engine/Component.hpp>
 #include <Engine/Coroutine.hpp>
 #include <Engine/Engine.hpp>
-#include <Engine/FontAwesome5.hpp>
+#include <Engine/IconsFontAwesome5.hpp>
+#include <Engine/IconsFontAwesome5Brands.hpp>
 #include <Engine/GameObject.hpp>
 #include <Engine/Id.hpp>
 #include <Engine/Macros.hpp>

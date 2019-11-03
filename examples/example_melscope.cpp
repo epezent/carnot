@@ -189,7 +189,7 @@ public:
             }
 
             ImGui::SameLine();
-            if (ImGui::Button(ICON_FA_CROSSHAIRS)) {
+            if (ImGui::Button(ICON_FA_GITHUB_ALT)) {
 
             }
 
