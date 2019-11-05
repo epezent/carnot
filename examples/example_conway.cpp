@@ -76,10 +76,10 @@ public:
         C((std::size_t)(width/size))
     {
         cells.resize(R);
-        loadBg = addComponent<ShapeRenderer>(make<RectangleShape>(500,20));
+        loadBg = addComponent<ShapeRenderer>(make<RectangleShape>(505,25));
         loadBg->setColor(Grays::Gray50);
         loadBg->getShape()->move(960,540);
-        loadRect = make<RectangleShape>(0,20);
+        loadRect = make<RectangleShape>(500,20);
         loadFg = addComponent<ShapeRenderer>(loadRect);
         loadFg->setColor(Whites::White);
         loadFg->getShape()->move(960,540);
@@ -116,6 +116,7 @@ public:
             if (r%2) {
                 float percentDone = (float)r/(float)R;
                 loadRect->setWidth(500 * percentDone);
+                loadFg->getShape()->move(960,540);
                 co_yield nullptr;
             }
         }

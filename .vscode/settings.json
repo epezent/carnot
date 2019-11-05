@@ -1,5 +1,5 @@
 {
-    "cmake.buildDirectory": "${workspaceRoot}/build-${buildKit}-${variant:buildType}",
+    "cmake.buildDirectory": "${workspaceRoot}/build-${variant:buildType}",
     "files.associations": {
         "*.in": "cmake",
         "vector": "cpp",

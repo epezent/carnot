@@ -15,7 +15,7 @@ public:
         }
         ch = make<Checkerboard>(RGB{0.05f,0.05f,0.05f,1.0f}, Grays::Black, 50, 1920.0f/1080.0f);
         auto sr = addComponent<ShapeRenderer>(make<RectangleShape>(1920,1080));
-        sr->setEffect(ch);
+        sr->setEffect(gr);
     }
 
     void update() {
