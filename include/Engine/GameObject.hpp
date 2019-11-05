@@ -114,17 +114,6 @@ protected:
     friend class Transform;
     friend class Trigger;
 
-    //==========================================================================
-    // Virtual Callbacks
-    //==========================================================================
-
-    /// Called by a Trigger when the mouse enters it
-    virtual void onMouseEnter();
-    /// Called by a Trigger when the mouse exits it
-    virtual void onMouseExit();
-    /// Called by a Trigger when a mouse is inside of it
-    virtual void onMouseStay();
-
 private:
 
     /// Attaches a Component to this GameObject

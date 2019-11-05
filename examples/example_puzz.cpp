@@ -563,14 +563,16 @@ class Board : public GameObject
         tr = addComponent<Trigger>();
         tr->mode = Trigger::Vertices;
         tr->shape = sr->getShape();
+        tr->onMouseEnter.connect(this, &Board::onMouseEnter);
+        tr->onMouseExit.connect(this, &Board::onMouseExit);
     }
 
-    void onMouseEnter() override {
+    void onMouseEnter()  {
         lr1->setThickness(3.0f);
         lr2->setThickness(3.0f);
     }
 
-    void onMouseExit() override {
+    void onMouseExit()  {
         lr1->setThickness(1.0f);
         lr2->setThickness(1.0f);
     }
@@ -606,16 +608,19 @@ class Piece : public GameObject
         tr = addComponent<Trigger>();
         tr->mode = Trigger::Vertices;
         tr->shape = sr->getShape();
+        tr->onMouseEnter.connect(this, &Piece::onMouseEnter);
+        tr->onMouseStay.connect(this, &Piece::onMouseStay);
+        tr->onMouseExit.connect(this, &Piece::onMouseExit);
         // perm
         m_perm = 0;
     }
 
-    void onMouseEnter() override {
+    void onMouseEnter()  {
         lr->setColor(m_color);
         lr->setThickness(3.0f);
     }
 
-    void onMouseStay() override {
+    void onMouseStay()  {
         ImGui::BeginTooltip();
         ImGui::TextColored(m_color, getName().c_str());
         ImGui::Text("R:%i C:%i", m_coord.x, m_coord.y);
@@ -629,7 +634,7 @@ class Piece : public GameObject
             m_selected = !m_selected;
     }
 
-    void onMouseExit() override  {
+    void onMouseExit()   {
         lr->setColor(Tween::Linear(Whites::White, m_color, 0.5f));
         lr->setThickness(1.0f);
     }

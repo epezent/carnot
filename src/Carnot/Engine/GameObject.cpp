@@ -239,22 +239,6 @@ Handle<Component> GameObject::attachComponent(Ptr<Component> component) {
 }
 
 //==============================================================================
-// Virtual Callbacks
-//==============================================================================
-
-void GameObject::onMouseEnter() {
-    // do nothing by default
-}
-
-void GameObject::onMouseExit() {
-    // do nothing by default
-}
-
-void GameObject::onMouseStay() {
-    // do nothing by default
-}
-
-//==============================================================================
 // Private Functions
 //==============================================================================
 

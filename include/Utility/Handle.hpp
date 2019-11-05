@@ -15,7 +15,7 @@ using WkPtr = std::weak_ptr<T>;
 
 /// Shorthand for std::make_shared<T>(...)
 template <typename T, typename ...Args>
-Ptr<T> make(Args... args) {
+inline Ptr<T> make(Args... args) {
     return std::make_shared<T>(std::forward<Args>(args)...);
 }
 

@@ -20,12 +20,18 @@ Trigger::Trigger(GameObject& _gameObject, Ptr<Shape> _shape, Mode mode) :
 }
 
 void Trigger::updateState(bool inside) {
-    if (!m_inside && inside)
-        gameObject.onMouseEnter();
-    else if (m_inside && inside)
-        gameObject.onMouseStay();
-    else if (m_inside && !inside)
-        gameObject.onMouseExit();
+    if (!m_inside && inside) {
+        onMouseEnter.emit();
+        // gameObject.onMouseEnter();
+    }
+    else if (m_inside && inside) {
+        onMouseStay.emit();
+        // gameObject.onMouseStay();
+    }
+    else if (m_inside && !inside) {
+        onMouseExit.emit();
+        // gameObject.onMouseExit();
+    }
     m_inside = inside;
 }
 

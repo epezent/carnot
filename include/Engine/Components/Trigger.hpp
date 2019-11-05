@@ -2,6 +2,7 @@
 
 #include <Engine/Component.hpp>
 #include <Geometry/Shape.hpp>
+#include <Utility/Signal.hpp>
 
 namespace carnot {
 
@@ -23,6 +24,10 @@ public:
     Trigger(GameObject& gameObject, Ptr<Shape> shape, Mode mode = Points);
   
 public:
+
+    ProtectedSignal<void(void), Trigger> onMouseEnter; ///< emitted when the mouse enters the trigger
+    ProtectedSignal<void(void), Trigger> onMouseStay;  ///< emitted when the mouse stays in the trigger
+    ProtectedSignal<void(void), Trigger> onMouseExit;  ///< emitted when the mouse exits the trigger
 
     Mode mode;         ///< Trigger query mode
     Ptr<Shape> shape;  ///< Shape to be quried
