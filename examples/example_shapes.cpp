@@ -12,6 +12,7 @@ class ShapeDemo : public GameObject {
     }
 
     void start() override {
+        
         // basic shapes
         addShape(make<SquareShape>(80), 100,100);
         addShape(make<RectangleShape>(40,80), 200,100);
@@ -26,8 +27,6 @@ class ShapeDemo : public GameObject {
         sqr->setRadius(0, 20);
         sqr->setRadius(2, 20);
         addShape(sqr, 100, 300);
-
-        
 
     }
 
