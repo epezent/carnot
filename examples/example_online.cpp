@@ -29,7 +29,7 @@ public:
         m_text->text.setCharacterSize(20);
         m_text->text.setString(m_username);
         m_text->text.setPosition(-25, -55);
-        transform.setPosition(Random::range(100.0f, 900.0f), Random::range(100.0f, 900.0f));
+        transform.setPosition(Random::range(100.0f, 700.0f), Random::range(100.0f, 700.0f));
     }
 
     void start() override {
@@ -79,7 +79,7 @@ public:
 
         m_notifyText = addComponent<TextRenderer>();
         m_notifyText->text = m_text->text;
-        m_notifyText->text.setPosition(5, 970);
+        m_notifyText->text.setPosition(5, 770);
 
         m_player = makeChild<Player>(username);
         notify("Welcome!");
@@ -151,9 +151,11 @@ public:
     Client(const string& username) :
         NetworkObject(username)
     {
+        notify("Welcome! Press C to connect to the Server.");
     }
 
     void update() override {
+        NetworkObject::update();
         if (Input::getKeyDown(Key::C) && !m_connected)
             startCoroutine(connect());
         Packet packet;
@@ -229,7 +231,6 @@ public:
         if (m_listener.listen(SERVER_TCP) == Socket::Error)
             print(m_status = "TCP Failed");
         m_selector.add(m_listener);
-
     }
 
     ~Server() {
@@ -242,6 +243,7 @@ public:
     }
 
     void update() override {
+        NetworkObject::update();
         pollSocket();
         broadcastAddress();
     }
@@ -371,7 +373,7 @@ int main(int argc, char *argv[])
     auto input = options.parse(argc, argv);
 
     if (input.count("user")) {
-        Engine::init(1000,1000,"Online Demo");
+        Engine::init(800,800,"Online Demo");
         if (input.count("server")) {
             Engine::makeRoot<Server>(input["u"].as<string>());
         }
