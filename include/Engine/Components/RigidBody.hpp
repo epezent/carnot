@@ -61,6 +61,16 @@ public:
     /// Get RigidBody center of gravity
     Vector2f getCOG() const;
 
+    /// Set RigidBody linear damping
+    void setLinearDamping(float damping);
+    /// Gets RigidBody linear damping
+    float getLinearDamping() const;
+
+    /// Set RigidBody angular damping
+    void setAngularDamping(float damping);
+    /// Gets RigidBody angular damping
+    float getAngularDamping() const;
+    
     //==============================================================================
     // SHAPES
     //==============================================================================

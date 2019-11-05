@@ -1,46 +1,23 @@
-#include <Engine/Object.hpp>
-#include <Engine/Engine.hpp>
-#include <Graphics.hpp>
-#include <typeinfo>
-#include <sstream>
-#include <Engine/XboxController.hpp>
+#include <carnot>
 
 using namespace carnot;
 
-class MyObject : public Object {
+class CoroutineDemo : public GameObject {
 public:
 
     Handle<Coroutine> m_coro;
+    Handle<ShapeRenderer> sr;
+    Ptr<SquareShape> sqr;
 
-    XboxController m_xbox;
-
-    bool prevPress = false;
-    bool currPress = false;
-    bool down = false;
-    bool up = false;
-
-    MyObject() :
-        m_xbox(0)
-    {
-        m_sqr.setSideLength(50.0f);
-        m_sqr.setColor(Reds::FireBrick);
-        m_sqr.setPosition(250,250);
-        m_font.loadFromFile("../../fonts/Roboto-Bold.ttf");
-        m_text.setFont(m_font);
-        m_text.setCharacterSize(20);
-        m_text.setPosition(5, 5);
-        m_text.setFillColor(Whites::White);
+    void start() override {
+        sr = addComponent<ShapeRenderer>();
+        sqr = make<SquareShape>(50);
+        sr->setShape(sqr);
+        sr->setColor(Reds::FireBrick);
+        transform.setPosition(250,250);
     }
 
     void update() override {
-
-        prevPress = currPress;
-        currPress = m_xbox.getButton(XboxController::LB);
-        if (currPress != prevPress) {
-            up = currPress ? false : true;
-            down = currPress ? true : false;
-        }
-
 
         if (Input::getKeyDown(Key::Num1))
             startCoroutine(Fade());
@@ -68,47 +45,13 @@ public:
 
         if (Input::getKeyDown(Key::X))
             stopAllCoroutines();
-
-        std::string x = "Coroutines: " + std::to_string(getCoroutineCount());
-        if (m_coro.isValid())
-            x += "\nHandle<Coroutine> is valid";
-        else
-            x += "\nHandle<Coroutine> is invalid";
-        m_text.setString(x);
-
-        std::ostringstream ss;
-        ss << "prev: " << prevPress << std::endl;
-        ss << "curr: " << currPress << std::endl;
-        ss << "up:   " << up << std::endl;
-        ss << "down: " << down << std::endl;
-
-
-        if (down) {
-            m_sqr.setColor(Whites::White);
-            print("Down!");
-        }
-        if (up) {
-            m_sqr.setColor(Reds::FireBrick);
-            print("Up!");
-        }
-
-        up = false;
-        down = false;
-
-
-        m_text.setString(ss.str());
-
     }
 
-    void draw(sf::RenderTarget& target, sf::RenderStates states) const override {
-        target.draw(m_sqr, states);
-        target.draw(m_text, states);
-    }
 
     Enumerator MoveX() {
         float elapsedTime = 0.0f;
         while (elapsedTime < 5.0f) {
-            m_sqr.setPosition(250 + 100*std::sin(2.0f * PI * elapsedTime), m_sqr.getPosition().y);
+            transform.setPosition(250 + 100*std::sin(2.0f * Math::PI * elapsedTime), transform.getPosition().y);
             elapsedTime += Engine::deltaTime();
             co_yield nullptr;
         }
@@ -117,7 +60,7 @@ public:
     Enumerator MoveY() {
         float elapsedTime = 0.0f;
         while (elapsedTime < 5.0f) {
-            m_sqr.setPosition(m_sqr.getPosition().x, 250 + 100*std::sin(2.0f * PI * elapsedTime));
+            transform.setPosition(transform.getPosition().x, 250 + 100*std::sin(2.0f * Math::PI * elapsedTime));
             elapsedTime += Engine::deltaTime();
             co_yield nullptr;
         }
@@ -127,11 +70,11 @@ public:
         float elapsedTime = 0.0f;
         while (elapsedTime < 5.0f) {
             float r = Tween::Smootherstep(0.0f, 720.0f, elapsedTime / 5.0f);
-            m_sqr.setRotation(r);
+            transform.setRotation(r);
             elapsedTime += Engine::deltaTime();
             co_yield nullptr;
         }
-        m_sqr.setRotation(0.0f);
+        transform.setRotation(0.0f);
     }
 
     Enumerator Fade() {
@@ -140,36 +83,34 @@ public:
         Color to = Blues::DeepSkyBlue;
         while (elapsedTime < 5.0f) {
             Color tween = Tween::Exponential::Out(from, to, elapsedTime / 5.0f);
-            m_sqr.setColor(tween);
+            sr->setColor(tween);
             elapsedTime += Engine::deltaTime();
             co_yield nullptr;
         }
-        m_sqr.setColor(to);
+        sr->setColor(to);
     }
 
     Enumerator Multi() {
-        auto x = startCoroutine(MoveX());
-        auto y = startCoroutine(MoveY());
-        co_yield x;
-        co_yield y;
+        co_yield startCoroutine(MoveX());
+        co_yield startCoroutine(MoveY());
     }
 
     Enumerator Wait() {
-        m_sqr.setRotation(45.0f);
+        transform.setRotation(45.0f);
         co_yield new WaitForSeconds(0.1f);
-        m_sqr.setRotation(90.0f);
+        transform.setRotation(90.0f);
         co_yield new WaitForSeconds(0.1f);
-        m_sqr.setRotation(135.0f);
+        transform.setRotation(135.0f);
         co_yield new WaitForSeconds(0.1f);
-        m_sqr.setRotation(180.0f);
+        transform.setRotation(180.0f);
         co_yield new WaitForSeconds(0.1f);
-        m_sqr.setRotation(225.0f);
+        transform.setRotation(225.0f);
         co_yield new WaitForSeconds(0.1f);
-        m_sqr.setRotation(270.0f);
+        transform.setRotation(270.0f);
         co_yield new WaitForSeconds(0.1f);
-        m_sqr.setRotation(315.0f);
+        transform.setRotation(315.0f);
         co_yield new WaitForSeconds(0.1f);
-        m_sqr.setRotation(0.0f);
+        transform.setRotation(0.0f);
     }
 
     Enumerator Seq() {
@@ -184,7 +125,7 @@ public:
             float t = elapsedTime / 5.0f;
             float x = Tween::Linear(50.0f, 450.0f, t);
             float y = seq(t);
-            m_sqr.setPosition(x, y);
+            transform.setPosition(x, y);
             elapsedTime += Engine::deltaTime();
             co_yield nullptr;
         }
@@ -196,11 +137,10 @@ public:
 };
 
 int main() {
-    Engine engine(500,500);
-    engine.setBackgroundColor(Color::Black);
-    engine.window.setTitle("Coroutine Testing");
-    auto root = engine.makeRoot<MyObject>();
-    root->setName("root");
-    engine.run();
+
+    Engine::init(500,500, "Coroutines");
+    Engine::setBackgroundColor(Color::Black);
+    Engine::makeRoot<CoroutineDemo>();
+    Engine::run();
     return 0;
 }

@@ -113,6 +113,22 @@ Vector2f RigidBody::getCOG() const {
     return fromB2D(data.center);
 }
 
+void RigidBody::setLinearDamping(float damping) {
+    m_body->SetLinearDamping(damping);
+}
+
+float RigidBody::getLinearDamping() const {
+    return m_body->GetLinearDamping();
+}
+
+void RigidBody::setAngularDamping(float damping) {
+    m_body->SetAngularDamping(damping);
+}
+
+float RigidBody::getAngularDamping() const {
+    return m_body->GetAngularDamping();
+}
+
 //==============================================================================
 // SHAPES
 //==============================================================================

@@ -2,18 +2,17 @@
 
 using namespace carnot;
 
-class TriggerTester : public GameObject {
+class TriggerExample : public GameObject {
 public:
 
     Handle<Trigger> tr;
     Handle<ShapeRenderer> sr;
 
-    TriggerTester() {
+    TriggerExample() {
         sr = addComponent<ShapeRenderer>(make<StarShape>());
-        sr->setColor(Random::color());
+        sr->setColor(Color::White);
         tr = addComponent<Trigger>(sr->getShape());
-        sr->getShape()->addHole(CircleShape(40));
-        sr->getShape()->move(100,100);
+        sr->getShape()->addHole(CircleShape(25));
     }
 
     void onMouseEnter() {
@@ -21,21 +20,20 @@ public:
     }
 
     void onMouseExit() {
-        sr->setColor(Random::color());
+        sr->setColor(Color::White);
     }
 
     void onMouseStay() {
         transform.rotate(90*Engine::deltaTime());
-        sr->getShape()->rotate(90*Engine::deltaTime());
     }
     
 };
 
 int main(int argc, char const *argv[])
 {
-    Engine::init(500,500);
+    Engine::init(500,500,"Trigger Example");
     Engine::getView(0).setCenter(0,0);
-    Engine::makeRoot<TriggerTester>();
+    Engine::makeRoot<TriggerExample>();
     Engine::run();
     return 0;
 }

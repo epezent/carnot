@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Common/Types.hpp>
+#include <Utility/Types.hpp>
 #include <Engine/GameObject.hpp>
 #include <Engine/ResourceManager.hpp>
 #include <Engine/Systems/DebugSystem.hpp>

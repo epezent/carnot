@@ -38,6 +38,9 @@ extern unsigned int  RobotoMono_Italic_ttf_len;
 extern unsigned char fa_solid_900_ttf[];
 extern unsigned int  fa_solid_900_ttf_len;
 
+extern unsigned char fa_brands_400_ttf[];
+extern unsigned int  fa_brands_400_ttf_len;
+
 } // namespace carnot
 
 

@@ -80,7 +80,16 @@
         "variant": "cpp",
         "carnot": "cpp",
         "filesystem": "cpp",
-        "mutex": "cpp"
+        "mutex": "cpp",
+        "clocale": "cpp",
+        "codecvt": "cpp",
+        "cstdarg": "cpp",
+        "cwctype": "cpp",
+        "optional": "cpp",
+        "string_view": "cpp",
+        "concepts": "cpp",
+        "*.tcc": "cpp",
+        "memory_resource": "cpp"
     },
     "C_Cpp.default.configurationProvider": "vector-of-bool.cmake-tools",
     "cSpell.enabled": false

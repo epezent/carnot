@@ -1,7 +1,7 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Graphics/RenderTarget.hpp>
 #include <Geometry/Shape.hpp>
-#include <Common/Math.hpp>
+#include <Utility/Math.hpp>
 #include <iostream>
 #include <limits>
 #include "clipper/clipper.hpp"

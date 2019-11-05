@@ -1,7 +1,7 @@
 #pragma once
 
-#include <Common/Types.hpp>
-#include <Common/Handle.hpp>
+#include <Utility/Types.hpp>
+#include <Utility/Handle.hpp>
 
 
 struct cpSpace;
@@ -19,6 +19,8 @@ void setDeltaTime(float dt);
 void setGravity(const Vector2f& g);
 /// Gets the global gravity vector
 Vector2f getGravity();
+
+
 
 // Implementation details [internal use only]
 namespace detail {

@@ -1,6 +1,6 @@
 #include <Engine/Components/StrokeRenderer.hpp>
 #include <Engine/GameObject.hpp>
-#include <Common/Math.hpp>
+#include <Utility/Math.hpp>
 #include <SFML/OpenGL.hpp>
 #include <SFML/Graphics/Transform.hpp>
 #include <Engine/Systems/DebugSystem.hpp>

@@ -1,16 +1,16 @@
 #include <Engine/Systems/DebugSystem.hpp>
 #include <Engine/Engine.hpp>
-#include <Common/Alignment.hpp>
+#include <Utility/Alignment.hpp>
 #include <Engine/ProcessInfo.hpp>
 #include <sstream>
 #include <iomanip>
 #include <iostream>
 #include <Engine/Components/Renderer.hpp>
 #include <Engine/Components/RigidBody.hpp>
-#include <Common/Math.hpp>
+#include <Utility/Math.hpp>
 #include <Engine/ImGui/imgui.h>
 #include <Engine/ImGui/imgui-SFML.h>
-#include <Engine/FontAwesome5.hpp>
+#include <Engine/IconsFontAwesome5.hpp>
 #include <Graphics/NamedColors.hpp>
 #include <sstream>
 #include <array>
@@ -268,7 +268,7 @@ void infoMenu() {
     if (corner != -1)
         ImGui::SetNextWindowPos(window_pos, ImGuiCond_Always, window_piv);
     ImGui::SetNextWindowContentWidth(150);
-    if (ImGui::Begin("Info", nullptr, (corner != -1 ? ImGuiWindowFlags_NoMove : 0) | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoNav))
+    if (ImGui::Begin("Info##CARNOT_DEBUG", nullptr, (corner != -1 ? ImGuiWindowFlags_NoMove : 0) | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoNav))
     {
         ImGui::Text("CLK: %.2f s", Engine::time());
         tooltip("Current time");
@@ -306,7 +306,7 @@ void gizmoMenu() {
     if (corner != -1)
         ImGui::SetNextWindowPos(window_pos, ImGuiCond_Always, window_piv);
     // ImGui::SetNextWindowContentWidth(150);
-    if (ImGui::Begin("Gizmos", nullptr, (corner != -1 ? ImGuiWindowFlags_NoMove : 0) | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoNav))
+    if (ImGui::Begin("Gizmos##CARNOT_DEBUG", nullptr, (corner != -1 ? ImGuiWindowFlags_NoMove : 0) | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoNav))
     {
         for (auto& id : g_gizmoIds) {
             auto color = g_gizmoColors[id];
@@ -329,23 +329,23 @@ void toolbarMenu() {
     ImVec2 window_pos = ImVec2(io.DisplaySize.x * 0.5f, g_windowDistance);
     ImVec2 window_piv = ImVec2(0.5f, 0.0f);
     ImGui::SetNextWindowPos(window_pos, ImGuiCond_Always, window_piv);
-    if (ImGui::Begin("Toolbar", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav))
+    if (ImGui::Begin("Toolbar##CARNOT_DEBUG", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav))
     {
 
         if (!g_paused) {
-            if (ImGui::Button(ICON_FA_PAUSE))
+            if (ImGui::Button(ICON_FA_PAUSE"##CARNOT_DEBUG"))
                 g_paused = true;
             if (ImGui::IsItemHovered())
                 ImGui::SetTooltip("Pause (F2)");
         }
         else {
-            if (ImGui::Button(ICON_FA_PLAY))
+            if (ImGui::Button(ICON_FA_PLAY"##CARNOT_DEBUG"))
                 g_paused = false;
             if (ImGui::IsItemHovered())
                 ImGui::SetTooltip("Play (F2)");
         }
         ImGui::SameLine();
-        if (ImGui::Button(ICON_FA_STEP_FORWARD)) {
+        if (ImGui::Button(ICON_FA_STEP_FORWARD"##CARNOT_DEBUG")) {
             if (!g_paused)
                 g_paused = !g_paused;
             else
@@ -354,7 +354,7 @@ void toolbarMenu() {
         if (ImGui::IsItemHovered())
             ImGui::SetTooltip("Step (F3)");
         ImGui::SameLine();
-        if (ImGui::Button(ICON_FA_STOP)) {
+        if (ImGui::Button(ICON_FA_STOP"##CARNOT_DEBUG")) {
             Engine::stop();
         }
         if (ImGui::IsItemHovered())
@@ -362,7 +362,7 @@ void toolbarMenu() {
         ImGui::SameLine();
         if (g_panTool)
             ImGui::PushStyleColor(ImGuiCol_Text, Blues::LightSkyBlue);
-        if (ImGui::Button(ICON_FA_ARROWS_ALT)) {
+        if (ImGui::Button(ICON_FA_ARROWS_ALT"##CARNOT_DEBUG")) {
             if (g_panTool)
                 ImGui::PopStyleColor();
             g_panTool = !g_panTool;

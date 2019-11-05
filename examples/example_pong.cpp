@@ -9,7 +9,7 @@ public:
         sr->setShape(make<RectangleShape>(width,height));
         sr->setColor(Color::White);
         auto rb = addComponent<RigidBody>(RigidBody::Static);
-        rb->addBoxShape(width,height);
+        rb->addBoxShape(width,height,1.0f, 0.0f, 1.0f);
     }
 };
 
@@ -21,7 +21,9 @@ public:
         sr->setShape(make<CircleShape>(10));
         sr->setColor(Reds::FireBrick);
         rb = addComponent<RigidBody>();
-        rb->addCircleShape(10);
+        rb->addCircleShape(10, Vector2f(), 1.0f, 0.0f, 1.0f);
+        rb->setLinearDamping(0);
+        rb->setAngularDamping(0);
         reset();
     }
 
@@ -46,7 +48,7 @@ public:
         sr->setShape(make<RectangleShape>(10,100));
         transform.setPosition(125,250);
         rb = addComponent<RigidBody>(RigidBody::Kinematic);
-        rb->addBoxShape(10, 100);
+        rb->addBoxShape(10, 100, 1, 0.0f, 1.0f);
     }
 
     void update() override {

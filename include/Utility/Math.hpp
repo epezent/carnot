@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Common/Types.hpp>
+#include <Utility/Types.hpp>
 #include <cmath>
 #include <vector>
 #include <limits>
@@ -249,4 +249,4 @@ inline T perlin(T x, T y);
 }  // namespace Math
 }  // namespace carnot
 
-#include <Common/Detail/Math.inl>
+#include <Utility/Detail/Math.inl>

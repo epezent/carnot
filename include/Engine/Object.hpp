@@ -1,11 +1,11 @@
 #pragma once
 
 #include <Engine/Coroutine.hpp>
-#include <Common/Handle.hpp>
+#include <Utility/Handle.hpp>
 #include <Engine/Id.hpp>
-#include <Common/Types.hpp>
-#include <Common/Print.hpp>
-#include <Common/Random.hpp>
+#include <Utility/Types.hpp>
+#include <Utility/Print.hpp>
+#include <Utility/Random.hpp>
 #include <vector>
 #include <utility>
 

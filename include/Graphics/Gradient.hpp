@@ -1,7 +1,7 @@
 #pragma once
 
 #include <Graphics/Effect.hpp>
-#include <Common/Sequence.hpp>
+#include <Utility/Sequence.hpp>
 #include <Graphics/Color.hpp>
 #include <array>
 

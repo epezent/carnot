@@ -35,10 +35,10 @@ int main(int argc, char const *argv[])
     auto mars    =   sun->body->makeChild<Body>("mars",    Reds::IndianRed, 10.0f, 300.0f, 5.0f);
     auto phobos  =  mars->body->makeChild<Body>("phobos",  Grays::Gray50,   3.0f,  15.0f,  100.0f);
     auto deimos  =  mars->body->makeChild<Body>("deimos",  Grays::Gray50,   2.0f,  20.0f,  50.0f);
-    auto saturn =   sun->body->makeChild<Body>("saturn", Browns::Tan, 25.0f, 450.0f, 2.0f);
+    auto saturn  =   sun->body->makeChild<Body>("saturn",  Browns::Tan, 25.0f, 450.0f, 2.0f);
     auto jupiter =   sun->body->makeChild<Body>("jupiter", Browns::SandyBrown, 35.0f, 600.0f, 1.5f);
-    auto uranus  =   sun->body->makeChild<Body>("uranus", Cyans::PaleTurquoise, 20.0f, 750.0f, 0.75f);
-    auto neptune  =   sun->body->makeChild<Body>("neptune", Blues::RoyalBlue, 20.0f, 900.0f, 0.7f);
+    auto uranus  =   sun->body->makeChild<Body>("uranus",  Cyans::PaleTurquoise, 20.0f, 750.0f, 0.75f);
+    auto neptune =   sun->body->makeChild<Body>("neptune", Blues::RoyalBlue, 20.0f, 900.0f, 0.7f);
 
     Engine::run();
     return 0;

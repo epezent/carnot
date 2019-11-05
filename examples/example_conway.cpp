@@ -187,7 +187,8 @@ int main(int argc, char const *argv[])
     g_colorSpectrum[1.0f] = Grays::LightSlateGray;
 
     Engine::init();
-    Engine::makeRoot<Conway>(5);
+    Engine::makeRoot<Conway>(6);
+    Engine::window->setFramerateLimit(10);
     Engine::run();
     return 0;
 }

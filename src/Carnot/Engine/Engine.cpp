@@ -6,7 +6,8 @@
 #include <Engine/Components/Renderer.hpp>
 #include <Engine/ImGui/imgui.h>
 #include <Engine/ImGui/imgui-SFML.h>
-#include <Engine/FontAwesome5.hpp>
+#include <Engine/IconsFontAwesome5.hpp>
+#include <Engine/IconsFontAwesome5Brands.hpp>
 #include <windows.h>
 #include <winuser.h>
 #include <atomic>
@@ -197,15 +198,23 @@ void Engine::init(unsigned int width, unsigned int height, unsigned int style, c
     std::memcpy(fontCopy1, &RobotoMono_Bold_ttf, RobotoMono_Bold_ttf_len);
     io.Fonts->AddFontFromMemoryTTF(fontCopy1, RobotoMono_Bold_ttf_len, 15.0f * g_dpiFactor);
 
-    // merge in icons from font awesome
-    static const ImWchar icons_ranges[] = { ICON_MIN_FA, ICON_MAX_FA, 0 };
     ImFontConfig icons_config;
     icons_config.MergeMode = true;
     icons_config.PixelSnapH = true;
     icons_config.GlyphMinAdvanceX = 14.0f;
+
+    // merge in icons from font awesome 5
+    static const ImWchar fa_ranges[] = { ICON_MIN_FA, ICON_MAX_FA, 0 };
     unsigned char* fontCopy2 = new unsigned char[fa_solid_900_ttf_len];
     std::memcpy(fontCopy2, &fa_solid_900_ttf, fa_solid_900_ttf_len);
-    io.Fonts->AddFontFromMemoryTTF(fontCopy2, fa_solid_900_ttf_len, 10.0f * g_dpiFactor, &icons_config, icons_ranges );
+    io.Fonts->AddFontFromMemoryTTF(fontCopy2, fa_solid_900_ttf_len, 14.0f * g_dpiFactor, &icons_config, fa_ranges );
+
+    // merge in icons from font awesome 5 brands
+    static const ImWchar fab_ranges[] = { ICON_MIN_FAB, ICON_MAX_FAB, 0 };
+    unsigned char* fontCopy3 = new unsigned char[fa_brands_400_ttf_len];
+    std::memcpy(fontCopy3, &fa_brands_400_ttf, fa_brands_400_ttf_len);
+    io.Fonts->AddFontFromMemoryTTF(fontCopy3, fa_brands_400_ttf_len, 14 * g_dpiFactor, &icons_config, fab_ranges);
+    
     io.FontGlobalScale = 1.0f / g_dpiFactor;  
     io.IniFilename = 0;
     ImGui::SFML::UpdateFontTexture();
@@ -448,26 +457,6 @@ void Engine::render() {
         }
     }
 }
-
-// void Engine::processEvents() {
-//     Event event;
-//     while (window->pollEvent(event)) {
-//         Input::detail::processEvent(event);
-//         ImGui::SFML::ProcessEvent(event);
-//         switch (event.type) {
-//             case Event::Closed: {
-//                 window->close();
-//                 break;
-//             }
-//             case Event::Resized: {              
-//                 g_views[0].setSize((float)event.size.width / g_dpiFactor, (float)event.size.height / g_dpiFactor);
-//                 break;
-//             }
-//             default:
-//                 break;
-//         }
-//     }
-// }
 
 void Engine::processEvents() {
     Event event;

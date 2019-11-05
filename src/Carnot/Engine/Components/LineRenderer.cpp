@@ -1,7 +1,7 @@
 #include <Engine/Components/LineRenderer.hpp>
 #include <Engine/GameObject.hpp>
 #include <Engine/Engine.hpp>
-#include <Common/Math.hpp>
+#include <Utility/Math.hpp>
 
 namespace carnot {
 

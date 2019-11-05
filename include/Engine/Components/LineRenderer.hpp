@@ -3,7 +3,7 @@
 #include <Engine/Components/Renderer.hpp>
 #include <Graphics/Gradient.hpp>
 #include <Geometry/Shape.hpp>
-#include <Common/Sequence.hpp>
+#include <Utility/Sequence.hpp>
 
 namespace carnot {
 

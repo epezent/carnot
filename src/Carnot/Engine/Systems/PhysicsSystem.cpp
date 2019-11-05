@@ -2,7 +2,7 @@
 #include <Carnot/Glue/Box2D.inl>
 #include <Engine/Systems/DebugSystem.hpp>
 #include <Graphics/NamedColors.hpp>
-#include <Common/Print.hpp>
+#include <Utility/Print.hpp>
 
 namespace carnot {
 
@@ -103,7 +103,7 @@ void init()
     g_dt       = 1.0f / 60.0f;
     g_scale    = 0.010f;
     g_invScale = 100.0f;
-    g_world = new b2World(b2Vec2(0.0f, 1000.0f * g_scale));
+    g_world = new b2World(b2Vec2(0.0f, 981.0f * g_scale));
     g_draw  = new CarnotB2Draw();
     				
     g_draw->SetFlags(b2Draw::e_shapeBit | b2Draw::e_jointBit | b2Draw::e_pairBit | b2Draw::e_centerOfMassBit | b2Draw::e_particleBit);
