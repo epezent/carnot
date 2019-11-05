@@ -24,13 +24,20 @@ public:
 
     void update() {
         if (!confirmed && Input::getMouseUp(MouseButton::Left)) {
-            if (Math::absVec(start - end) == Vector2f(0,0)) {
+            if (Math::absVec(start - end).x < 10 || Math::absVec(start - end).y < 10) {
                 destroy();
             }
             else {
                 confirmed = true;
                 rb = addComponent<RigidBody>(RigidBody::Dynamic);
                 rb->addShape(sr->getShape(), 1.0f, 0.5f, 0.0f);
+                tr = addComponent<Trigger>(sr->getShape());
+                tr->onMouseStay.connect(
+                    [&]() {
+                        if (Input::getKeyDown(Key::D))
+                            destroy();
+                    }
+                );
             }
         }
         if (!confirmed && Input::getMouse(MouseButton::Left)) {
@@ -41,14 +48,14 @@ public:
         }
         if (rb) {
             Debug::drawText(str("mass = ",rb->getMass()), transform.getPosition(), Whites::White);
-            auto localPos = transform.worldToLocal(Input::getMousePosition());
-           
+            auto localPos = transform.worldToLocal(Input::getMousePosition());           
         }
     }
 
     Color color;
     Handle<ShapeRenderer> sr;
     Handle<RigidBody> rb;
+    Handle<Trigger> tr;
     Vector2f start, end;
     bool confirmed = false;
 };
@@ -115,7 +122,7 @@ public:
 
     void update() {
         if (Input::getKeyDown(Key::G))
-            Physics::setGravity(Vector2f(0,1000) - Physics::getGravity());
+            Physics::setGravity(Vector2f(0,981) - Physics::getGravity());
         if (Input::getMouseDown(MouseButton::Left))
             makeChild<RectObject>();
         if (Input::getMouseDown(MouseButton::Right)) {
@@ -135,7 +142,7 @@ public:
 };
 
 int main(int argc, char const *argv[]) {
-    Engine::init(750,750);
+    Engine::init(750,750,"Physics Demo");
     Engine::getView(0).setCenter(0, 0);
     Engine::makeRoot<Player>();
     Debug::show(true);

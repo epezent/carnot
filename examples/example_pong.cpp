@@ -19,9 +19,9 @@ public:
         transform.setPosition(500,250);
         auto sr = addComponent<ShapeRenderer>();
         sr->setShape(make<CircleShape>(10));
-        sr->setColor(Reds::FireBrick);
+        sr->setColor(Whites::White);
         rb = addComponent<RigidBody>();
-        rb->addCircleShape(10, Vector2f(), 1.0f, 0.0f, 1.0f);
+        rb->addCircleShape(10, Vector2f(), 1.0f, 0.1f, 1.0f);
         rb->setLinearDamping(0);
         rb->setAngularDamping(0);
         reset();
@@ -33,7 +33,7 @@ public:
     }
 
     void reset() {
-        transform.setPosition(500,250);
+        rb->setPosition(500,250);
         rb->setVelocity(Math::unit(Vector2f(Random::range(-10.0f,10.0f),Random::range(-2.0f,2.0f)))*750.0f);
     }
 
@@ -42,23 +42,63 @@ public:
 
 class Paddle : public GameObject {
 public:
-    Paddle() {
+
+    Paddle(float x, const Color& color, float _speed) : speed(_speed) {
         auto sr = addComponent<ShapeRenderer>();
-        sr->setColor(Color::White);
+        sr->setColor(color);
         sr->setShape(make<RectangleShape>(10,100));
-        transform.setPosition(125,250);
+        transform.setPosition(x,250);
         rb = addComponent<RigidBody>(RigidBody::Kinematic);
-        rb->addBoxShape(10, 100, 1, 0.0f, 1.0f);
+        rb->addBoxShape(10, 100, 1, 0.1f, 1.0f);
     }
+
+    void move(float y) {
+        rb->setPosition(rb->getPosition() + Vector2f(0, y));
+    }
+
+    float speed;
+
+    Handle <RigidBody> rb;
+
+};
+
+
+
+class Player : public Paddle {
+public:
+
+    using Paddle::Paddle;
 
     void update() override {
         if (Input::getKey(Key::Up))
-            rb->setPosition(rb->getPosition() + Vector2f(0,-500) * Engine::deltaTime());
-        else if (Input::getKey(Key::Down))
-            rb->setPosition(rb->getPosition() + Vector2f(0,500) * Engine::deltaTime());
+            move(-speed * Engine::deltaTime());
+        if (Input::getKey(Key::Down))
+            move(speed * Engine::deltaTime());
+    }
+};
+
+class Agent : public Paddle {
+public:
+
+    using Paddle::Paddle;
+
+    Handle<Ball> ball;
+
+    void start() override {
+        ball = findSibling<Ball>();
     }
 
-    Handle <RigidBody> rb;
+    void update() override  {
+        if (ball->rb->getVelocity().x > 0) {
+            float ballY = ball->transform.getPosition().y;
+            float thisY = this->transform.getPosition().y;
+            float delta = ballY - thisY;
+            if (Math::abs(delta) > 20) {
+                int dir = Math::sign(delta);
+                move(dir * speed * Engine::deltaTime());
+            }
+        }
+    }
 };
 
 class Pong : public GameObject {
@@ -68,17 +108,15 @@ public:
         makeChild<Wall>(10,500,995,250);
         makeChild<Wall>(1000,10,500,5);
         makeChild<Wall>(1000,10,500,495);
-        ball = makeChild<Ball>();
-        paddle = makeChild<Paddle>();
+        makeChild<Ball>();
+        makeChild<Player>(100, Blues::DeepSkyBlue, 500);
+        makeChild<Agent>(900,   Reds::FireBrick,   250);
     }
-
-    Handle<Ball> ball;
-    Handle<Paddle> paddle;
 };
 
 int main(int argc, char const *argv[])
 {
-    Engine::init(1000,500);
+    Engine::init(1000,500, "Pong");
     Engine::makeRoot<Pong>();
     Physics::setGravity(Vector2f(0,0));
     Engine::run();

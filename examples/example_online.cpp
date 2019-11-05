@@ -128,6 +128,12 @@ int main(int argc, char *argv[])
         ("r,remote", "Remote Port", value<int>())
         ("i,ip",     "Remote IP  ", value<string>());
     auto input = options.parse(argc, argv);
+    if (input.count("l") == 0 || input.count("r") == 0 || input.count("i") == 0) {
+        print("Invalid arguments provided. Example usaged:");
+        print("computer-a> online.exe -l 55001 -r 55002 -i 192.168.1.2");
+        print("computer-b> online.exe -l 55002 -l 55001 -i 192.168.1.1");
+        return 1;
+    }
 
     Engine::init(250,250,"Online Example");
     Engine::makeRoot<UdpClient>(input["l"].as<int>(),input["r"].as<int>(),input["i"].as<string>())->transform.setPosition(125, 125);

@@ -112,7 +112,6 @@ protected:
 
     friend class Engine;
     friend class Transform;
-    friend class Trigger;
 
 private:
 
