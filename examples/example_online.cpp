@@ -322,7 +322,7 @@ public:
             client->receive(packet);
             packet >> username >> color >> x >> y;
             packet.clear();
-            if (m_clients.count(username)) {
+            if (m_clients.count(username) || username == m_player->m_username) {
                 packet << ("Username " + username + " is unavailable");
                 client->send(packet);
                 delete client;
