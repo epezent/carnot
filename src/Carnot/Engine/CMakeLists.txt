@@ -8,9 +8,10 @@ target_sources(carnot
 		Object.cpp
 		ProcessInfo.cpp
 		XboxController.cpp
+		InputSystem.cpp
+		DebugSystem.cpp
 )
 
 add_subdirectory(Components)
 add_subdirectory(Fonts)
-add_subdirectory(Systems)
 add_subdirectory(ImGui)

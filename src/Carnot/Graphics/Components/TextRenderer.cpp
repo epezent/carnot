@@ -1,4 +1,4 @@
-#include <Engine/Components/TextRenderer.hpp>
+#include <Graphics/Components/TextRenderer.hpp>
 #include <Engine/GameObject.hpp>
 #include <Engine/Engine.hpp>
 

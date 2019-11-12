@@ -1,4 +1,4 @@
-#include <Engine/Components/SpriteRenderer.hpp>
+#include <Graphics/Components/SpriteRenderer.hpp>
 #include <Engine/GameObject.hpp>
 #include <Engine/Engine.hpp>
 

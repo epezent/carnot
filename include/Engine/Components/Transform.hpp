@@ -1,7 +1,6 @@
 #pragma once
 
 #include <Engine/Component.hpp>
-#include <Utility/Signal.hpp>
 
 namespace carnot {
 

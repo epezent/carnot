@@ -1,7 +1,8 @@
 #pragma once
-
+\
 #include <Engine/Coroutine.hpp>
 #include <Utility/Handle.hpp>
+#include <Utility/Signal.hpp>
 #include <Engine/Id.hpp>
 #include <Utility/Types.hpp>
 #include <Utility/Print.hpp>

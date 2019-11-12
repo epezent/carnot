@@ -9,6 +9,12 @@ namespace carnot {
 
 class Shape;
 class CircleShape;
+class CollisionListener;
+class RigidBody;
+
+struct Collision {
+    RigidBody* other;
+};
 
 class RigidBody : public Component {
 public:
@@ -81,7 +87,8 @@ public:
     void addBoxShape(float width, float height, float density = 1.0f, float friction = 0.1f, float resitution = 0.0f);
     /// Adds a cenetered circle shape to the RigidBody
     void addCircleShape(float radius, const Vector2f& offset = Vector2f(), float density = 1.0f, float friction = 0.1f, float resitution = 0.0f);
-
+    /// Removes a shape from the RigidBody
+    void destroyShape(std::size_t index);
     /// Gets the number of shapes attached to RigidBody
     std::size_t getShapeCount() const;
 
@@ -89,7 +96,7 @@ public:
     void setShapeDensity(std::size_t index, float density);
     /// Set a shape's friction
     void setShapeFriction(std::size_t index, float friction);
-    /// Set a shape's elasticity
+    /// Set a shape's elasticity from 0 to 1
     void setShapeRestitution(std::size_t index, float restitution);
 
     /// Get a shape's mass
@@ -129,6 +136,12 @@ public:
 
     /// Gets the number of RigidBodys currently in the Engine
     static std::size_t getRigidBodyCount();
+
+public:
+    
+    ProtectedSignal<void(Collision), CollisionListener> onCollisionEnter; // TODO
+    ProtectedSignal<void(Collision), CollisionListener> onCollisionExit;  // TODO
+    ProtectedSignal<void(Collision), CollisionListener> onCollisionStay;  // TODO
 
 private:
 

@@ -3,9 +3,9 @@
 #include <Utility/Types.hpp>
 #include <Engine/GameObject.hpp>
 #include <Engine/ResourceManager.hpp>
-#include <Engine/Systems/DebugSystem.hpp>
-#include <Engine/Systems/InputSystem.hpp>
-#include <Engine/Systems/PhysicsSystem.hpp>
+#include <Engine/DebugSystem.hpp>
+#include <Engine/InputSystem.hpp>
+#include <Physics/PhysicsSystem.hpp>
 
 namespace carnot {
 class Engine { 

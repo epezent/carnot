@@ -105,6 +105,8 @@ public:
     std::size_t getComponentCount() const;
     /// Gets the first Component of a specific type
     template <typename T> Handle<T> getComponent();
+    /// Gets all Components of a specific type
+    template <typename T> std::vector<Handle<T>> getComponents();
     /// Removes the first Component of a specific type
     void removeComponent(std::size_t index);
 
@@ -219,5 +221,17 @@ Handle<T> GameObject::getComponent() {
     }
     return Handle<T>();
 }
+
+template <typename T> 
+std::vector<Handle<T>> GameObject::getComponents() {
+    std::vector<Handle<T>> comps;
+    comps.reserve(getComponentCount());
+    for (auto& comp : m_components) {
+        auto cast = std::dynamic_pointer_cast<T>(comp);
+        if (cast)
+            comps.push_back(Handle<T>(cast));
+    }
+    return comps;
+};
 
 }

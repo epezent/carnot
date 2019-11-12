@@ -1,12 +1,12 @@
-#include <Engine/Systems/DebugSystem.hpp>
+#include <Engine/DebugSystem.hpp>
 #include <Engine/Engine.hpp>
 #include <Utility/Alignment.hpp>
 #include <Engine/ProcessInfo.hpp>
 #include <sstream>
 #include <iomanip>
 #include <iostream>
-#include <Engine/Components/Renderer.hpp>
-#include <Engine/Components/RigidBody.hpp>
+#include <Graphics/Components/Renderer.hpp>
+#include <Physics/Components/RigidBody.hpp>
 #include <Utility/Math.hpp>
 #include <Engine/ImGui/imgui.h>
 #include <Engine/ImGui/imgui-SFML.h>

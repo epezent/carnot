@@ -1,4 +1,4 @@
-#include <Engine/Systems/InputSystem.hpp>
+#include <Engine/InputSystem.hpp>
 #include <Utility/Print.hpp>
 #include <Engine/Engine.hpp>
 #include <array>

@@ -1,4 +1,4 @@
-#include <Engine/Components/ShapeRenderer.hpp>
+#include <Graphics/Components/ShapeRenderer.hpp>
 #include <Engine/GameObject.hpp>
 #include <Engine/Engine.hpp>
 #include <Carnot/Glue/earcut.inl>

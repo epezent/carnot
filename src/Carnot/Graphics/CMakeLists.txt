@@ -5,3 +5,5 @@ target_sources(carnot
         Effect.cpp
         Gradient.cpp
 )
+
+add_subdirectory(Components)

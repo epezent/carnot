@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Engine/Components/Renderer.hpp>
+#include <Graphics/Components/Renderer.hpp>
 
 namespace carnot {
 

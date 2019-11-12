@@ -3,7 +3,7 @@
 #include <Engine/GameObject.hpp>
 #include <cassert>
 #include "Fonts/EngineFonts.hpp"
-#include <Engine/Components/Renderer.hpp>
+#include <Graphics/Components/Renderer.hpp>
 #include <Engine/ImGui/imgui.h>
 #include <Engine/ImGui/imgui-SFML.h>
 #include <Engine/IconsFontAwesome5.hpp>

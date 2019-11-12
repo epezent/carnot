@@ -1,4 +1,4 @@
-#include <Engine/Components/Renderer.hpp>
+#include <Graphics/Components/Renderer.hpp>
 #include <Engine/Engine.hpp>
 #include <cassert>
 

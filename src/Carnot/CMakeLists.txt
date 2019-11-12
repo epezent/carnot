@@ -4,7 +4,8 @@
 # )
 
 # add the subdirectories to get source files
-add_subdirectory(Common)
 add_subdirectory(Engine)
 add_subdirectory(Geometry)
 add_subdirectory(Graphics)
+add_subdirectory(Utility)
+add_subdirectory(Physics)

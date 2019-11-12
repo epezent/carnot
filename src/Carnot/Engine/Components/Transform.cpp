@@ -26,7 +26,7 @@ Transform::Transform(GameObject& _gameObject) :
     m_invLocalTransformDirty(true),
     m_invWorldTransformDirty(true)
 {
-
+    
 }
 
 //==============================================================================

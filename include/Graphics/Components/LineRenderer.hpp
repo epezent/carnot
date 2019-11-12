@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Engine/Components/Renderer.hpp>
+#include <Graphics/Components/Renderer.hpp>
 #include <Graphics/Gradient.hpp>
 #include <Geometry/Shape.hpp>
 #include <Utility/Sequence.hpp>

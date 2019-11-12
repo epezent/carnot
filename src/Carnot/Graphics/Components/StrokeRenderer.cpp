@@ -1,9 +1,9 @@
-#include <Engine/Components/StrokeRenderer.hpp>
+#include <Graphics/Components/StrokeRenderer.hpp>
 #include <Engine/GameObject.hpp>
 #include <Utility/Math.hpp>
 #include <SFML/OpenGL.hpp>
 #include <SFML/Graphics/Transform.hpp>
-#include <Engine/Systems/DebugSystem.hpp>
+#include <Engine/DebugSystem.hpp>
 
 #define PUSH_BACK_TRIANGLE(a,b,c) \
     m_vertexArray.push_back(static_cast<Vector2f>(a)); \

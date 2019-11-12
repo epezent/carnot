@@ -1,4 +1,4 @@
-#include <Engine/Components/RigidBody.hpp>
+#include <Physics/Components/RigidBody.hpp>
 #include <Engine/Engine.hpp>
 #include <cassert>
 #include <Geometry/CircleShape.hpp>
@@ -11,8 +11,6 @@ namespace {
 static const char RBShapeTypePolygon = 0;
 static const char RBShapeTypeCircle  = 1;
 static const char RBShapeTypeSegment = 2;
-
-std::size_t g_rigidBodyCount = 0;
 
 } // namespace
 
@@ -42,14 +40,14 @@ RigidBody::RigidBody(GameObject& _gameObject, BodyType type) :
         }
     }
     m_body = Physics::detail::world()->CreateBody(&def);
+    // set user data
+    m_body->SetUserData(this);
     // set initial position
     syncWithTransform();
-    g_rigidBodyCount++;
 }
 
 RigidBody::~RigidBody() {
     Physics::detail::world()->DestroyBody(m_body);
-    g_rigidBodyCount--;
 }
 
 void RigidBody::setBodyType(BodyType type) {
@@ -133,6 +131,15 @@ float RigidBody::getAngularDamping() const {
 // SHAPES
 //==============================================================================
 
+inline b2Fixture* getFixture(b2Body* body, std::size_t index) {
+    b2Fixture* fix = body->GetFixtureList();
+    for (int i = 0; i < index; ++i) {
+        fix = fix->GetNext();
+        assert(fix);
+    }
+    return fix;
+}
+
 void RigidBody::addBoxShape(float width, float height, float density, float friction, float restitution) {
     // shape
     b2PolygonShape square;
@@ -144,7 +151,8 @@ void RigidBody::addBoxShape(float width, float height, float density, float fric
     def.restitution = restitution;
     def.shape = &square;
     // create
-    m_body->CreateFixture(&def);
+    auto fix = m_body->CreateFixture(&def);
+    fix->SetUserData(this);
 }
 
 void RigidBody::addCircleShape(float radius, const Vector2f& offset, float density, float friction, float restitution) {
@@ -159,7 +167,8 @@ void RigidBody::addCircleShape(float radius, const Vector2f& offset, float densi
     def.restitution = restitution;
     def.shape = &circle;
     // create
-    m_body->CreateFixture(&def);
+    auto fix = m_body->CreateFixture(&def);
+    fix->SetUserData(this);
 }
 
 void RigidBody::addShape(Ptr<Shape> shape, float density, float friction, float restitution) {
@@ -182,15 +191,76 @@ void RigidBody::addShape(Ptr<Shape> shape, float density, float friction, float 
         def.restitution = restitution;
         def.shape = &polygon;
         // create
-        m_body->CreateFixture(&def);
+        auto fix = m_body->CreateFixture(&def);
+        fix->SetUserData(this);
     }
 }
+
+void RigidBody::destroyShape(std::size_t index) {
+    auto fix = getFixture(m_body, index);
+    m_body->DestroyFixture(fix);
+}
+
 
 std::size_t RigidBody::getShapeCount() const {
     std::size_t count = 0;
     for (auto fix = m_body->GetFixtureList(); fix; fix = fix->GetNext())
         count++;
     return count;
+}
+
+
+void RigidBody::setShapeDensity(std::size_t index, float density) {
+    assert(index < getShapeCount());
+    auto fix = getFixture(m_body, index);
+    fix->SetDensity(density);
+    m_body->ResetMassData();
+}
+
+void RigidBody::setShapeFriction(std::size_t index, float friction) {
+    assert(index < getShapeCount());
+    auto fix = getFixture(m_body, index);
+    fix->SetFriction(friction);
+}
+
+void RigidBody::setShapeRestitution(std::size_t index, float restitution) {
+    assert(index < getShapeCount());
+    auto fix = getFixture(m_body, index);
+    fix->SetRestitution(restitution);
+}
+
+float RigidBody::getShapeMass(std::size_t index) const {
+    assert(index < getShapeCount());
+    auto fix = getFixture(m_body, index);
+    b2MassData data;
+    fix->GetMassData(&data);
+    return data.mass;
+}
+
+float RigidBody::getShapeInertia(std::size_t index) const {
+    assert(index < getShapeCount());
+    auto fix = getFixture(m_body, index);
+    b2MassData data;
+    fix->GetMassData(&data);
+    return data.I;
+}
+
+float RigidBody::getShapeDensity(std::size_t index) const {
+    assert(index < getShapeCount());
+    auto fix = getFixture(m_body, index);
+    return fix->GetDensity();
+}
+
+float RigidBody::getShapeFriction(std::size_t index) const {
+    assert(index < getShapeCount());
+    auto fix = getFixture(m_body, index);
+    return fix->GetFriction();
+}
+
+float RigidBody::getShapeRestitution(std::size_t index) const {
+    assert(index < getShapeCount());
+    auto fix = getFixture(m_body, index);
+    return fix->GetRestitution();
 }
 
 
@@ -216,58 +286,6 @@ void RigidBody::setRotation(float angle) {
 
 float RigidBody::getRotation() const {
     return fromB2D(m_body->GetAngle());
-}
-
-void RigidBody::setShapeDensity(std::size_t index, float density) {
-    assert(index < getShapeCount());
-    auto fix = m_body->GetFixtureList()[index];
-    fix.SetDensity(density);
-}
-
-void RigidBody::setShapeFriction(std::size_t index, float friction) {
-    assert(index < getShapeCount());
-    auto fix = m_body->GetFixtureList()[index];
-    fix.SetFriction(friction);
-}
-
-void RigidBody::setShapeRestitution(std::size_t index, float restitution) {
-    assert(index < getShapeCount());
-    auto fix = m_body->GetFixtureList()[index];
-    fix.SetRestitution(restitution);
-}
-
-float RigidBody::getShapeMass(std::size_t index) const {
-    assert(index < getShapeCount());
-    auto fix = m_body->GetFixtureList()[index];
-    b2MassData data;
-    fix.GetMassData(&data);
-    return data.mass;
-}
-
-float RigidBody::getShapeInertia(std::size_t index) const {
-    assert(index < getShapeCount());
-    auto fix = m_body->GetFixtureList()[index];
-    b2MassData data;
-    fix.GetMassData(&data);
-    return data.I;
-}
-
-float RigidBody::getShapeDensity(std::size_t index) const {
-    assert(index < getShapeCount());
-    auto fix = m_body->GetFixtureList()[index];
-    return fix.GetDensity();
-}
-
-float RigidBody::getShapeFriction(std::size_t index) const {
-    assert(index < getShapeCount());
-    auto fix = m_body->GetFixtureList()[index];
-    return fix.GetFriction();
-}
-
-float RigidBody::getShapeRestitution(std::size_t index) const {
-    assert(index < getShapeCount());
-    auto fix = m_body->GetFixtureList()[index];
-    return fix.GetRestitution();
 }
 
 //==============================================================================
@@ -303,7 +321,7 @@ void RigidBody::applyTorqueToCenter(float torque) {
 }
 
 std::size_t RigidBody::getRigidBodyCount() {
-    return g_rigidBodyCount;
+    return Physics::detail::world()->GetBodyCount();
 }
 
 

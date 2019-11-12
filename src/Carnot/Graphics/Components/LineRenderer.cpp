@@ -1,4 +1,4 @@
-#include <Engine/Components/LineRenderer.hpp>
+#include <Graphics/Components/LineRenderer.hpp>
 #include <Engine/GameObject.hpp>
 #include <Engine/Engine.hpp>
 #include <Utility/Math.hpp>

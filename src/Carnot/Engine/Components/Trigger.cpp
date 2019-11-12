@@ -1,5 +1,5 @@
 #include <Engine/Components/Trigger.hpp>
-#include <Engine/Systems/InputSystem.hpp>
+#include <Engine/InputSystem.hpp>
 #include <Engine/GameObject.hpp>
 #include <Utility/Math.hpp>
 
