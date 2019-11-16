@@ -26,3 +26,7 @@ cmake .. -A x64
 cmake --build . --target install --config Release
 cmake --build . --target install --config Debug
 ```
+
+<!-- 
+cmake .. -G Ninja -DCMAKE_C_COMPILER:PATH="C:\Program Files\LLVM\bin\clang-cl.exe" -DCMAKE_CXX_COMPILER:PATH="C:\Program Files\LLVM\bin\clang-cl.exe"
+ -->

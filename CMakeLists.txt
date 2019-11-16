@@ -15,7 +15,7 @@ target_compile_features(carnot PUBLIC cxx_std_17 PRIVATE)
 if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
     target_compile_options(carnot PUBLIC "/await" PRIVATE) # COROUTINES
 elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    target_compile_options(carnot PUBLIC "-fcoroutines-ts -stdlib=libc++" PRIVATE) # COROUTINES
+    target_compile_options(carnot PUBLIC "-std=c++2a" "-stdlib=libc++") # COROUTINES
 endif()
 
 # add source files to target
