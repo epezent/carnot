@@ -1,7 +1,11 @@
 macro(carnot_example CARNOT_EXAMPLE_NAME ICON)
-    add_executable(${CARNOT_EXAMPLE_NAME} "example_${CARNOT_EXAMPLE_NAME}.cpp" "resources/icons/${ICON}")
+    if (WIN32)
+        add_executable(${CARNOT_EXAMPLE_NAME} "example_${CARNOT_EXAMPLE_NAME}.cpp" "resources/icons/${ICON}")
+        set_target_properties(${CARNOT_EXAMPLE_NAME} PROPERTIES LINK_FLAGS "/ENTRY:mainCRTStartup")
+    else()
+        add_executable(${CARNOT_EXAMPLE_NAME} "example_${CARNOT_EXAMPLE_NAME}.cpp")
+    endif()
     target_link_libraries(${CARNOT_EXAMPLE_NAME} carnot)
-    set_target_properties(${CARNOT_EXAMPLE_NAME} PROPERTIES LINK_FLAGS "/ENTRY:mainCRTStartup")
     set_target_properties(${CARNOT_EXAMPLE_NAME} PROPERTIES DEBUG_POSTFIX -d)
     install(TARGETS ${CARNOT_EXAMPLE_NAME}
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
@@ -9,7 +13,9 @@ macro(carnot_example CARNOT_EXAMPLE_NAME ICON)
 endmacro()
 
 # disable console
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup")
+if (WIN32)
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup")
+endif()
 
 carnot_example(hello_world carnot.rc)
 carnot_example(coroutine carnot.rc)

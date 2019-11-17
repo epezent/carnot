@@ -32,7 +32,7 @@ public:
     Handle<GameObject> target;
 
     IkSolver() {
-        for (auto& i : range(0,n))
+        for (int i = 0; i < n; ++i)
             J.push_back(makeChild<IkJoint>());
         stroke = addComponent<LineRenderer>(n);
         stroke->setColor(Whites::White);
@@ -51,7 +51,7 @@ public:
         for (auto& j : J)
             j->destroy();
         J.clear();
-        for (auto& i : range(0,n))
+        for (int i = 0; i < n; ++i)
             J.push_back(makeChild<IkJoint>());
         stroke->setPointCount(n);
         P.resize(n);
