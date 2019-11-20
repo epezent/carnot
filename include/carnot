@@ -57,4 +57,5 @@
 #include <Graphics/Components/TextRenderer.hpp>
 
 #include <Physics/Components/RigidBody.hpp>
+#include <Physics/Components/ParticleSystem.hpp>
 #include <Physics/PhysicsSystem.hpp>

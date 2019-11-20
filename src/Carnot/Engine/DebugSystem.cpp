@@ -7,6 +7,7 @@
 #include <iostream>
 #include <Graphics/Components/Renderer.hpp>
 #include <Physics/Components/RigidBody.hpp>
+#include <Physics/Components/ParticleSystem.hpp>
 #include <Utility/Math.hpp>
 #include <Engine/ImGui/imgui.h>
 #include <Engine/ImGui/imgui-SFML.h>
@@ -198,7 +199,7 @@ void drawPolygon(const std::vector<Vector2f>& vertices, const Color& color, bool
 }
 
 void drawCircle(const Vector2f &position, float radius, const Color& color, bool fill) {
-    std::size_t smoothness = 36;
+    std::size_t smoothness = 32;
     float angleIncrement = 2.0f * Math::PI / smoothness;
     for (std::size_t i = 1; i < smoothness + 1; i++) {
         float angle1 = (i-1) * angleIncrement - 0.5f * Math::PI;
@@ -293,6 +294,7 @@ void infoMenu() {
         tooltip("Total Renderer count");
         ImGui::Text("BDY: %i", (int)RigidBody::getRigidBodyCount());
         tooltip("Total RigidBody count");
+        ImGui::Text("BDY: %i", (int)ParticleSystem::getParticleCount());
         showContextMenu(corner);
     }
     ImGui::End();

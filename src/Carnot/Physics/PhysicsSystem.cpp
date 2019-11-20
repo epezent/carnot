@@ -57,7 +57,15 @@ public:
 
 	/// Draw a particle array
 	virtual void DrawParticles(const b2Vec2 *centers, float32 radius, const b2ParticleColor *colors, int32 count) override  {
-        // TODO
+        if (colors) {
+            for (int i = 0; i < count; ++i) {
+                Debug::drawCircle(fromB2D(centers[i]), radius * g_invScale, fromB2D(colors[i].GetColor()), false);
+            }
+        }
+        else {
+            for (int i = 0; i < count; ++i) 
+                Debug::drawCircle(fromB2D(centers[i]), radius * g_invScale, Whites::White, false);
+        }
     }
 
 	/// Draw a line segment.
