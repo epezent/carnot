@@ -8,12 +8,15 @@
 #include <Engine/ImGui/imgui-SFML.h>
 #include <Engine/IconsFontAwesome5.hpp>
 #include <Engine/IconsFontAwesome5Brands.hpp>
-#include <windows.h>
-#include <winuser.h>
 #include <atomic>
 #include <thread>
-#include <ShellScalingAPI.h>
 #include "SPSCQueue.hpp"
+
+#ifdef _WIN32
+#include <windows.h>
+#include <winuser.h>
+#include <ShellScalingAPI.h>
+#endif
 
 using namespace rigtorp;
 
@@ -92,6 +95,8 @@ void determineDpi() {
 // WINDOWS
 //==============================================================================
 
+#ifdef _WIN32
+
 LONG_PTR g_originalSfmlCallback = 0x0;
 
 LRESULT CALLBACK fileDropCallback(HWND handle, UINT message, WPARAM wParam, LPARAM lParam)
@@ -131,14 +136,19 @@ void enableFileDrop(sf::WindowHandle handle) {
 }
 
 void setUserIcon(sf::WindowHandle handle) {
-#ifdef _WIN32
     HANDLE hIcon = LoadIconW(GetModuleHandleW(NULL), L"CARNOT_ICON");
     if (hIcon) {
         ::SendMessage(handle, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
         ::SendMessage(handle, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
     }
-#endif
 }
+
+#else
+
+void enableFileDrop(sf::WindowHandle handle) {}
+void setUserIcon(sf::WindowHandle handle) {}
+
+#endif
 
 
 
@@ -265,8 +275,8 @@ void Engine::init(unsigned int width, unsigned int height, unsigned int style, c
     colors[ImGuiCol_ResizeGripHovered]      = ImVec4(0.56f, 0.56f, 0.58f, 1.00f);
     colors[ImGuiCol_ResizeGripActive]       = ImVec4(0.06f, 0.05f, 0.07f, 1.00f);
     colors[ImGuiCol_Tab]                    = ImVec4(0.10f, 0.09f, 0.12f, 1.00f);
-    colors[ImGuiCol_TabHovered]             = ImVec4(0.24f, 0.23f, 0.29f, 1.00f);
-    colors[ImGuiCol_TabActive]              = ImVec4(0.56f, 0.56f, 0.58f, 1.00f);
+    colors[ImGuiCol_TabActive]              = ImVec4(0.24f, 0.23f, 0.29f, 1.00f);
+    colors[ImGuiCol_TabHovered]             = ImVec4(0.56f, 0.56f, 0.58f, 1.00f);
     colors[ImGuiCol_TabUnfocused]           = ImVec4(0.10f, 0.09f, 0.12f, 1.00f);
     colors[ImGuiCol_TabUnfocusedActive]     = ImVec4(0.24f, 0.23f, 0.29f, 1.00f);
     colors[ImGuiCol_PlotLines]              = ImVec4(0.80f, 0.80f, 0.83f, 1.00f);
@@ -300,12 +310,16 @@ void Engine::eventThread() {
 }
 
 Vector2u Engine::getWindowSize() {
+#ifdef _WIN32
     RECT rect;
     GetClientRect(window->getSystemHandle(), &rect);  
     Vector2u out;
     out.x = rect.right - rect.left;
     out.y = rect.bottom - rect.top;
     return out;
+#else
+    return window->getSize();
+#endif
 }
 
 void Engine::renderThread() {

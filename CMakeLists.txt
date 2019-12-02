@@ -15,11 +15,11 @@ target_compile_features(carnot PUBLIC cxx_std_17 PRIVATE)
 if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
     target_compile_options(carnot PUBLIC "/await" PRIVATE) # COROUTINES
 elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    target_compile_options(carnot PUBLIC "-fcoroutines-ts -stdlib=libc++" PRIVATE) # COROUTINES
+    target_compile_options(carnot PUBLIC "-std=c++2a" "-fcoroutines-ts" "-stdlib=libc++") # COROUTINES
 endif()
 
 # add source files to target
-add_subdirectory(src)
+add_subdirectory(src) 
 
 # add include files
 file(GLOB_RECURSE CARNOT_INCLUDE "include/*.hpp" "include/*.inl" "include/*.h")
@@ -28,8 +28,10 @@ target_sources(carnot PRIVATE ${CARNOT_INCLUDE})
 # find SFML
 set(SFML_STATIC_LIBRARIES TRUE)
 find_package(SFML 2.5 REQUIRED COMPONENTS audio graphics window system network)
+find_package(OpenGL REQUIRED)
 
 # add dependcies
+if (WIN32)
 target_link_libraries(carnot
 	PUBLIC
 		ws2_32
@@ -41,6 +43,14 @@ target_link_libraries(carnot
 		sfml-audio sfml-graphics sfml-window sfml-system sfml-network
 	PRIVATE
 )
+else()
+target_link_libraries(carnot
+	PUBLIC
+		sfml-audio sfml-graphics sfml-window sfml-system sfml-network
+		${OPENGL_LIBRARIES}
+	PRIVATE
+)
+endif()
 
 target_compile_definitions(carnot
 	PUBLIC

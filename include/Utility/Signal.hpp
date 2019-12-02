@@ -122,17 +122,17 @@ public:
     /// Operator to add a new function or lambda as signal handler, returns a handler connection ID.
     size_t connect(const CbFunction &cb) { return add_cb(cb); }
 
-    template <class Class, class R, class... Args>
-    size_t connect(Class *object, R (Class::*method)(Args...))
+    template <class Class, class RR, class... Args2>
+    size_t connect(Class *object, RR (Class::*method)(Args2...))
     {
-        auto f = [object, method](Args... args) { return (object->*method)(args...); };
+        auto f = [object, method](Args2... args) { return (object->*method)(args...); };
         return connect(f);
     }
 
-    template <class Instance, class Class, class R, class... Args>
-    size_t connect(Instance &object, R (Class::*method)(Args...))
+    template <class Instance, class Class, class RR, class... Args2>
+    size_t connect(Instance &object, RR (Class::*method)(Args2...))
     {
-        auto f = [&object, method](Args... args) { return (object.*method)(args...); };
+        auto f = [&object, method](Args2... args) { return (object.*method)(args...); };
         return connect(f);
     }
 

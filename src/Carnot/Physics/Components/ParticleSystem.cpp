@@ -13,7 +13,7 @@ ParticleSystem::ParticleSystem(GameObject& _gameObject) :
     def.pressureStrength = 1.0f;
     def.springStrength = 1;
     def.elasticStrength = 1;
-    def.
+    
     m_system = Physics::detail::world()->CreateParticleSystem(&def);
     b2ParticleDef pdef;
     for (int i = -2500; i < 2500; ++i) {

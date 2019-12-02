@@ -149,7 +149,7 @@ public:
 
     void update() {
         if (!paused) {
-            for (auto i : range(1000)) {
+            for (int i = 0; i < 1000; ++i) {
                 sinwave[i] = 0.5f * Math::sin(2 * Math::PI * (Engine::time() + (float)i/100.0f)) + 0.5f * Math::sin(2 * Math::PI * 0.5 * (Engine::time() + (float)i/100.0f));
             }
         }

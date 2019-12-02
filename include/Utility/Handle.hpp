@@ -99,7 +99,7 @@ Handle<T>::Handle(WkPtr<T> wkPtr) :
 template <typename T>
 template <typename U>
 Handle<T>::Handle(Handle<U> handle) {
-    *this = handle.as<T>();
+    *this = handle.template as<T>();
 }
 
 template <typename T>

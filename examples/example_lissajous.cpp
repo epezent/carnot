@@ -93,7 +93,7 @@ public:
         };
 
         // make column/row headers
-        for (auto& i : range(0,7)) {
+        for (int i = 0; i < 7; ++i) {
             rHeaders[i] = makeChild<LissaCircle>(colors[i], i+1,false);
             rHeaders[i]->transform.setPosition(50.0f, i * 100.0f + 150.0f);
             cHeaders[i] = makeChild<LissaCircle>(colors[i], i+1,true);
@@ -101,9 +101,9 @@ public:
         }
 
         // make nodes
-        for (auto& r : range(0,7)) {
+        for (int r = 0; r < 7; ++r) {
             nodes[r].resize(7);
-            for (auto& c : range(0,7)) {
+            for (int c = 0; c < 7; ++c) {
                 nodes[r][c] = makeChild<LissaPath>(rHeaders[r],cHeaders[c]);
             }
         }

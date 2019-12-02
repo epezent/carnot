@@ -209,7 +209,7 @@ template <typename T, typename ...Args>
 Handle<T> GameObject::addComponent(Args... args) {
     auto component = std::make_shared<T>(*this, std::forward<Args>(args)...);
     auto handle = attachComponent(std::move(component));
-    return handle.as<T>();
+    return handle.template as<T>();
 }
 
 template <typename T>
