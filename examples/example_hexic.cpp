@@ -1,3 +1,5 @@
+#define CARNOT_USE_DISCRETE_GPU
+
 #include <carnot>
 
 using namespace carnot;

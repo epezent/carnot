@@ -1,6 +1,8 @@
 {
     "cmake.buildDirectory": "${workspaceRoot}/build-${variant:buildType}",
     "files.associations": {
+        "tact": "cpp",
+        "syntacts": "cpp",
         "*.in": "cmake",
         "vector": "cpp",
         "algorithm": "cpp",
@@ -89,7 +91,9 @@
         "string_view": "cpp",
         "concepts": "cpp",
         "*.tcc": "cpp",
-        "memory_resource": "cpp"
+        "memory_resource": "cpp",
+        "stack": "cpp",
+        "cinttypes": "cpp"
     },
     "C_Cpp.default.configurationProvider": "vector-of-bool.cmake-tools",
     "cSpell.enabled": false
