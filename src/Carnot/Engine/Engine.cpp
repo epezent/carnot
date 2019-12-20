@@ -4,8 +4,8 @@
 #include <cassert>
 #include "Fonts/EngineFonts.hpp"
 #include <Graphics/Components/Renderer.hpp>
-#include <Engine/ImGui/imgui.h>
-#include <Engine/ImGui/imgui-SFML.h>
+#include <ImGui/imgui.h>
+#include <ImGui/imgui-SFML.h>
 #include <Engine/IconsFontAwesome5.hpp>
 #include <Engine/IconsFontAwesome5Brands.hpp>
 #include <atomic>
@@ -72,7 +72,7 @@ void freeResources() {
     // free resources
     Engine::textures.unloadAll();
     Engine::fonts.unloadAll();
-    Engine::sounds.unloadAll();
+    // Engine::sounds.unloadAll();
     Engine::shaders.unloadAll();
     // free window
     Engine::window.reset();
@@ -162,7 +162,7 @@ Ptr<RenderWindow> Engine::window;
 
 ResourceManager<Texture>     Engine::textures = ResourceManager<Texture>();
 ResourceManager<Font>        Engine::fonts    = ResourceManager<Font>();
-ResourceManager<SoundBuffer> Engine::sounds   = ResourceManager<SoundBuffer>();
+// ResourceManager<SoundBuffer> Engine::sounds   = ResourceManager<SoundBuffer>();
 ResourceManager<Shader>      Engine::shaders  = ResourceManager<Shader>();
 
 void Engine::init(const std::string& title) {
@@ -232,13 +232,26 @@ void Engine::init(unsigned int width, unsigned int height, unsigned int style, c
     // stype ImGui
     ImGuiStyle * imStyle = &ImGui::GetStyle();
 
-    imStyle->WindowRounding = 2.0f;
-    imStyle->FrameRounding = 2.0f;
-    imStyle->IndentSpacing = 25.0f;
-    imStyle->ScrollbarSize = 15.0f;
-    imStyle->ScrollbarRounding = 9.0f;
+    // Main
+    imStyle->WindowPadding    = ImVec2(8,8);
+    imStyle->FramePadding     = ImVec2(3,3);
+    imStyle->ItemSpacing      = ImVec2(4,4);
+    imStyle->ItemInnerSpacing = ImVec2(4,4);
+    imStyle->IndentSpacing    = 20.0f;
+    imStyle->ScrollbarSize    = 15.0f;
     imStyle->GrabMinSize = 5.0f;
+
+    // Rounding
+    imStyle->WindowRounding = 2.0f;
+    imStyle->ChildRounding = 2.0f;
+    imStyle->FrameRounding = 2.0f;
+    imStyle->PopupRounding = 2.0f;
+    imStyle->ScrollbarRounding = 10.0f;
     imStyle->GrabRounding = 2.0f;
+    imStyle->TabRounding = 2.0f;
+
+    // Alignment
+    imStyle->WindowMenuButtonPosition = ImGuiDir_Right;
 
     ImVec4* colors = ImGui::GetStyle().Colors;
     colors[ImGuiCol_Text]                   = ImVec4(0.80f, 0.80f, 0.83f, 1.00f);

@@ -1,5 +1,5 @@
-#include <Engine/ImGui/imgui-SFML.h>
-#include <Engine/ImGui/imgui.h>
+#include <imgui-SFML.h>
+#include <imgui.h>
 #include <Utility/Print.hpp>
 
 #include <SFML/OpenGL.hpp>

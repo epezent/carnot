@@ -3,7 +3,7 @@
 #ifndef IMGUI_DEFINE_MATH_OPERATORS
 #define IMGUI_DEFINE_MATH_OPERATORS
 #endif
-#include <Engine/ImGui/imgui_internal.h>
+#include <ImGui/imgui_internal.h>
 #include <filesystem>
 
 //=============================================================================

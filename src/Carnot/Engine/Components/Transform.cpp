@@ -2,7 +2,7 @@
 #include <Engine/GameObject.hpp>
 #include <Engine/Engine.hpp>
 #include <Utility/Math.hpp>
-#include <Engine/ImGui/imgui.h>
+#include <ImGui/imgui.h>
 #include <Graphics/NamedColors.hpp>
 
 namespace carnot {

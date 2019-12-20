@@ -73,7 +73,7 @@ static Ptr<RenderWindow> window;  ///< Engine render window
 
 static ResourceManager<Texture>     textures; ///< 2D textures
 static ResourceManager<Font>        fonts;    ///< fonts
-static ResourceManager<SoundBuffer> sounds;   ///< SFX/music
+// static ResourceManager<SoundBuffer> sounds;   ///< SFX/music
 static ResourceManager<Shader>      shaders;  ///< shaders
 
 private:

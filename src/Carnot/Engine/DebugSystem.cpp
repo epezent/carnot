@@ -9,8 +9,8 @@
 #include <Physics/Components/RigidBody.hpp>
 #include <Physics/Components/ParticleSystem.hpp>
 #include <Utility/Math.hpp>
-#include <Engine/ImGui/imgui.h>
-#include <Engine/ImGui/imgui-SFML.h>
+#include <ImGui/imgui.h>
+#include <ImGui/imgui-SFML.h>
 #include <Engine/IconsFontAwesome5.hpp>
 #include <Graphics/NamedColors.hpp>
 #include <sstream>
@@ -268,7 +268,7 @@ void infoMenu() {
     ImVec2 window_piv = ImVec2((corner & 1) ? 1.0f : 0.0f, (corner & 2) ? 1.0f : 0.0f);
     if (corner != -1)
         ImGui::SetNextWindowPos(window_pos, ImGuiCond_Always, window_piv);
-    ImGui::SetNextWindowContentWidth(150);
+    ImGui::SetNextWindowContentSize(ImVec2(150, 0.0f));
     if (ImGui::Begin("Info##CARNOT_DEBUG", nullptr, (corner != -1 ? ImGuiWindowFlags_NoMove : 0) | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoNav))
     {
         ImGui::Text("CLK: %.2f s", Engine::time());

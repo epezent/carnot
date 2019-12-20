@@ -27,7 +27,7 @@ target_sources(carnot PRIVATE ${CARNOT_INCLUDE})
 
 # find SFML
 set(SFML_STATIC_LIBRARIES TRUE)
-find_package(SFML 2.5 REQUIRED COMPONENTS audio graphics window system network)
+find_package(SFML 2.5 REQUIRED COMPONENTS graphics window system network)
 find_package(OpenGL REQUIRED)
 
 # add dependcies
@@ -40,13 +40,13 @@ target_link_libraries(carnot
 		Psapi
 		XInput
 		Shcore
-		sfml-audio sfml-graphics sfml-window sfml-system sfml-network
+		sfml-graphics sfml-window sfml-system sfml-network
 	PRIVATE
 )
 else()
 target_link_libraries(carnot
 	PUBLIC
-		sfml-audio sfml-graphics sfml-window sfml-system sfml-network
+		sfml-graphics sfml-window sfml-system sfml-network
 		${OPENGL_LIBRARIES}
 	PRIVATE
 )

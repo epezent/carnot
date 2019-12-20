@@ -14,4 +14,3 @@ target_sources(carnot
 
 add_subdirectory(Components)
 add_subdirectory(Fonts)
-add_subdirectory(ImGui)

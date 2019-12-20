@@ -2,13 +2,17 @@
 #ifndef IMGUI_DEFINE_MATH_OPERATORS
 #define IMGUI_DEFINE_MATH_OPERATORS
 #endif
-#include <Engine/ImGui/imgui_internal.h>
+#include <ImGui/imgui_internal.h>
 
 using namespace carnot;
 
 ///////////////////////////////////////////////////////////////////////////////
 
 namespace ImGui {
+
+float Remap( float num, float low1, float high1, float low2, float high2 ) {
+    return low2 + ( num - low1 ) * ( high2 - low2 ) / ( high1 - low1 );
+}
 
 void RenderGrid(ImRect bb, int nx, int ny, ImU32 gridColor, ImU32 bgColor, float thickness = 1.0f) {
     ImDrawList* DrawList = GetWindowDrawList();
@@ -27,46 +31,47 @@ void RenderGrid(ImRect bb, int nx, int ny, ImU32 gridColor, ImU32 bgColor, float
     }
 }
 
-struct GrabHandle {
+struct PolyBezierPoint {
     ImVec2 pos;    
     bool grabbed = false;
     ImVec2 constrain(float xMin, float xMax, float yMin, float yMax) {       
         ImVec2 constrained = pos;
-        pos.x = ImClamp(pos.x,xMin,xMax);
-        pos.y = ImClamp(pos.y, yMin, yMax);
+        pos.x = ImClamp(pos.x, std::max(xMin,constraints.Min.x), std::min(xMax,constraints.Max.x));
+        pos.y = ImClamp(pos.y, std::max(yMin,constraints.Min.y), std::min(yMax,constraints.Max.y));
         return pos - constrained;
     }
+    ImRect constraints = ImRect(-FLT_MAX, -FLT_MAX, FLT_MAX, FLT_MAX);
 };
 
-struct GrabGroup : std::enable_shared_from_this<GrabGroup> {
+struct PolyBezierGroup : std::enable_shared_from_this<PolyBezierGroup> {
 
-    GrabGroup(ImVec2 pos) {
+    PolyBezierGroup(ImVec2 pos, float cpLength) {
         p.pos = pos;
-        l.pos = pos - ImVec2(0.1f,0);
-        r.pos = pos + ImVec2(0.1f,0);
+        cpl.pos = pos - ImVec2(cpLength, 0);
+        cpr.pos = pos + ImVec2(cpLength, 0);
     }
 
-    void constrain() {
+    void constrain(const ImRect& bb) {
         if (forceTanget) {
-            if (r.grabbed) {
-                auto v = r.pos - p.pos;
-                l.pos = p.pos - v;
+            if (cpr.grabbed) {
+                auto v = cpr.pos - p.pos;
+                cpl.pos = p.pos - v;
             }
             else {
-                auto v = l.pos - p.pos;
-                r.pos = p.pos - v;
+                auto v = cpl.pos - p.pos;
+                cpr.pos = p.pos - v;
             }
         } 
-        p.constrain(prev ? prev->p.pos.x : 0, next ? (next->p.grabbed ? p.pos.x : next->p.pos.x) : 1, 0, 1);
-        l.constrain(prev ? prev->p.pos.x : -FLT_MAX, p.pos.x, -FLT_MAX, FLT_MAX);
-        r.constrain(p.pos.x, next ? next->p.pos.x : FLT_MAX, -FLT_MAX, FLT_MAX);   
+        constrainP(bb);
+        cpl.constrain(prev ? prev->p.pos.x : -FLT_MAX, p.pos.x, -FLT_MAX, FLT_MAX);
+        cpr.constrain(p.pos.x, next ? next->p.pos.x : FLT_MAX, -FLT_MAX, FLT_MAX);   
     }
 
-    ImVec2 constrainP() {
-        return p.constrain(prev ? prev->p.pos.x : 0, next ? (next->p.grabbed ? p.pos.x : next->p.pos.x) : 1, 0, 1);
+    ImVec2 constrainP(const ImRect& bb) {
+        return p.constrain(prev ? prev->p.pos.x : bb.Min.x, next ? (next->p.grabbed ? p.pos.x : next->p.pos.x) : bb.Max.x, bb.Min.y, bb.Max.y);
     }
 
-    void insert(std::shared_ptr<GrabGroup> g) {
+    void insert(std::shared_ptr<PolyBezierGroup> g) {
         if (prev) {
             prev->next = g;
             g->prev = prev;
@@ -75,7 +80,7 @@ struct GrabGroup : std::enable_shared_from_this<GrabGroup> {
         prev = g;
     }
 
-    void push(std::shared_ptr<GrabGroup> g) {
+    void push(std::shared_ptr<PolyBezierGroup> g) {
         next = g;
         g->prev = shared_from_this();
     }
@@ -87,26 +92,68 @@ struct GrabGroup : std::enable_shared_from_this<GrabGroup> {
             next->prev = prev;
     }
 
-    GrabHandle l, p, r;
+    PolyBezierPoint p, cpl, cpr;
     bool active = false;
     bool forceTanget = true;
 
-    std::shared_ptr<GrabGroup> prev = nullptr;
-    std::shared_ptr<GrabGroup> next = nullptr;
+    std::shared_ptr<PolyBezierGroup> prev = nullptr;
+    std::shared_ptr<PolyBezierGroup> next = nullptr;
 };
 
 struct PolyBezier {
+    PolyBezier(ImVec4 color = ImVec4(0,1,1,1), ImRect bounds = ImRect(0,0,1,1)) : 
+        color(color), bounds(bounds) 
+    {
+        root = std::make_shared<PolyBezierGroup>(bounds.Min, 0.25f * bounds.GetWidth());
+        head = std::make_shared<PolyBezierGroup>(bounds.Max, 0.25f * bounds.GetWidth());
+        root->push(head);
+    }
+
     int pointCount() {
         int points = 0;
         for (auto g = root; g; g = g->next) 
             points++;
-        return points;
+        return points;     
+    }    
+
+    int bezierCount() {
+        int beziers = -1;
+        for (auto g = root; g; g = g->next) 
+            beziers++;
+        return ImClamp(beziers,0,INT_MAX);
     }
-    std::shared_ptr<GrabGroup> root;
-    std::shared_ptr<GrabGroup> head;
+
+    void getPoint(int index, ImVec2* cpL, ImVec2* pos, ImVec2* clR) {
+        IM_ASSERT(index < pointCount());
+        auto g = root;
+        for (int i = 0; i < index; ++i)
+            g = g->next;
+        *cpL = g->cpl.pos; *pos = g->p.pos; *clR = g->cpr.pos;
+    }
+
+    void getBezier(int index, ImVec2* pos0, ImVec2* cp0, ImVec2* cp1, ImVec2* pos1) {
+        IM_ASSERT(index < bezierCount());
+        auto g = root;
+        for (int i = 0; i < index; ++i) 
+            g = g->next;
+        *pos0 = g->p.pos; *cp0 = g->cpr.pos; *cp1 = g->next->cpl.pos; *pos1 = g->next->p.pos;
+    }
+
+    ImRect bounds;
+    ImVec4 color;
+    float thickness = 1;
+    int segments = 64;
+    bool constrainEndpoints = true;
+    float grabRadius = 3;
+
+private:
+    friend void PolyBezierEdit(const char*,PolyBezier*,int,int,ImVec2);
+    std::shared_ptr<PolyBezierGroup> root;
+    std::shared_ptr<PolyBezierGroup> head;
 };
 
-void PolyBezierEditor(const char* label, PolyBezier& pb, float grabRadius, ImVec4 color, float thickness = 1.0f, int segments = 64, ImVec2 size = ImVec2(-1,0)) {
+void PolyBezierEdit(const char* label, PolyBezier* polyBezier, int gridX = 10, int gridY = 10, ImVec2 size = ImVec2(-1,0)) {
+    PolyBezier& pb = *polyBezier;
     // skip render if SkipItems on
     ImGuiWindow* window = GetCurrentWindow();
     if (window->SkipItems)
@@ -118,46 +165,56 @@ void PolyBezierEditor(const char* label, PolyBezier& pb, float grabRadius, ImVec
     const ImGuiIO& IO = GetIO();
     ImDrawList* DrawList = GetWindowDrawList();
     // convert color
-    auto color32 = ColorConvertFloat4ToU32(color);
+    auto color32 = ColorConvertFloat4ToU32(pb.color);
     // sizing
     size = CalcItemSize(size, 200, 200);
-    const ImRect frame_bb(window->DC.CursorPos, window->DC.CursorPos + size);
+    const ImRect bb_frame(window->DC.CursorPos, window->DC.CursorPos + size);
     const ImVec2 padding(10,10);
-    const ImRect inner_bb(frame_bb.Min + padding, frame_bb.Max - padding);
-    const float bb_width = inner_bb.GetWidth();
-    const float bb_height = inner_bb.GetHeight();
-    const float bb_invWidth = 1.0f / inner_bb.GetWidth();
-    const float bb_invHeight = 1.0f / inner_bb.GetHeight();
+    const ImRect bb_px(bb_frame.Min + padding, bb_frame.Max - padding);
+
+    const float bb_px_width     = bb_px.GetWidth();
+    const float bb_px_height    = bb_px.GetHeight();
+    const float bb_px_invWidth  = 1.0f / bb_px_width;
+    const float bb_px_invHeight = 1.0f / bb_px_height;
+
+    const float bb_pb_width     = pb.bounds.GetWidth();
+    const float bb_pb_height    = pb.bounds.GetHeight();
+    const float bb_pb_invWidth  = 1.0f / bb_pb_width;
+    const float bb_pb_invHeight = 1.0f / bb_pb_height;    
+
     // render background
-    ItemSize(frame_bb, style.FramePadding.y);
-    if (!ItemAdd(frame_bb, 0, &frame_bb))
+    ItemSize(bb_frame, style.FramePadding.y);
+    if (!ItemAdd(bb_frame, 0, &bb_frame))
         return;
-    const bool hovered = ItemHoverable(inner_bb, id);
-    RenderFrame(frame_bb.Min, frame_bb.Max, GetColorU32(ImGuiCol_FrameBg), true, style.FrameRounding);
-    RenderGrid(inner_bb, 10, 10, GetColorU32(ImGuiCol_WindowBg), GetColorU32(ImGuiCol_FrameBgHovered, 0.05f));
+    const bool hovered = ItemHoverable(bb_px, id);
+    RenderFrame(bb_frame.Min, bb_frame.Max, GetColorU32(ImGuiCol_FrameBg), true, style.FrameRounding);
+    RenderGrid(bb_px, gridX, gridY, GetColorU32(ImGuiCol_WindowBg), GetColorU32(ImGuiCol_FrameBgHovered, 0.1f));
     // clear active lambda
-    auto clearActivations = [&](std::shared_ptr<GrabGroup> except = nullptr) {
+    auto clearActivations = [&](std::shared_ptr<PolyBezierGroup> except = nullptr) {
         for (auto g = pb.root; g; g = g->next){
             if (g != except)
                 g->active = false;
         }
     };
-    // conversion lambdas
-    auto toPx = [&](const ImVec2& nm) -> ImVec2 {
-        auto px = ImVec2(inner_bb.Min.x + nm.x * bb_width, inner_bb.Max.y - nm.y * bb_height);
-        return px;
+    // transformation lambdas
+    auto toPx = [&](const ImVec2& pbV) -> ImVec2 {
+        float pxX = bb_px.Min.x + ( pbV.x - pb.bounds.Min.x ) * bb_px_width  * bb_pb_invWidth;
+        float pxY = bb_px.Max.y - ( pbV.y - pb.bounds.Min.y ) * bb_px_height * bb_pb_invHeight;
+        return ImVec2(pxX,pxY);
     };
-    auto toNm = [&](const ImVec2& px) -> ImVec2 {
-        auto nm = ImVec2((px.x-inner_bb.Min.x) * bb_invWidth, -(px.y-inner_bb.Max.y) * bb_invHeight);
-        return nm;
+    auto toPb = [&](const ImVec2& pxV) -> ImVec2 {
+        float pbX =  (pxV.x - bb_px.Min.x) * bb_px_invWidth  * bb_pb_width  + pb.bounds.Min.x;
+        float pbY = -(pxV.y - bb_px.Max.y) * bb_px_invHeight * bb_pb_height + pb.bounds.Min.y;
+        return ImVec2(pbX,pbY);
     };
-    auto toNmD = [&](const ImVec2& px) -> ImVec2 {
-        auto nmD = ImVec2(px.x * bb_invWidth, - px.y * bb_invHeight);
-        return nmD;
+    auto toPbD = [&](const ImVec2& pxV) -> ImVec2 {
+        float pbDX =  (pxV.x) * bb_px_invWidth  * bb_pb_width;
+        float pbDY = -(pxV.y) * bb_px_invHeight * bb_pb_height;
+        return ImVec2(pbDX,pbDY);
     };    
     // check for additions
     if (IO.MouseClicked[1] && hovered) {
-        auto newG = std::make_shared<GrabGroup>(toNm(IO.MousePos));
+        auto newG = std::make_shared<PolyBezierGroup>(toPb(IO.MousePos), 0.25f * pb.bounds.GetWidth());
         if (!pb.root) {
             pb.root = newG;
             pb.head = pb.root;
@@ -199,37 +256,37 @@ void PolyBezierEditor(const char* label, PolyBezier& pb, float grabRadius, ImVec
         float d;
         if (g->active) {
             // drag left cp
-            v = (IO.MousePos - toPx(g->l.pos));
+            v = (IO.MousePos - toPx(g->cpl.pos));
             d = v.x * v.x + v.y * v.y;  
             if (d < 25) {
                 if (IO.MouseClicked[0]) {
                     if (IO.KeyCtrl)
                         g->forceTanget = !g->forceTanget;
-                    g->l.grabbed = true;
+                    g->cpl.grabbed = true;
                     clearActive = false;
                 }   
             }
-            if (g->l.grabbed) {
-                g->l.pos += toNmD(IO.MouseDelta);
+            if (g->cpl.grabbed) {
+                g->cpl.pos += toPbD(IO.MouseDelta);
                 if (IO.MouseReleased[0]) 
-                    g->l.grabbed = false;
+                    g->cpl.grabbed = false;
                 break;
             }
             // drag right cp
-            v = (IO.MousePos - toPx(g->r.pos));
+            v = (IO.MousePos - toPx(g->cpr.pos));
             d = v.x * v.x + v.y * v.y;  
             if (d < 25) {
                 if (IO.MouseClicked[0]) {
                     if (IO.KeyCtrl)
                         g->forceTanget = !g->forceTanget;
-                    g->r.grabbed = true;
+                    g->cpr.grabbed = true;
                     clearActive = false;
                 }   
             }
-            if (g->r.grabbed) {
-                g->r.pos += toNmD(IO.MouseDelta);
+            if (g->cpr.grabbed) {
+                g->cpr.pos += toPbD(IO.MouseDelta);
                 if (IO.MouseReleased[0]) 
-                    g->r.grabbed = false;
+                    g->cpr.grabbed = false;
                 break;
             }
         } 
@@ -247,18 +304,38 @@ void PolyBezierEditor(const char* label, PolyBezier& pb, float grabRadius, ImVec
             }
         }
         if (g->p.grabbed) {
-            g->p.pos += toNmD(IO.MouseDelta);
-            auto constrainedBy = g->constrainP();
-            g->r.pos += toNmD(IO.MouseDelta) + constrainedBy;
-            g->l.pos += toNmD(IO.MouseDelta) + constrainedBy;
+            g->p.pos += toPbD(IO.MouseDelta);
+            auto constrainedBy = g->constrainP(pb.bounds);
+            g->cpr.pos += toPbD(IO.MouseDelta) + constrainedBy;
+            g->cpl.pos += toPbD(IO.MouseDelta) + constrainedBy;
             if (IO.MouseReleased[0] || IO.MouseReleased[1]) 
                 g->p.grabbed = false;
             break;
         }
     }
     // constrain
+    if (pb.constrainEndpoints) {
+        if (pb.root) {
+            pb.root->p.constraints.Min.x = pb.bounds.Min.x;
+            pb.root->p.constraints.Max.x = pb.bounds.Min.x;
+        }
+        if (pb.head && pb.head != pb.root) {
+            pb.head->p.constraints.Min.x = pb.bounds.Max.x;
+            pb.head->p.constraints.Max.x = pb.bounds.Max.x;
+        }
+    }
+    else {
+        if (pb.root) {
+            pb.root->p.constraints.Min.x = -FLT_MAX;
+            pb.root->p.constraints.Max.x = -FLT_MAX;
+        }
+        if (pb.head && pb.head != pb.root) {
+            pb.head->p.constraints.Min.x = FLT_MAX;
+            pb.head->p.constraints.Max.x = FLT_MAX;
+        }
+    }
     for (auto g = pb.root; g; g = g->next) 
-        g->constrain();
+        g->constrain(pb.bounds);
     // clear active if clicked
     if (IO.MouseClicked[0] && clearActive)
         clearActivations();
@@ -271,19 +348,19 @@ void PolyBezierEditor(const char* label, PolyBezier& pb, float grabRadius, ImVec
             break;
         }
     } 
-    // count points
-    int points = pb.pointCount();
+    // bezierCount points
+    int beziers = pb.bezierCount();
     // render points
     if (hovered || active) {
         for (auto g = pb.root; g; g = g->next) 
-            DrawList->AddCircleFilled(toPx(g->p.pos), grabRadius, color32);
+            DrawList->AddCircleFilled(toPx(g->p.pos), pb.grabRadius, color32);
     }
     // render bezier
-    if (points > 0) {
-        DrawList->PushClipRect(inner_bb.Min, inner_bb.Max, true);
+    if (beziers > 0) {
+        DrawList->PushClipRect(bb_px.Min, bb_px.Max, true);
         auto g = pb.root;
-        for (int i = 0; i < points-1; ++i) {
-            DrawList->AddBezierCurve(toPx(g->p.pos), toPx(g->r.pos), toPx(g->next->l.pos), toPx(g->next->p.pos), color32, thickness, segments);
+        for (int i = 0; i < beziers; ++i) {
+            DrawList->AddBezierCurve(toPx(g->p.pos), toPx(g->cpr.pos), toPx(g->next->cpl.pos), toPx(g->next->p.pos), color32, pb.thickness, pb.segments);
             g = g->next;
         }
         DrawList->PopClipRect();
@@ -293,22 +370,31 @@ void PolyBezierEditor(const char* label, PolyBezier& pb, float grabRadius, ImVec
         if (g->active) {
             int segs = 12;
             if (g->prev) {
-                    ImGui::GetForegroundDrawList()->AddLine(toPx(g->l.pos), toPx(g->p.pos), GetColorU32(ImGuiCol_ButtonActive));
+                    ImGui::GetForegroundDrawList()->AddLine(toPx(g->cpl.pos), toPx(g->p.pos), GetColorU32(ImGuiCol_ButtonActive));
 
                 if (g->forceTanget)
-                    ImGui::GetForegroundDrawList()->AddRectFilled(toPx(g->l.pos) - ImVec2(grabRadius,grabRadius), toPx(g->l.pos) + ImVec2(grabRadius,grabRadius), GetColorU32(ImGuiCol_ButtonActive));
+                    ImGui::GetForegroundDrawList()->AddRectFilled(toPx(g->cpl.pos) - ImVec2(pb.grabRadius,pb.grabRadius), toPx(g->cpl.pos) + ImVec2(pb.grabRadius,pb.grabRadius), GetColorU32(ImGuiCol_ButtonActive));
                 else 
-                    ImGui::GetForegroundDrawList()->AddRect(toPx(g->l.pos) - ImVec2(grabRadius,grabRadius), toPx(g->l.pos) + ImVec2(grabRadius,grabRadius), GetColorU32(ImGuiCol_ButtonActive));
+                    ImGui::GetForegroundDrawList()->AddRect(toPx(g->cpl.pos) - ImVec2(pb.grabRadius,pb.grabRadius), toPx(g->cpl.pos) + ImVec2(pb.grabRadius,pb.grabRadius), GetColorU32(ImGuiCol_ButtonActive));
                 
             }
             if (g->next) {
-                ImGui::GetForegroundDrawList()->AddLine(toPx(g->r.pos), toPx(g->p.pos), GetColorU32(ImGuiCol_ButtonActive));
+                ImGui::GetForegroundDrawList()->AddLine(toPx(g->cpr.pos), toPx(g->p.pos), GetColorU32(ImGuiCol_ButtonActive));
                 if (g->forceTanget)
-                    ImGui::GetForegroundDrawList()->AddRectFilled(toPx(g->r.pos) - ImVec2(grabRadius,grabRadius), toPx(g->r.pos) + ImVec2(grabRadius,grabRadius), GetColorU32(ImGuiCol_ButtonActive));                
+                    ImGui::GetForegroundDrawList()->AddRectFilled(toPx(g->cpr.pos) - ImVec2(pb.grabRadius,pb.grabRadius), toPx(g->cpr.pos) + ImVec2(pb.grabRadius,pb.grabRadius), GetColorU32(ImGuiCol_ButtonActive));                
                 else 
-                    ImGui::GetForegroundDrawList()->AddRect(toPx(g->r.pos) - ImVec2(grabRadius,grabRadius), toPx(g->r.pos) + ImVec2(grabRadius,grabRadius), GetColorU32(ImGuiCol_ButtonActive));                
+                    ImGui::GetForegroundDrawList()->AddRect(toPx(g->cpr.pos) - ImVec2(pb.grabRadius,pb.grabRadius), toPx(g->cpr.pos) + ImVec2(pb.grabRadius,pb.grabRadius), GetColorU32(ImGuiCol_ButtonActive));                
             }
         }
+    }
+    // render position label
+    if (hovered || active) {
+        char posText[16];
+        ImVec2 nmMouse = toPb(IO.MousePos);
+        sprintf(posText,"%.2f,%.2f",nmMouse.x, nmMouse.y);
+        ImVec2 posTextSize = CalcTextSize(posText);
+        RenderText(bb_px.Max - posTextSize - style.FramePadding, posText);
+        
     }
 }
 
@@ -317,11 +403,13 @@ void PolyBezierEditor(const char* label, PolyBezier& pb, float grabRadius, ImVec
 class Window : public GameObject {
 public:
 
-    ImGui::PolyBezier pb1, pb2;
+    ImGui::PolyBezier pb;
+
+    Window() : pb(Greens::Chartreuse, ImRect(0,0,100,100)) { }
 
     void start() {
-        // m_root = std::make_shared<ImGui::GrabGroup>(ImVec2(50,50));
-        // m_root->next = std::make_shared<ImGui::GrabGroup>(ImVec2(300,150));
+        // pb1.bounds.Max.x = 10;
+        // pb1.bounds.Max.y = 10;
     }
 
     void update() {
@@ -329,10 +417,32 @@ public:
         ImGui::SetNextWindowPos(Vector2f(5,5), ImGuiCond_Always);
         ImGui::SetNextWindowSize(Vector2f(winSize.x - 10, winSize.y - 10), ImGuiCond_Always);
         ImGui::Begin("Widgets", &visible, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
-        ImGui::PolyBezierEditor("PolyBezier1", pb1, 2.5, Blues::DeepSkyBlue);
-        ImGui::End();
-    }
+        float bounds[4];
+        bounds[0] = pb.bounds.Min.x;
+        bounds[1] = pb.bounds.Min.y;
+        bounds[2] = pb.bounds.Max.x;
+        bounds[3] = pb.bounds.Max.y;
+        ImGui::PushItemWidth(-1);
+        ImGui::DragFloat4("##Bounds",bounds);
+        ImGui::PopItemWidth();
+        pb.bounds.Min.x = bounds[0];
+        pb.bounds.Min.y = bounds[1];
+        pb.bounds.Max.x = bounds[2];
+        pb.bounds.Max.y = bounds[3];
 
+
+        ImGui::PolyBezierEdit("PolyBezier1", &pb, 10, 10, ImVec2(-1,150));
+        ImGui::End();
+
+        if (Input::getKeyDown(Key::Space)) {
+            ImVec2 pos0, cp0, cp1, pos1;
+            pb.getBezier(1,&pos0,&cp0,&cp1,&pos1);
+            print(pos0.x, pos0.y);
+            print(cp0.x, cp0.y);
+            print(cp1.x, cp1.y);
+            print(pos1.x, pos1.y);
+        }
+    }
 
     bool visible;
 };
