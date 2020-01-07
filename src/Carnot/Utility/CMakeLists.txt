@@ -3,5 +3,6 @@ target_sources(carnot
         Cacheable.cpp
         Print.cpp
         Random.cpp
+        Range.cpp
         Util.cpp
 )

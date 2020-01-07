@@ -201,7 +201,9 @@ void Engine::init(unsigned int width, unsigned int height, unsigned int style, c
     g_views[0].setCenter(g_views[0].getCenter() / g_dpiFactor);
     g_views[0].setSize(g_views[0].getSize() / g_dpiFactor);
     // initialize imgui
-    ImGui::SFML::Init(*window, g_dpiFactor);
+    ImGui::SFML::Init(*window, true);
+    ImGui::GetIO().DisplayFramebufferScale = ImVec2(g_dpiFactor,g_dpiFactor);
+
     ImGuiIO& io = ImGui::GetIO();
     io.Fonts->Clear();
     unsigned char* fontCopy1 = new unsigned char[RobotoMono_Bold_ttf_len];
@@ -349,7 +351,9 @@ void Engine::renderThread() {
         // print(windowSize);
         g_views[0].setSize(windowSize.x / g_dpiFactor, windowSize.y / g_dpiFactor);
         // upate imgui
-        ImGui::SFML::Update(*window, *window, windowSize, deltaTime);
+        // ImGui::SFML::Update(*window, *window, windowSize, deltaTime);
+        ImGui::SFML::Update(*window, deltaTime);
+
         // game update
         if (Debug::detail::proceed()) {
             // update continous time
