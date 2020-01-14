@@ -69,6 +69,12 @@ static Handle<GameObject> getRoot();
 // GLOBAL RESOURCES
 //=============================================================================
 
+static Signal<void(const std::string&, const Vector2u&)> onFileDrop;
+
+//=============================================================================
+// GLOBAL RESOURCES
+//=============================================================================
+
 static Ptr<RenderWindow> window;  ///< Engine render window
 
 static ResourceManager<Texture>     textures; ///< 2D textures

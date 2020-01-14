@@ -107,26 +107,18 @@ LRESULT CALLBACK fileDropCallback(HWND handle, UINT message, WPARAM wParam, LPAR
         POINT p;
         p.x = 0;
         p.y = 0;
-        if(DragQueryPoint(hdrop, &p))
-            std::printf("Point is %d, %d\n", p.x, p.y);
-        else
-            std::cout << "Failed to get point" << std::endl;
-
+        DragQueryPoint(hdrop, &p);
         const UINT filescount = DragQueryFile(hdrop, 0xFFFFFFFF, NULL, 0);
         for(UINT i = 0; i < filescount; ++i)
         {
             const UINT bufsize = DragQueryFile(hdrop, i, NULL, 0);
             std::string str;
-            str.resize(bufsize + 1);
-            if(DragQueryFile(hdrop, i, (&str[0]), bufsize + 1))
-            {
-
-                std::cout << str << std::endl;
-            }
+            str.resize(bufsize);
+            if(DragQueryFile(hdrop, i, (&str[0]), bufsize + 1))            
+                Engine::onFileDrop.emit(str, Vector2u(p.x,p.y));
         }
         DragFinish(hdrop);
-        std::cout << "-------------" << std::endl;
-    }//if WM_DROPFILES
+    } //if WM_DROPFILES
     return CallWindowProcW(reinterpret_cast<WNDPROC>(g_originalSfmlCallback), handle, message, wParam, lParam);
 }
 
@@ -164,6 +156,8 @@ ResourceManager<Texture>     Engine::textures = ResourceManager<Texture>();
 ResourceManager<Font>        Engine::fonts    = ResourceManager<Font>();
 // ResourceManager<SoundBuffer> Engine::sounds   = ResourceManager<SoundBuffer>();
 ResourceManager<Shader>      Engine::shaders  = ResourceManager<Shader>();
+
+Signal<void(const std::string&, const Vector2u&)> Engine::onFileDrop;
 
 void Engine::init(const std::string& title) {
     init(sf::VideoMode::getDesktopMode().width, sf::VideoMode::getDesktopMode().height, WindowStyle::Fullscreen, title);
