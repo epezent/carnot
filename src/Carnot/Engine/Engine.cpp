@@ -208,6 +208,7 @@ void Engine::init(unsigned int width, unsigned int height, unsigned int style, c
     icons_config.MergeMode = true;
     icons_config.PixelSnapH = true;
     icons_config.GlyphMinAdvanceX = 14.0f;
+    icons_config.GlyphOffset = ImVec2(0,1);
 
     // merge in icons from font awesome 5
     static const ImWchar fa_ranges[] = { ICON_MIN_FA, ICON_MAX_FA, 0 };
@@ -230,7 +231,7 @@ void Engine::init(unsigned int width, unsigned int height, unsigned int style, c
 
     // Main
     imStyle->WindowPadding    = ImVec2(8,8);
-    imStyle->FramePadding     = ImVec2(3,3);
+    imStyle->FramePadding     = ImVec2(2,2);
     imStyle->ItemSpacing      = ImVec2(4,4);
     imStyle->ItemInnerSpacing = ImVec2(4,4);
     imStyle->IndentSpacing    = 20.0f;
