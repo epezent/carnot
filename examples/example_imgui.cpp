@@ -6,10 +6,6 @@ using namespace carnot;
 class MyGameObject : public GameObject {
 public:
 
-    void start() {
-        ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-    }
-
     void update() {
         ImGui::ShowDemoWindow(&window_open);
     }

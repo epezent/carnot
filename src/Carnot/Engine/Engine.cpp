@@ -199,6 +199,8 @@ void Engine::init(unsigned int width, unsigned int height, unsigned int style, c
     ImGui::GetIO().DisplayFramebufferScale = ImVec2(g_dpiFactor,g_dpiFactor);
 
     ImGuiIO& io = ImGui::GetIO();
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+
     io.Fonts->Clear();
     unsigned char* fontCopy1 = new unsigned char[RobotoMono_Bold_ttf_len];
     std::memcpy(fontCopy1, &RobotoMono_Bold_ttf, RobotoMono_Bold_ttf_len);
