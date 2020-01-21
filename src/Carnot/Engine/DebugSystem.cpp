@@ -45,6 +45,7 @@ namespace {
     bool g_paused;
     bool g_advance;
     bool g_panTool;
+    bool g_functionKeysEnabled;
 
     Ptr<Text> g_text;
 
@@ -52,7 +53,7 @@ namespace {
     std::vector<Vertex> g_lines;
     std::vector<std::tuple<std::string, Vector2f, Color>> g_texts;
 
-    struct DebugInfo {
+    struct DebugInfoInternal {
         float       elapsedTime = 0.0f;
         std::size_t frames = 0;
         std::size_t fpsDisplay = 0;
@@ -63,7 +64,7 @@ namespace {
         std::size_t ramDisplay = 0;
     };
 
-    DebugInfo g_info;
+    DebugInfoInternal g_info;
 
     float g_windowDistance;
 
@@ -81,6 +82,18 @@ void show(bool _show) {
 
 bool isShown() {
     return g_show;
+}
+
+void setFunctionKeysEnabled(bool enabled) {
+    g_functionKeysEnabled = enabled;
+}
+
+DebugInfo getInfo() {
+    DebugInfo info;
+    info.fps = (float)g_info.fpsDisplay;
+    info.cpu = (float)g_info.cpuDisplay;
+    info.ram = (float)g_info.ramDisplay;
+    return info;
 }
 
 void addGizmo(const std::string& name, const Color& color) {
@@ -392,8 +405,9 @@ void init()
     g_show = false;
     g_paused = false;
     g_advance = false;
-    g_info = DebugInfo();
+    g_info = DebugInfoInternal();
     g_panTool = false;
+    g_functionKeysEnabled = true;
 
     g_gizmoIds.clear();
     g_gizmoNames.clear();
@@ -425,20 +439,22 @@ void shutdown() {
 
 void update() {
     // check for user input
-    if (Input::getKeyDown(Key::F1))
-        g_show = !g_show;
-    if (Input::getKeyDown(Key::F2))
-        g_paused = !g_paused;
-    if (Input::getKeyDown(Key::F3)) {
-        if (!g_paused)
+    if (g_functionKeysEnabled) {
+        if (Input::getKeyDown(Key::F1))
+            g_show = !g_show;
+        if (Input::getKeyDown(Key::F2))
             g_paused = !g_paused;
-        else
-            g_advance = true;
+        if (Input::getKeyDown(Key::F3)) {
+            if (!g_paused)
+                g_paused = !g_paused;
+            else
+                g_advance = true;
+        }
+        if (Input::getKeyDown(Key::F4))
+            Engine::stop();
+        if (Input::getKeyDown(Key::F5))
+            g_panTool = !g_panTool;
     }
-    if (Input::getKeyDown(Key::F4))
-        Engine::stop();
-    if (Input::getKeyDown(Key::F5))
-        g_panTool = !g_panTool;
     // pan tool
     if (g_panTool) {
         float scroll = Input::getScroll();

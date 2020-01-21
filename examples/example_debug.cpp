@@ -19,6 +19,7 @@ int main(int argc, char const *argv[])
 {
     Engine::init(500,500);
     Engine::getView(0).setCenter(0,0);
+    Debug::setFunctionKeysEnabled(false);
     Engine::makeRoot<DebugTester>();
     Debug::show(true);
     Engine::run();

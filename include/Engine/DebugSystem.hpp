@@ -6,11 +6,23 @@
 namespace carnot {
 namespace Debug {
 
+struct DebugInfo {
+    float fps;
+    float cpu;
+    float ram;
+};
+
 /// Shows/hides debug info and Gizmos
 void show(bool show);
 
 /// Returns true if the debug info is shown
 bool isShown();
+
+/// Enables/Disables F Keys
+void setFunctionKeysEnabled(bool enabled);
+
+/// Get FPS, CPU, and RAM usage (updated every second)
+DebugInfo getInfo();
 
 /// Adds a new Gizmo option and associated color
 void addGizmo(const std::string& name, const Color& color);
