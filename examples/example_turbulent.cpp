@@ -1,7 +1,6 @@
-#include <Engine/Object.hpp>
-#include <Engine/Engine.hpp>
-#include <Engine/XboxController.hpp>
-#include <Graphics.hpp>
+#define CARNOT_USE_DISCRETE_GPU
+
+#include <carnot>
 #include <chipmunk.h>
 
 using namespace carnot;
@@ -10,13 +9,13 @@ using namespace carnot;
 // WORLD
 //=============================================================================
 
-#define WORLD_WIDTH  1800
-#define WORLD_HEIGHT 1000
+#define WORLD_WIDTH  1920
+#define WORLD_HEIGHT 1080
 
-class World : public Object {
+class World : public GameObject {
 public:
     // Constructor
-    World(Engine& engine) : Object(engine),  m_dt(1.0f/60.0f) {
+    World() : GameObject("world"),  m_dt(1.0f/60.0f) {
         m_space = cpSpaceNew();
         cpSpaceSetIterations(m_space, 10);
         cpSpaceSetSleepTimeThreshold(m_space, 0.5f);
@@ -58,17 +57,17 @@ private:
 // PHYSICS OBJECT
 //=============================================================================
 
-class PhysicsObject : public Object {
+class PhysicsObject : public GameObject {
 public:
 
     // Constructor
-    PhysicsObject(Handle<World> world, const Shape& shape, Color color) :
+    PhysicsObject(Handle<World> world, Ptr<Shape> shape, Color color) :
         m_world(world),
-        m_gfx(shape),
         m_shape(nullptr),
         m_body(nullptr)
     {
-        m_gfx.setColor(color);
+        m_gfx = addComponent<ShapeRenderer>(shape);
+        m_gfx->setColor(color);
     }
 
     // Destructor
@@ -84,24 +83,24 @@ public:
         auto position = cpBodyGetPosition(m_body);
         auto angle = cpBodyGetAngle(m_body);
         transform.setPosition(position.x, position.y);
-        transform.setRotation(angle * RAD2DEG);
+        transform.setRotation(angle * Math::RAD2DEG);
     }
 
     // Draw
-    void draw(sf::RenderTarget& target, sf::RenderStates states) const override {
-        target.draw(m_gfx, states);
-    }
+    // void draw(sf::RenderTarget& target, sf::RenderStates states) const override {
+    //     target.draw(m_gfx, states);
+    // }
 
     // Reposition
     virtual void reposition(float x, float y, float angle) = 0;
 
     void setColor(const Color& color) {
-        m_gfx.setColor(color);
+        m_gfx->setColor(color);
     }
 
 protected:
     Handle<World> m_world;
-    Shape m_gfx;
+    Handle<ShapeRenderer> m_gfx;
     cpShape* m_shape;
     cpBody* m_body;
 };
@@ -113,11 +112,11 @@ protected:
 class Obstacle : public PhysicsObject {
 public:
     // Constructor
-    Obstacle(Handle<World> world, RectangleShape shape, Color color) :
-        PhysicsObject(world, static_cast<Shape>(shape), color)
+    Obstacle(Handle<World> world, Ptr<RectangleShape> shape, Color color) :
+        PhysicsObject(world, shape, color)
     {
         m_body = cpSpaceAddBody(m_world->space(), cpBodyNewStatic());
-        m_shape = cpBoxShapeNew(m_body, shape.getWidth(), shape.getHeight(), 1.0);
+        m_shape = cpBoxShapeNew(m_body, shape->getWidth(), shape->getHeight(), 1.0);
         cpSpaceAddShape(m_world->space(), m_shape);
         cpShapeSetElasticity(m_shape, 0.0f);
         cpShapeSetFriction(m_shape, 0.0f);
@@ -127,7 +126,7 @@ public:
     // Reposition
     void reposition(float x, float y, float angle) override {
         cpBodySetPosition(m_body, cpv(x,y));
-        cpBodySetAngle(m_body, angle * DEG2RAD);
+        cpBodySetAngle(m_body, angle * Math::DEG2RAD);
         cpSpaceReindexShape(m_world->space(), m_shape);
     }
 };
@@ -140,12 +139,12 @@ class Particle : public PhysicsObject {
 public:
 
     // Constructor from RectangleShape
-    Particle(Handle<World> world, RectangleShape shape, float mass, float elasticity, float friction, Color color) :
-        PhysicsObject(world, static_cast<Shape>(shape), color)
+    Particle(Handle<World> world, Ptr<RectangleShape> shape, float mass, float elasticity, float friction, Color color) :
+        PhysicsObject(world, shape, color)
     {
-        auto moment = cpMomentForBox(mass, shape.getWidth(), shape.getHeight());
+        auto moment = cpMomentForBox(mass, shape->getWidth(), shape->getHeight());
         m_body = cpSpaceAddBody(m_world->space(), cpBodyNew(mass, moment));
-        m_shape = cpBoxShapeNew(m_body, shape.getWidth(), shape.getHeight(), 0.5f);
+        m_shape = cpBoxShapeNew(m_body, shape->getWidth(), shape->getHeight(), 0.5f);
         cpSpaceAddShape(m_world->space(), m_shape);
         cpShapeSetElasticity(m_shape, elasticity);
         cpShapeSetFriction(m_shape, friction);
@@ -153,12 +152,12 @@ public:
     }
 
     // Constructor from CircleShape
-    Particle(Handle<World> world, CircleShape shape, float mass, float elasticity, float friction, Color color) :
-        PhysicsObject(world, static_cast<Shape>(shape), color)
+    Particle(Handle<World> world, Ptr<CircleShape> shape, float mass, float elasticity, float friction, Color color) :
+        PhysicsObject(world, shape, color)
     {
-        auto moment = cpMomentForCircle(mass, 0.0f, shape.getCircleRadius(), cpv(0,0));
+        auto moment = cpMomentForCircle(mass, 0.0f, shape->getCircleRadius(), cpv(0,0));
         m_body = cpSpaceAddBody(m_world->space(), cpBodyNew(mass, moment));
-        m_shape = cpCircleShapeNew(m_body, shape.getCircleRadius(), cpv(0,0));
+        m_shape = cpCircleShapeNew(m_body, shape->getCircleRadius(), cpv(0,0));
         cpSpaceAddShape(m_world->space(), m_shape);
         cpShapeSetElasticity(m_shape, elasticity);
         cpShapeSetFriction(m_shape, friction);
@@ -168,7 +167,7 @@ public:
     // Reposition
     void reposition(float x, float y, float angle) override {
         cpBodySetPosition(m_body, cpv(x,y));
-        cpBodySetAngle(m_body, angle * DEG2RAD);
+        cpBodySetAngle(m_body, angle * Math::DEG2RAD);
     }
 
     Vector2f getPhysicsPosition() {
@@ -185,14 +184,14 @@ public:
     // Push Particle to Point
     void pushToPoint(Vector2f point, float force) {
         auto pos = cpBodyGetPosition(m_body);
-        Vector2f v = unit(Vector2f(point.x - pos.x, point.y - pos.y));
+        Vector2f v = Math::unit(Vector2f(point.x - pos.x, point.y - pos.y));
         cpBodyApplyForceAtWorldPoint(m_body, cpv(v.x*force,v.y*force), cpv(pos.x,pos.y));
     }
 
     void torqueAboutPoint(Vector2f point, float force) {
         auto pos = cpBodyGetPosition(m_body);
-        Vector2f v = unit(Vector2f(point.x - pos.x, point.y - pos.y));
-        Vector2f n = normal(v);
+        Vector2f v = Math::unit(Vector2f(point.x - pos.x, point.y - pos.y));
+        Vector2f n = Math::normal(v);
         cpBodyApplyForceAtWorldPoint(m_body, cpv(n.x*force,n.y*force), cpv(pos.x,pos.y));
     }
 
@@ -210,7 +209,7 @@ public:
 
 class Scoreboard;
 
-class Swarm : public Object {
+class Swarm : public GameObject {
 public:
     Swarm(Handle<World> world, int ctrl, Color color, std::size_t particleCount) :
         m_world(world),
@@ -220,12 +219,12 @@ public:
         m_boostLossRate(0.5f),
         m_boostGainRate(0.1f)
     {
-        RectangleShape shape(20,20);
-        shape.setRadii(5.0f, 5);
+        Ptr<RectangleShape> shape = make<RectangleShape>(10,10);
+        // shape->setRadii(5.0f, 5);
         // CircleShape shape(10);
         for (std::size_t i = 0; i < m_particleCount; ++i) {
             auto particle = makeChild<Particle>(world, shape, 1.0f, 0.5f, 0.5f, color);
-            particle->reposition(random(0, WORLD_WIDTH), random(0, WORLD_HEIGHT), random(0.0f, 90.0f));
+            particle->reposition(Random::range(0, WORLD_WIDTH), Random::range(0, WORLD_HEIGHT), Random::range(0.0f, 90.0f));
             m_particles.push_back(particle);
         }
 
@@ -238,7 +237,7 @@ public:
             print("Xbox Controller Not Connected!");
 
         RGB rgb{color.r,color.g,color.b,color.a};
-        m_color = rgbToHsv(rgb);
+        m_color = toHsv(rgb);
     }
 
     void update() override {
@@ -260,14 +259,16 @@ public:
             // spin += 4000.0f * m_boost;
             pull += pull * 2.0f * m_boost;
         }
-        m_boost = clamp01(m_boost);
+        m_boost = Math::clamp01(m_boost);
 
         updateColor();
 
-        for (auto& particle : m_particles) {
-            particle->applyForceToCenter(fx, fy);
-            particle->pushToPoint(m_mean, pull);
-            particle->torqueAboutPoint(m_mean, spin);
+        if (m_xbox.isConnected()) {
+            for (auto& particle : m_particles) {
+                particle->applyForceToCenter(fx, fy);
+                particle->pushToPoint(m_mean, pull);
+                particle->torqueAboutPoint(m_mean, spin);
+            }
         }
     }
 
@@ -281,9 +282,9 @@ public:
             xs.push_back(particlePosition.x);
             ys.push_back(particlePosition.y);
         }
-        m_stddev.x = stddev(xs, m_mean.x);
-        m_stddev.y = stddev(ys, m_mean.y);
-        m_packingFactor = clamp01(interp(magnitude(m_stddev), 100.0f, 2000.0f, 1.0f, 0.0f));
+        m_stddev.x = Math::stddev(xs, m_mean.x);
+        m_stddev.y = Math::stddev(ys, m_mean.y);
+        m_packingFactor = Math::clamp01(Math::interp(Math::magnitude(m_stddev), 100.0f, 2000.0f, 1.0f, 0.0f));
 
         float Ix  = 0.0f;
         float Iy  = 0.0f;
@@ -300,19 +301,19 @@ public:
         float R = std::sqrt(((Ix - Iy) * 0.5f)*((Ix - Iy) * 0.5f) + Ixy*Ixy);
         float L1 = Iavg + R;
         float L2 = Iavg - R;
-        m_v1 = unit(Vector2f(-Ixy, -Ix + L1));
-        m_v2 = unit(Vector2f(Iy - L2, Ixy));
+        m_v1 = Math::unit(Vector2f(-Ixy, -Ix + L1));
+        m_v2 = Math::unit(Vector2f(Iy - L2, Ixy));
     }
 
     // update Color
     void updateColor() {
-        m_color.s = interp(m_boost, 0.0f, 1.0f, 0.5f, 1.0f);
-        auto color = hsvToRgb(m_color);
+        m_color.s = Math::interp(m_boost, 0.0f, 1.0f, 0.5f, 1.0f);
+        auto color = toRgb(m_color);
         for (auto& particle : m_particles)
             particle->setColor(Color(color.r,color.g,color.b,color.a));
     }
 
-    void draw(sf::RenderTarget& target, sf::RenderStates states) const override {
+    // void draw(sf::RenderTarget& target, sf::RenderStates states) const override {
         // Stroke stroke1(2);
         // stroke1.setPoint(0, m_mean - m_v1 * 1000.0f);
         // stroke1.setPoint(1, m_mean + m_v1 * 1000.0f);
@@ -327,7 +328,7 @@ public:
 
         // target.draw(stroke1, states);
         // target.draw(stroke2, states);
-    }
+    // }
 
 private:
 
@@ -351,13 +352,13 @@ private:
 // BOUNDARY
 //=============================================================================
 
-class Boundary : public Object {
+class Boundary : public GameObject {
 public:
 
     Boundary(Handle<World> world, float width, float height, float wallThickness) {
-        RectangleShape vert(wallThickness, WORLD_HEIGHT + 2 * wallThickness);
-        RectangleShape horz(WORLD_WIDTH + 2 * wallThickness, wallThickness);
-
+        Ptr<RectangleShape> vert = make<RectangleShape>(wallThickness, WORLD_HEIGHT + 2 * wallThickness);
+        Ptr<RectangleShape> horz = make<RectangleShape>(WORLD_WIDTH + 2 * wallThickness, wallThickness);
+    
         m_left = makeChild<Obstacle>(world, vert, Whites::White);
         m_left->reposition(-wallThickness/2, WORLD_HEIGHT/2, 0);
         m_right = makeChild<Obstacle>(world, vert, Whites::White);
@@ -401,9 +402,9 @@ public:
         m_text.setString(s);
     }
 
-    void draw(sf::RenderTarget& target, sf::RenderStates states) const override {
-        target.draw(m_text, states);
-    }
+    // void draw(sf::RenderTarget& target, sf::RenderStates states) const override {
+    //     target.draw(m_text, states);
+    // }
 
 private:
     Font m_font;
@@ -419,25 +420,24 @@ private:
 
 int main()
 {
-    Engine engine(WORLD_WIDTH, WORLD_HEIGHT);
-    engine.window.setTitle("Physics Demo");
-    engine.setLayerCount(2);
+    Engine::init("Turbulent");
+    Engine::setLayerCount(2);
 
     // make world
-    auto world = engine.makeRoot<World>();
+    auto world = Engine::makeRoot<World>();
     world->enableGravity(false);
     // make boundary
     world->makeChild<Boundary>(world, WORLD_WIDTH, WORLD_HEIGHT, 500);
     // make swarms
     auto swarm1 = world->makeChild<Swarm>(world, 0, Blues::DeepSkyBlue, 400);
-    // auto swarm2 = world->makeChild<Swarm>(world, 1, Color(255,48,48), 400);
+    auto swarm2 = world->makeChild<Swarm>(world, 1, Color(255,48,48), 400);
 
-    //world->makeChild<Particle>(world, CircleShape(25.0f), 5.0f, 0.0f, 1.0f, Whites::White)->reposition(WORLD_WIDTH/2,WORLD_HEIGHT/2,0);
-    world->makeChild<Particle>(world, CircleShape(25), 5.0f, 0.0f, 5.0f, Whites::White)->reposition(WORLD_WIDTH/2,WORLD_HEIGHT/2,0);
+    // world->makeChild<Particle>(world, make<CircleShape>(25.0f), 5.0f, 0.0f, 1.0f, Whites::White)->reposition(WORLD_WIDTH/2,WORLD_HEIGHT/2,0);
+    world->makeChild<Particle>(world, make<CircleShape>(25), 5.0f, 0.0f, 5.0f, Whites::White)->reposition(WORLD_WIDTH/2,WORLD_HEIGHT/2,0);
     // world->makeChild<Scoreboard>(swarm1, swarm2);
 
     // Run game
-    engine.run();
+    Engine::run();
     return 0;
 }
 

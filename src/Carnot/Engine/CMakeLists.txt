@@ -7,7 +7,7 @@ target_sources(carnot
 		Id.cpp
 		Object.cpp
 		ProcessInfo.cpp
-		# XboxController.cpp
+		XboxController.cpp
 		InputSystem.cpp
 		DebugSystem.cpp
 )
